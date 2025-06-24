@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
+import 'package:caretime/screens/login_screen.dart';
+import 'package:caretime/screens/register_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -84,30 +86,6 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Se connecter')),
-      body: const Center(child: Text('Écran de connexion')),
-    );
-  }
-}
-
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("S'inscrire")),
-      body: const Center(child: Text("Écran d'inscription")),
     );
   }
 }
