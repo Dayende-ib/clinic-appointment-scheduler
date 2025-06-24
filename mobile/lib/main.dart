@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caretime/app_colors.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Caretime - Your Clinic Appointment Scheduler',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 58, 183, 162),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
       home: const WelcomeScreen(),
     );
@@ -34,7 +33,6 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset('images/caretime_2x1.png'),
-              const SizedBox(height: 16),
               const Text(
                 'Your health, our priority',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -59,9 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                     );
                   },
                   style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(
-                      const Color.fromARGB(255, 58, 183, 162),
-                    ),
+                    backgroundColor: WidgetStateProperty.all(AppColors.primary),
                   ),
                   child: const Text(
                     'Se connecter',
