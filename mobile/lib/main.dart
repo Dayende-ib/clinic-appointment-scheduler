@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Caretime - Your Clinic Appointment Scheduler',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 58, 183, 162),
@@ -33,14 +33,16 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset('images/caretime_2x1.png'),
+              const SizedBox(height: 16),
               const Text(
-                'Bienvenue sur le gestionnaire de rendez-vous !',
+                'Your health, our priority',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               const Text(
-                'Connectez-vous ou inscrivez-vous pour commencer à gérer vos rendez-vous.',
+                "The app that's revolutionizing medical appointment scheduling. Simple, fast and secure for patients and healthcare professionals.",
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
@@ -56,7 +58,15 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text('Se connecter'),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(
+                      const Color.fromARGB(255, 58, 183, 162),
+                    ),
+                  ),
+                  child: const Text(
+                    'Se connecter',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
