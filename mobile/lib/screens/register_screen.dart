@@ -1,5 +1,6 @@
 import 'package:caretime/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import '../app_strings.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,15 +25,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isDoctor = false;
   DateTime? _selectedDate;
 
-  final List<String> _genders = ['Homme', 'Femme', 'Autre'];
+  // Only English
+  final List<String> _genders = ['Male', 'Female', 'Other'];
   final List<String> _specialties = [
-    'Cardiologie',
-    'Dermatologie',
-    'Gynécologie',
-    'Pédiatrie',
-    'Ophtalmologie',
-    'Généraliste',
-    'Autre',
+    'Cardiology',
+    'Dermatology',
+    'Gynecology',
+    'Pediatrics',
+    'Ophthalmology',
+    'General practitioner',
+    'Other',
   ];
   String? _selectedGender;
   String? _selectedSpecialty;
@@ -129,66 +131,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         Text(
-                          'Créer un compte',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                          AppStrings.enRegisterScreenTitle,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _lastnameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Nom',
-                            prefixIcon: Icon(Icons.person_outline),
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: 'Last name',
+                            prefixIcon: const Icon(Icons.person_outline),
+                            border: const OutlineInputBorder(),
                           ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Champ requis'
+                                      ? 'Required field'
                                       : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _firstnameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Prénom',
-                            prefixIcon: Icon(Icons.person),
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: 'First name',
+                            prefixIcon: const Icon(Icons.person),
+                            border: const OutlineInputBorder(),
                           ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Champ requis'
+                                      ? 'Required field'
                                       : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Champ requis'
+                                      ? 'Required field'
                                       : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Mot de passe',
-                            prefixIcon: Icon(Icons.lock_outline),
-                            border: OutlineInputBorder(),
-                          ),
                           obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            border: const OutlineInputBorder(),
+                          ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Champ requis'
+                                      ? 'Required field'
                                       : null,
                         ),
                         const SizedBox(height: 16),
@@ -198,7 +199,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: TextFormField(
                                 controller: _dateOfBirthController,
                                 decoration: const InputDecoration(
-                                  labelText: 'Date de naissance',
+                                  labelText: 'Date of birth',
                                   prefixIcon: Icon(Icons.cake_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -211,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: DropdownButtonFormField<String>(
                                 value: _selectedGender,
                                 decoration: const InputDecoration(
-                                  labelText: 'Genre',
+                                  labelText: 'Gender',
                                   prefixIcon: Icon(Icons.wc_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -233,7 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 validator:
                                     (value) =>
                                         value == null || value.isEmpty
-                                            ? 'Champ requis'
+                                            ? 'Required field'
                                             : null,
                               ),
                             ),
@@ -243,16 +244,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         TextFormField(
                           controller: _countryController,
                           decoration: const InputDecoration(
-                            labelText: 'Pays',
+                            labelText: 'Country',
                             prefixIcon: Icon(Icons.flag_outlined),
                             border: OutlineInputBorder(),
                           ),
                         ),
                         const SizedBox(height: 24),
                         CheckboxListTile(
-                          title: const Text(
-                            'Je souhaite m’inscrire en tant que docteur',
-                          ),
+                          title: const Text('I want to register as a doctor'),
                           value: _isDoctor,
                           onChanged: (val) {
                             setState(() {
@@ -266,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           DropdownButtonFormField<String>(
                             value: _selectedSpecialty,
                             decoration: const InputDecoration(
-                              labelText: 'Spécialité',
+                              labelText: 'Specialty',
                               prefixIcon: Icon(Icons.medical_services_outlined),
                               border: OutlineInputBorder(),
                             ),
@@ -288,14 +287,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             validator:
                                 (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Champ requis'
+                                        ? 'Required field'
                                         : null,
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _licenseNumberController,
                             decoration: const InputDecoration(
-                              labelText: 'Numéro de licence',
+                              labelText: 'License number',
                               prefixIcon: Icon(
                                 Icons.confirmation_number_outlined,
                               ),
@@ -321,7 +320,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                             onPressed: _register,
-                            child: const Text("S'inscrire"),
+                            child: Text(AppStrings.enRegister),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -334,7 +333,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             );
                           },
-                          child: const Text('Déjà un compte ? Se connecter'),
+                          child: const Text('Already have an account? Login'),
                         ),
                       ],
                     ),
