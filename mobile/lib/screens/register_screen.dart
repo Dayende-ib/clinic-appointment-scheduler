@@ -1,4 +1,4 @@
-import 'package:caretime/screens/login_screen.dart';
+//import 'package:caretime/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import '../app_strings.dart';
 
@@ -326,12 +326,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 12),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => const LoginScreen(),
+                            //   ),
+                            // );
                           },
                           child: const Text('Already have an account? Login'),
                         ),
