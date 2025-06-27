@@ -59,9 +59,67 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     );
   }
 
+  PreferredSizeWidget _buildAppBar() {
+    final today = DateFormat.yMMMMd('en_US').format(DateTime.now());
+    String title;
+    String? subtitle;
+    if (_selectedIndex == 0) {
+      title = "Welcome Doctor 👨‍⚕️";
+      subtitle = "Today is $today";
+    } else if (_selectedIndex == 1) {
+      title = "Appointments";
+      subtitle = null;
+    } else if (_selectedIndex == 2) {
+      title = "Availability";
+      subtitle = null;
+    } else if (_selectedIndex == 3) {
+      title = "Profile";
+      subtitle = null;
+    } else {
+      title = "";
+      subtitle = null;
+    }
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      elevation: 0,
+      centerTitle: false,
+      title:
+          subtitle == null
+              ? Text(title, style: Theme.of(context).textTheme.headlineSmall)
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_none, color: Color(0xFF0891B2)),
+          onPressed: showNotificationsSheet,
+        ),
+        IconButton(
+          icon: const Icon(Icons.person_outline, color: Color(0xFF0891B2)),
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final today = DateFormat.yMMMMd('fr_FR').format(DateTime.now());
+    DateFormat.yMMMMd('en_US').format(DateTime.now());
     final appointments = [
       {'patient': 'Karim Sanou', 'time': '09:00'},
       {'patient': 'Fatou Ouédraogo', 'time': '11:00'},
@@ -81,47 +139,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-        centerTitle: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Bonjour Docteur 👨‍⚕️",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              "Nous sommes le $today",
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
-              color: Color(0xFF0891B2),
-            ),
-            onPressed: showNotificationsSheet,
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline, color: Color(0xFF0891B2)),
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                ),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

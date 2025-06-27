@@ -101,13 +101,13 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                           final status = rdv['status'] as String;
                           Color statusColor;
                           switch (status) {
-                            case 'À venir':
+                            case 'Upcoming':
                               statusColor = Colors.teal;
                               break;
-                            case 'Terminé':
+                            case 'Completed':
                               statusColor = Colors.green;
                               break;
-                            case 'Annulé':
+                            case 'Cancelled':
                               statusColor = Colors.red;
                               break;
                             default:
@@ -128,7 +128,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               subtitle: Text(
-                                '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}',
+                                '${DateFormat('EEEE d MMMM', 'en_US').format(date)} at ${DateFormat('HH:mm').format(date)}',
                               ),
                               trailing: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -140,10 +140,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  if (status == 'À venir')
+                                  if (status == 'To come up')
                                     TextButton(
                                       onPressed: () {},
-                                      child: const Text('Voir fiche'),
+                                      child: const Text('Show Details'),
                                     ),
                                 ],
                               ),

@@ -49,13 +49,15 @@ class HomeDoctorScreen extends StatelessWidget {
           ),
           if (showSeeMore)
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => onQuickAction(1),
                 child: const Text('See more'),
               ),
             ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 5),
+          Divider(thickness: 1.0),
+          const SizedBox(height: 10),
           Text(
             "Today's statistics",
             style: GoogleFonts.poppins(
@@ -65,8 +67,9 @@ class HomeDoctorScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _StatsCard(totalRdv: appointments.length),
-          const SizedBox(height: 24),
-          // Nouvelle carte : Planning hebdomadaire compact
+          const SizedBox(height: 12),
+          Divider(thickness: 1.0),
+          const SizedBox(height: 12),
           Text(
             "🗓️ Weekly planning",
             style: GoogleFonts.poppins(
@@ -76,8 +79,9 @@ class HomeDoctorScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _WeeklyPlanningCard(appointments: appointments),
-          const SizedBox(height: 24),
-          // Nouvelle carte : Derniers patients consultés (2 derniers)
+          const SizedBox(height: 12),
+          Divider(thickness: 1.0),
+          const SizedBox(height: 12),
           Text(
             "👤 Last consulted patients",
             style: GoogleFonts.poppins(
@@ -164,7 +168,7 @@ class _StatsCard extends StatelessWidget {
             Icon(Icons.schedule, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 12),
             Text(
-              '$totalRdv rendez-vous aujourd\'hui',
+              '$totalRdv appointments today',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
@@ -220,7 +224,7 @@ class _LastPatientCard extends StatelessWidget {
         leading: const Icon(Icons.person, color: Colors.teal),
         title: Text(patient, style: Theme.of(context).textTheme.bodyLarge),
         subtitle: Text(
-          "Vu à $time",
+          "See at $time",
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         trailing: TextButton(
