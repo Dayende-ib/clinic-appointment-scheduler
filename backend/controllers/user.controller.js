@@ -34,7 +34,10 @@ exports.register = async (req, res) => {
       licenseNumber
     });
 
-    res.status(201).json({ message: "Utilisateur enregistré" });
+    res.status(201).json({
+  message: "Utilisateur enregistré",
+  user: newUser
+});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
