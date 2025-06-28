@@ -5,6 +5,7 @@ import 'package:caretime/app_strings.dart';
 // import 'package:caretime/screens/login_screen.dart';
 import 'package:caretime/screens/register_screen.dart';
 import 'package:caretime/screens/doctor/doctor_home.dart';
+import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -91,6 +92,25 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                   child: Text(
                     AppStrings.enDoctorSpace,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: AppColors.primary),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminDashboardScreen(),
+                        ),
+                      ),
+                  child: Text(
+                    'Espace Admin',
                     style: Theme.of(
                       context,
                     ).textTheme.labelLarge?.copyWith(color: AppColors.primary),
