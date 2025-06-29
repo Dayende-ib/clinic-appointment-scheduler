@@ -16,7 +16,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["male", "female", "other", "prefer_not_to_say"],
     required: true
-  }
+  },
+  isActive: { type: Boolean, default: true }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
