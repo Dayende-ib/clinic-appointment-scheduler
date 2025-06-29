@@ -34,7 +34,26 @@ exports.register = async (req, res) => {
       licenseNumber
     });
 
-    res.status(201).json({ message: "Utilisateur enregistré" });
+    // Générer un token JWT
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      message: "Utilisateur enregistré",
+      token,
+      user: {
+        id: newUser._id,
+        lastname: newUser.lastname,
+        firstname: newUser.firstname,
+        email: newUser.email,
+        role: newUser.role,
+        specialty: newUser.specialty,
+        licenseNumber: newUser.licenseNumber
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -56,7 +75,18 @@ exports.login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(200).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        lastname: user.lastname,
+        firstname: user.firstname,
+        email: user.email,
+        role: user.role,
+        specialty: user.specialty,
+        licenseNumber: user.licenseNumber
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

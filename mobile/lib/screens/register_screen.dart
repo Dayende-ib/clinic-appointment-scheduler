@@ -1,6 +1,9 @@
 //import 'package:caretime/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../app_strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -69,9 +72,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  void _register() {
+  void _register() async {
     if (_formKey.currentState!.validate()) {
-      // Enregistrement fictif des données
       final userData = {
         'lastname': _lastnameController.text,
         'firstname': _firstnameController.text,
@@ -84,9 +86,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (_isDoctor) 'specialty': _specialtyController.text,
         if (_isDoctor) 'licenseNumber': _licenseNumberController.text,
       };
-      // Affichage fictif
-      print(userData);
-      Navigator.pushReplacementNamed(context, '/home');
+      final response = await http.post(
+        Uri.parse('http://localhost:5000/api/users/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(userData),
+      );
+
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final role = data['user']['role'];
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
+
+        if (role == 'doctor') {
+          Navigator.pushReplacementNamed(context, '/doctor');
+        } else {
+          Navigator.pushReplacementNamed(context, '/patient');
+        }
+      } else {
+        final msg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur : $msg')));
+      }
     }
   }
 
@@ -165,10 +193,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _emailController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            border: const OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email_outlined),
+                            border: OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator:
@@ -319,7 +347,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            onPressed: _register,
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              _register();
+                            },
                             child: Text(AppStrings.enRegister),
                           ),
                         ),
