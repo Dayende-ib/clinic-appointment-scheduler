@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:caretime/screens/welcome_screen.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:caretime/screens/login_screen.dart';
+import 'package:caretime/screens/register_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,111 +18,77 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Caretime - Your Clinic Appointment Scheduler',
       theme: ThemeData(
-        // Define the color scheme for the app
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          background: const Color(0xFFF8F9FA),
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          tertiary: AppColors.tertiary,
-          error: Colors.red,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onBackground: Colors.black87,
-          onSurface: Colors.black87,
-        ),
-        // Define the text theme using GoogleFonts.poppins
-        textTheme: TextTheme(
-          displayLarge: GoogleFonts.poppins(
-            fontSize: 57,
-            fontWeight: FontWeight.normal,
-          ),
-          displayMedium: GoogleFonts.poppins(
-            fontSize: 45,
-            fontWeight: FontWeight.normal,
-          ),
-          displaySmall: GoogleFonts.poppins(
-            fontSize: 36,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineLarge: GoogleFonts.poppins(
-            fontSize: 32,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineMedium: GoogleFonts.poppins(
-            fontSize: 28,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineSmall: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ), // Used for "Bonjour Docteur"
-          titleLarge: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0891B2),
-          ), // Used for AppBar title
-          titleMedium: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ), // Used for section titles like "Rendez-vous d’aujourd’hui"
-          titleSmall: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          bodyLarge: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-          bodyMedium: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          ), // Default body text
-          bodySmall: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-          ),
-          labelLarge: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ), // Used for button text
-          labelMedium: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-          ),
-          labelSmall: GoogleFonts.poppins(
-            fontSize: 11,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        // Define global ElevatedButton theme
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-            elevation: 2,
-            foregroundColor: Colors.white, // Text color for ElevatedButton
-          ),
-        ),
-        // Define global OutlinedButton theme
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary, width: 2),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        ),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
       ),
       home: const WelcomeScreen(),
+    );
+  }
+}
+
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('images/caretime_2x1.png'),
+              const Text(
+                'Your health, our priority',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "The app that's revolutionizing medical appointment scheduling. Simple, fast and secure for patients and healthcare professionals.",
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                  ),
+                  child: const Text(
+                    'Se connecter',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text("S'inscrire"),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
