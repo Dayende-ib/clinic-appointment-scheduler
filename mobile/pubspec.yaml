@@ -61,6 +61,7 @@ flutter:
   assets:
     - images/caretime_2x1.png
     - images/caretime_100x100_nobg.png
+    - images/Logo-caretime-removebg-preview.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
