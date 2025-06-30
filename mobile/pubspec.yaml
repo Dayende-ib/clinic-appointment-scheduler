@@ -8,12 +8,6 @@ version: 1.0.0+1
 environment:
   sdk: ^3.7.2
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
@@ -28,7 +22,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
 
@@ -37,6 +30,14 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/caretime_2x1.png
-    - images/caretime_100x100_nobg.png
-    - images/logo-caretime.png
+    - assets/images/caretime_2x1.png
+    - assets/images/caretime_100x100_nobg.png
+    - assets/images/logo-caretime.png
+
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-Regular.ttf
+        - asset: assets/fonts/NotoSans-Italic.ttf
+        - asset: assets/fonts/NotoSans-Medium.ttf
+        - asset: assets/fonts/NotoSans-Bold.ttf

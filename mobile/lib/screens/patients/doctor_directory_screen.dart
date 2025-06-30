@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'DoctorProfileScreen.dart';
+import 'doctor_profile_page.dart';
 import 'patient_dashboard_screen.dart';
-import 'AppointmentsScreen.dart';
+import 'appointments_page.dart';
 
 class DoctorsListScreen extends StatefulWidget {
   @override
@@ -83,12 +83,6 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
     return doctors
         .where((doctor) => doctor.specialty == selectedSpecialty)
         .toList();
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   void _showFilterBottomSheet() {

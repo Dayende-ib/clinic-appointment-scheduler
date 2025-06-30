@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:caretime/screens/welcome_page.dart';
 
 void main() async {
@@ -14,13 +15,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Caretime - Your Clinic Appointment Scheduler',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        fontFamily:
-            'Roboto', // Police par défaut pour éviter les erreurs de police
+        textTheme: GoogleFonts.poppinsTextTheme(textTheme),
       ),
       home: const WelcomeScreen(),
     );

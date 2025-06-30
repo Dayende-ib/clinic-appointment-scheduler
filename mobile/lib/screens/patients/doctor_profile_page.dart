@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
 import 'doctor_directory_screen.dart'; // Import pour accéder à la classe Doctor
-import 'AppointmentsScreen.dart'; // Import pour accéder à la page de rendez-vous
+import 'appointments_page.dart'; // Import pour accéder à la page de rendez-vous
 import 'doctor_profile_header.dart';
 import 'doctor_profile_calendar.dart';
 import 'doctor_profile_availability.dart';

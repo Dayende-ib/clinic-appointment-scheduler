@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -23,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
         title: Text(
           'My Profile',
-          style: GoogleFonts.poppins(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             color: const Color(0xFF0891B2),
           ),
@@ -49,15 +48,12 @@ class ProfileScreen extends StatelessWidget {
 
             Text(
               doctor['name']!,
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             Text(
               doctor['specialty']!,
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
 
             const SizedBox(height: 32),
@@ -79,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                 backgroundColor: const Color(0xFF03A6A1),
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 48),
-                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
 
@@ -96,7 +92,7 @@ class ProfileScreen extends StatelessWidget {
                 side: const BorderSide(color: Colors.redAccent),
                 foregroundColor: Colors.red,
                 minimumSize: const Size(double.infinity, 48),
-                textStyle: GoogleFonts.poppins(),
+                textStyle: const TextStyle(),
               ),
             ),
           ],
@@ -118,14 +114,11 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.poppins(
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),

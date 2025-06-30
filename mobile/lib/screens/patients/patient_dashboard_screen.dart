@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'doctor_directory_screen.dart';
-import 'AppointmentsScreen.dart';
+import 'appointments_page.dart';
 import 'doctors_list_body.dart';
 import '../profile_page.dart';
 
@@ -35,86 +34,98 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
     }
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        toolbarHeight: 80,
-        flexibleSpace: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                // Avatar circulaire
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF03A6A1),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: Color(0xFF03A6A1), width: 2),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'M',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+      appBar:
+          (_selectedIndex == 0)
+              ? PreferredSize(
+                preferredSize: Size.fromHeight(80),
+                child: AppBar(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 80,
+                  flexibleSpace: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        children: [
+                          // Avatar circulaire
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF03A6A1),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(
+                                color: Color(0xFF03A6A1),
+                                width: 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'M',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          // Texte de salutation
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Hello, Marie !',
+                                  style: TextStyle(
+                                    color: Color(0xFF1A202C),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'How are you?',
+                                  style: TextStyle(
+                                    color: Color(0xFF1A202C),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Icône de notification
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF03A6A1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.notifications_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 16),
-                // Texte de salutation
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Hello, Marie !',
-                        style: TextStyle(
-                          color: Color(0xFF1A202C),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'How are you?',
-                        style: TextStyle(
-                          color: Color(0xFF1A202C),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Icône de notification
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF03A6A1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {},
-                  ),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
-          ),
-        ),
-      ),
+              )
+              : null,
       body: body,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -155,47 +166,23 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
             elevation: 0,
             items: [
               BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.home_outlined, size: 24),
-                ),
-                activeIcon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.home, size: 24),
-                ),
+                icon: Icon(Icons.home_outlined, size: 24),
+                activeIcon: Icon(Icons.home, size: 24),
                 label: 'Accueil',
               ),
               BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.calendar_today_outlined, size: 24),
-                ),
-                activeIcon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.calendar_today, size: 24),
-                ),
+                icon: Icon(Icons.calendar_today_outlined, size: 24),
+                activeIcon: Icon(Icons.calendar_today, size: 24),
                 label: 'RDV',
               ),
               BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.medical_services_outlined, size: 24),
-                ),
-                activeIcon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.medical_services, size: 24),
-                ),
+                icon: Icon(Icons.medical_services_outlined, size: 24),
+                activeIcon: Icon(Icons.medical_services, size: 24),
                 label: 'Médecins',
               ),
               BottomNavigationBarItem(
-                icon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.person_outline, size: 24),
-                ),
-                activeIcon: Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(Icons.person, size: 24),
-                ),
+                icon: Icon(Icons.person_outline, size: 24),
+                activeIcon: Icon(Icons.person, size: 24),
                 label: 'Profil',
               ),
             ],
