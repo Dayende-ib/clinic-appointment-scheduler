@@ -51,74 +51,49 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                       ),
                       child: Row(
                         children: [
-                          // Avatar circulaire
                           Container(
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
                               color: Color(0xFF03A6A1),
                               borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                color: Color(0xFF03A6A1),
-                                width: 2,
-                              ),
                             ),
-                            child: Center(
-                              child: Text(
-                                'M',
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Welcome back!',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0891B2),
                                 ),
                               ),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          // Texte de salutation
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Hello, Marie !',
-                                  style: TextStyle(
-                                    color: Color(0xFF1A202C),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              Text(
+                                'Your health, our priority',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
                                 ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'How are you?',
-                                  style: TextStyle(
-                                    color: Color(0xFF1A202C),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Icône de notification
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF03A6A1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                                size: 20,
                               ),
-                              onPressed: () {},
-                            ),
+                            ],
                           ),
-                          SizedBox(width: 8),
+                          Spacer(),
+                          IconButton(
+                            icon: Icon(
+                              Icons.notifications,
+                              color: Color(0xFF0891B2),
+                            ),
+                            onPressed: () {},
+                          ),
                         ],
                       ),
                     ),
@@ -168,22 +143,22 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined, size: 24),
                 activeIcon: Icon(Icons.home, size: 24),
-                label: 'Accueil',
+                label: 'Home',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today_outlined, size: 24),
                 activeIcon: Icon(Icons.calendar_today, size: 24),
-                label: 'RDV',
+                label: 'Appointments',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.medical_services_outlined, size: 24),
                 activeIcon: Icon(Icons.medical_services, size: 24),
-                label: 'Médecins',
+                label: 'Doctors',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline, size: 24),
                 activeIcon: Icon(Icons.person, size: 24),
-                label: 'Profil',
+                label: 'Profile',
               ),
             ],
           ),
@@ -436,7 +411,7 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Rappel important',
+                        'Important reminder',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -445,7 +420,7 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'N\'oubliez pas votre rendez-vous avec Dr. Martin demain à 10h00',
+                        'Don\'t forget your appointment with Dr. Martin tomorrow at 10:00 AM',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.orange[700],

@@ -25,14 +25,14 @@ class DoctorListScreen extends StatelessWidget {
             )
             .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Liste des Médecins')),
+      appBar: AppBar(title: const Text('Doctor List')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Rechercher un médecin',
+                labelText: 'Search for a doctor',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: onSearch,
@@ -41,7 +41,7 @@ class DoctorListScreen extends StatelessWidget {
             Expanded(
               child:
                   filteredDoctors.isEmpty
-                      ? const Center(child: Text('Aucun médecin trouvé.'))
+                      ? const Center(child: Text('No doctor found.'))
                       : ListView.builder(
                         itemCount: filteredDoctors.length,
                         itemBuilder:
@@ -58,45 +58,21 @@ class DoctorListScreen extends StatelessWidget {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  filteredDoctors[i]['active']
-                                      ? 'Actif'
-                                      : 'Désactivé',
-                                  style: TextStyle(
-                                    color:
-                                        filteredDoctors[i]['active']
-                                            ? Colors.green
-                                            : Colors.red,
-                                  ),
+                                  filteredDoctors[i]['email'] ?? '',
                                 ),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: Icon(
-                                        filteredDoctors[i]['active']
-                                            ? Icons.block
-                                            : Icons.check,
-                                        color: Colors.orange,
-                                      ),
-                                      tooltip:
-                                          filteredDoctors[i]['active']
-                                              ? 'Désactiver'
-                                              : 'Activer',
-                                      onPressed:
-                                          () => onToggle(
-                                            doctors.indexOf(filteredDoctors[i]),
-                                          ),
+                                      icon: Icon(Icons.toggle_on),
+                                      onPressed: () => onToggle(i),
                                     ),
                                     IconButton(
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.delete,
                                         color: Colors.red,
                                       ),
-                                      tooltip: 'Supprimer',
-                                      onPressed:
-                                          () => onRemove(
-                                            doctors.indexOf(filteredDoctors[i]),
-                                          ),
+                                      onPressed: () => onRemove(i),
                                     ),
                                   ],
                                 ),

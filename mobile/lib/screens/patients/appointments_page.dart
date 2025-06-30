@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -19,8 +19,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     Appointment(
       id: '1',
       doctorName: 'Dr. Sophie Martin',
-      specialty: 'General Physician',
-      date: '15 juillet 2024',
+      specialty: 'General Practitioner',
+      date: 'July 15, 2024',
       time: '10:00',
       status: AppointmentStatus.confirmed,
       type: AppointmentType.upcoming,
@@ -30,7 +30,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       id: '2',
       doctorName: 'Dr. Pierre Dubois',
       specialty: 'Endocrinologist',
-      date: '20 juillet 2024',
+      date: 'July 20, 2024',
       time: '14:30',
       status: AppointmentStatus.pending,
       type: AppointmentType.upcoming,
@@ -40,7 +40,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       id: '3',
       doctorName: 'Dr. Marie Leroy',
       specialty: 'Endocrinologist',
-      date: '25 juillet 2024',
+      date: 'July 25, 2024',
       time: '16:00',
       status: AppointmentStatus.confirmed,
       type: AppointmentType.upcoming,
@@ -50,7 +50,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       id: '4',
       doctorName: 'Dr. Jean Dupont',
       specialty: 'Physician',
-      date: '10 juin 2024',
+      date: 'June 10, 2024',
       time: '09:30',
       status: AppointmentStatus.completed,
       type: AppointmentType.past,
@@ -60,7 +60,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       id: '5',
       doctorName: 'Dr. Anne Moreau',
       specialty: 'Dentist',
-      date: '15 mai 2024',
+      date: 'May 15, 2024',
       time: '15:00',
       status: AppointmentStatus.completed,
       type: AppointmentType.past,
@@ -70,7 +70,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       id: '6',
       doctorName: 'Dr. Paul Bernard',
       specialty: 'Physician',
-      date: '12 juillet 2024',
+      date: 'July 12, 2024',
       time: '14:00',
       status: AppointmentStatus.cancelled,
       type: AppointmentType.cancelled,
@@ -80,7 +80,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   List<Appointment> get filteredAppointments {
     if (selectedFilter == 'all') return appointments;
-    return appointments.where((apt) => apt.type.name == selectedFilter).toList();
+    return appointments
+        .where((apt) => apt.type.name == selectedFilter)
+        .toList();
   }
 
   @override
@@ -112,7 +114,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,10 +129,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   SizedBox(height: 4),
                   Text(
                     'Manage your medical appointments',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
               ),
@@ -156,12 +154,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
-          children: filters.entries
-              .map((e) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _buildFilterButton(e.value, e.key),
-                  ))
-              .toList(),
+          children:
+              filters.entries
+                  .map(
+                    (e) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _buildFilterButton(e.value, e.key),
+                    ),
+                  )
+                  .toList(),
         ),
       ),
     );
@@ -221,7 +222,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     return grouped;
   }
 
-  Widget _buildSection(String title, String emoji, List<Appointment> appointments) {
+  Widget _buildSection(
+    String title,
+    String emoji,
+    List<Appointment> appointments,
+  ) {
     if (appointments.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -257,10 +262,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border(
-          left: BorderSide(
-            color: _getBorderColor(appointment.type),
-            width: 4,
-          ),
+          left: BorderSide(color: _getBorderColor(appointment.type), width: 4),
         ),
         boxShadow: [
           BoxShadow(
@@ -296,7 +298,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             borderRadius: BorderRadius.circular(22.5),
           ),
           child: Center(
-            child: Text(appointment.avatar, style: const TextStyle(fontSize: 20)),
+            child: Text(
+              appointment.avatar,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -381,8 +386,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
-      child: Text(label, style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w600)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -392,27 +403,60 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     switch (appointment.type) {
       case AppointmentType.upcoming:
         actions = [
-          _action('Modify', Colors.grey.shade100, const Color(0xFF475569), () => _modifyAppointment(appointment)),
-          _action('Cancel', kSoftRed, Colors.white, () => _cancelAppointment(appointment)), // Rouge adouci ici
+          _action(
+            'Modify',
+            Colors.grey.shade100,
+            const Color(0xFF475569),
+            () => _modifyAppointment(appointment),
+          ),
+          _action(
+            'Cancel',
+            kSoftRed,
+            Colors.white,
+            () => _cancelAppointment(appointment),
+          ), // Rouge adouci ici
         ];
         break;
       case AppointmentType.past:
         actions = [
-          _action('View report', Colors.grey.shade100, const Color(0xFF475569), () => _viewReport(appointment)),
-          _action('Reschedule', kPrimaryColor, Colors.white, () => _rescheduleAppointment(appointment)),
+          _action(
+            'View report',
+            Colors.grey.shade100,
+            const Color(0xFF475569),
+            () => _viewReport(appointment),
+          ),
+          _action(
+            'Reschedule',
+            kPrimaryColor,
+            Colors.white,
+            () => _rescheduleAppointment(appointment),
+          ),
         ];
         break;
       case AppointmentType.cancelled:
         actions = [
-          _action('Reschedule', kPrimaryColor, Colors.white, () => _rescheduleAppointment(appointment)),
+          _action(
+            'Reschedule',
+            kPrimaryColor,
+            Colors.white,
+            () => _rescheduleAppointment(appointment),
+          ),
         ];
         break;
     }
 
     return Row(
-      children: actions
-          .map((btn) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 8), child: btn)))
-          .toList(),
+      children:
+          actions
+              .map(
+                (btn) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: btn,
+                  ),
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -421,11 +465,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: fg,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -442,10 +493,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     }
   }
 
-  void _modifyAppointment(Appointment appointment) => print('Modify appointment: ${appointment.doctorName}');
-  void _cancelAppointment(Appointment appointment) => print('Cancel appointment: ${appointment.doctorName}');
-  void _viewReport(Appointment appointment) => print('View report: ${appointment.doctorName}');
-  void _rescheduleAppointment(Appointment appointment) => print('Reschedule appointment: ${appointment.doctorName}');
+  void _modifyAppointment(Appointment appointment) =>
+      print('Modify appointment: ${appointment.doctorName}');
+  void _cancelAppointment(Appointment appointment) =>
+      print('Cancel appointment: ${appointment.doctorName}');
+  void _viewReport(Appointment appointment) =>
+      print('View report: ${appointment.doctorName}');
+  void _rescheduleAppointment(Appointment appointment) =>
+      print('Reschedule appointment: ${appointment.doctorName}');
 }
 
 class Appointment {
@@ -471,4 +526,5 @@ class Appointment {
 }
 
 enum AppointmentStatus { confirmed, pending, cancelled, completed }
+
 enum AppointmentType { upcoming, past, cancelled }

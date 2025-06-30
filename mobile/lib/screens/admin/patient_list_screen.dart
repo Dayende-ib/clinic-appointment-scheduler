@@ -25,14 +25,14 @@ class PatientListScreen extends StatelessWidget {
             )
             .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Liste des Patients')),
+      appBar: AppBar(title: const Text('Patient List')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Rechercher un patient',
+                labelText: 'Search for a patient',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: onSearch,
@@ -41,7 +41,7 @@ class PatientListScreen extends StatelessWidget {
             Expanded(
               child:
                   filteredPatients.isEmpty
-                      ? const Center(child: Text('Aucun patient trouvé.'))
+                      ? const Center(child: Text('No patient found.'))
                       : ListView.builder(
                         itemCount: filteredPatients.length,
                         itemBuilder:
@@ -58,49 +58,21 @@ class PatientListScreen extends StatelessWidget {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  filteredPatients[i]['active']
-                                      ? 'Actif'
-                                      : 'Désactivé',
-                                  style: TextStyle(
-                                    color:
-                                        filteredPatients[i]['active']
-                                            ? Colors.green
-                                            : Colors.red,
-                                  ),
+                                  filteredPatients[i]['email'] ?? '',
                                 ),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: Icon(
-                                        filteredPatients[i]['active']
-                                            ? Icons.block
-                                            : Icons.check,
-                                        color: Colors.orange,
-                                      ),
-                                      tooltip:
-                                          filteredPatients[i]['active']
-                                              ? 'Désactiver'
-                                              : 'Activer',
-                                      onPressed:
-                                          () => onToggle(
-                                            patients.indexOf(
-                                              filteredPatients[i],
-                                            ),
-                                          ),
+                                      icon: Icon(Icons.toggle_on),
+                                      onPressed: () => onToggle(i),
                                     ),
                                     IconButton(
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.delete,
                                         color: Colors.red,
                                       ),
-                                      tooltip: 'Supprimer',
-                                      onPressed:
-                                          () => onRemove(
-                                            patients.indexOf(
-                                              filteredPatients[i],
-                                            ),
-                                          ),
+                                      onPressed: () => onRemove(i),
                                     ),
                                   ],
                                 ),

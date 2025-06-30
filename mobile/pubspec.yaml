@@ -33,6 +33,7 @@ flutter:
     - assets/images/caretime_2x1.png
     - assets/images/caretime_100x100_nobg.png
     - assets/images/logo-caretime.png
+    - assets/images/male-doctor-icon.png
 
   fonts:
     - family: NotoSans
@@ -41,3 +42,4 @@ flutter:
         - asset: assets/fonts/NotoSans-Italic.ttf
         - asset: assets/fonts/NotoSans-Medium.ttf
         - asset: assets/fonts/NotoSans-Bold.ttf
+        - asset: assets/fonts/NotoSans-SemiBold.ttf

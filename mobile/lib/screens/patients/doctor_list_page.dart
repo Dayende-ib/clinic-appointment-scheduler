@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'patient_dashboard_page.dart';
-import 'appointments_page.dart';
 import 'doctor_profile_page.dart';
 
 class DoctorsListScreen extends StatefulWidget {
@@ -11,7 +9,6 @@ class DoctorsListScreen extends StatefulWidget {
 class _DoctorsListScreenState extends State<DoctorsListScreen> {
   final Color primaryColor = Color(0xFF03A6A1);
   final Color secondaryColor = Color(0xFF0891B2);
-  int _selectedIndex = 2; // Index 2 pour "Médecins"
 
   String? selectedSpecialty;
   int? selectedDoctorIndex;
@@ -22,95 +19,64 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
       specialty: "Endocrinologist",
       rating: 4.5,
       reviews: 85,
-      image: "assets/doctor1.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
     Doctor(
       name: "Dr. Marilyn Stanton",
-      specialty: "General Physician",
+      specialty: "General Practitioner",
       rating: 5.0,
       reviews: 85,
-      image: "assets/doctor2.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
     Doctor(
       name: "Dr. Marvin McKinney",
       specialty: "Cardiologist",
       rating: 4.3,
       reviews: 85,
-      image: "assets/doctor3.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
     Doctor(
       name: "Dr. Arlene McCoy",
       specialty: "Physician",
       rating: 4.5,
       reviews: 85,
-      image: "assets/doctor4.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
     Doctor(
       name: "Dr. Eleanor Pena",
-      specialty: "Arthropathic",
+      specialty: "Rheumatologist",
       rating: 4.4,
       reviews: 85,
-      image: "assets/doctor5.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
     Doctor(
       name: "Dr. Katya Donin",
       specialty: "Endocrinologist",
       rating: 5.0,
       reviews: 85,
-      image: "assets/doctor6.jpg",
+      image: "assets/images/male-doctor-icon.png",
     ),
   ];
 
   final List<String> specialties = [
-    'Toutes les spécialités',
-    'Cardiologie',
-    'Dermatologie',
-    'Pédiatrie',
-    'Orthopédie',
-    'Endocrinologie',
-    'Médecin généraliste',
-    'Médecin',
-    'Rhumatologie',
+    'All specialties',
+    'Cardiology',
+    'Dermatology',
+    'Pediatrics',
+    'Orthopedics',
+    'Endocrinology',
+    'General Practitioner',
+    'Physician',
+    'Rheumatology',
   ];
 
   List<Doctor> get filteredDoctors {
-    if (selectedSpecialty == null ||
-        selectedSpecialty == 'Toutes les spécialités') {
+    if (selectedSpecialty == null || selectedSpecialty == 'All specialties') {
       return doctors;
     }
     return doctors
         .where((doctor) => doctor.specialty == selectedSpecialty)
         .toList();
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navigation selon l'index sélectionné
-    switch (index) {
-      case 0:
-        // Accueil
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MedicalDashboard()),
-        );
-        break;
-      case 1:
-        // RDV
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AppointmentsScreen()),
-        );
-        break;
-      case 2:
-        // Médecins - déjà sur cette page
-        break;
-      case 3:
-        // Profil - À implémenter
-        break;
-    }
   }
 
   void _showFilterBottomSheet() {
@@ -142,7 +108,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
-          "Liste des médecins",
+          "Doctors List",
           style: TextStyle(
             color: Colors.black87,
             fontSize: 18,
@@ -183,7 +149,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                       Icons.tune,
                       color:
                           selectedSpecialty != null &&
-                                  selectedSpecialty != 'Toutes les spécialités'
+                                  selectedSpecialty != 'All specialties'
                               ? primaryColor
                               : Colors.grey[400],
                     ),
@@ -199,7 +165,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
             ),
           ),
           if (selectedSpecialty != null &&
-              selectedSpecialty != 'Toutes les spécialités')
+              selectedSpecialty != 'All specialties')
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -240,7 +206,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                   ),
                   SizedBox(width: 8),
                   Text(
-                    "${filteredDoctors.length} docteur(s) trouvé(s)",
+                    "${filteredDoctors.length} doctor(s) found",
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                 ],
@@ -253,7 +219,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                 left: 16,
                 right: 16,
                 bottom: 80,
-              ), // Ajout du padding bottom pour la nav bar
+              ), // Add bottom padding for nav bar
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -414,7 +380,7 @@ class DoctorCard extends StatelessWidget {
             ),
             SizedBox(height: 4),
             Text(
-              "${doctor.reviews} avis",
+              "${doctor.reviews} reviews",
               style: TextStyle(
                 fontSize: 10,
                 color:
@@ -495,7 +461,7 @@ class FilterBottomSheet extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  "Filtrer par spécialité",
+                  "Filter by specialty",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

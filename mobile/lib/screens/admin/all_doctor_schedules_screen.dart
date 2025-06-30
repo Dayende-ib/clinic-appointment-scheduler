@@ -13,26 +13,26 @@ class AllDoctorSchedulesScreen extends StatefulWidget {
 class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
   String search = '';
 
-  // Ajout de plus de médecins fictifs
+  // Add more fake doctors
   List<Map<String, dynamic>> get allDoctors => [
-    {'name': 'Dr. Dupont', 'active': true},
-    {'name': 'Dr. Martin', 'active': true},
-    {'name': 'Dr. Bernard', 'active': true},
-    {'name': 'Dr. Lefevre', 'active': true},
-    {'name': 'Dr. Petit', 'active': true},
-    {'name': 'Dr. Moreau', 'active': true},
-    {'name': 'Dr. Girard', 'active': true},
+    {'name': 'Dr. Smith', 'active': true},
+    {'name': 'Dr. Johnson', 'active': true},
+    {'name': 'Dr. Williams', 'active': true},
+    {'name': 'Dr. Brown', 'active': true},
+    {'name': 'Dr. Jones', 'active': true},
+    {'name': 'Dr. Miller', 'active': true},
+    {'name': 'Dr. Davis', 'active': true},
     {'name': 'Dr. Garcia', 'active': true},
-    {'name': 'Dr. Laurent', 'active': true},
-    {'name': 'Dr. Robert', 'active': true},
-    {'name': 'Dr. Simon', 'active': true},
-    {'name': 'Dr. Michel', 'active': true},
-    {'name': 'Dr. David', 'active': true},
-    {'name': 'Dr. Richard', 'active': true},
+    {'name': 'Dr. Rodriguez', 'active': true},
+    {'name': 'Dr. Wilson', 'active': true},
+    {'name': 'Dr. Martinez', 'active': true},
+    {'name': 'Dr. Anderson', 'active': true},
+    {'name': 'Dr. Taylor', 'active': true},
     {'name': 'Dr. Thomas', 'active': true},
+    {'name': 'Dr. Hernandez', 'active': true},
   ];
 
-  // Génère des plannings fictifs enrichis pour chaque médecin sur un mois
+  // Generate enriched fake schedules for each doctor for a month
   Map<String, List<Map<String, String>>> getMonthlySchedules() {
     final now = DateTime.now();
     final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
@@ -41,232 +41,109 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
     final Map<String, List<Map<String, String>>> schedules = {};
     final List<String> types = [
       'Consultation',
-      'Opération',
-      'Visite',
-      'Téléconsultation',
-      'Urgence',
+      'Operation',
+      'Visit',
+      'Teleconsultation',
+      'Emergency',
     ];
-    final List<String> lieux = [
-      'Cabinet A',
-      'Cabinet B',
-      'Clinique X',
-      'En ligne',
-      'Hôpital Y',
+    final List<String> locations = [
+      'Office A',
+      'Office B',
+      'Clinic X',
+      'Online',
+      'Hospital Y',
     ];
     final List<String> patients = [
-      'Alice Durand',
-      'Bob Leroy',
-      'Jean Petit',
-      'Sophie Martin',
-      'Lucas Bernard',
-      'Emma Lefevre',
-      'Noah Petit',
-      'Léa Moreau',
-      'Tom Girard',
-      'Chloé Garcia',
+      'Alice Smith',
+      'Bob Johnson',
+      'John Williams',
+      'Sophie Brown',
+      'Paul Jones',
+      'Emma Miller',
+      'Lucas Davis',
+      'Olivia Garcia',
+      'Liam Rodriguez',
+      'Mia Wilson',
     ];
-    for (final name in doctorNames) {
-      schedules[name] = List.generate(16, (i) {
-        final day = ((i + 2) * 2 + i) % daysInMonth + 1;
-        final startHour = 8 + (i % 8);
-        final endHour = startHour + 1 + (i % 2);
-        return {
-          'date': DateFormat(
-            'dd/MM/yyyy',
-          ).format(DateTime(now.year, now.month, day)),
-          'heure':
-              '${startHour.toString().padLeft(2, '0')}:00 - ${endHour.toString().padLeft(2, '0')}:00',
-          'type': types[i % types.length],
-          'lieu': lieux[i % lieux.length],
-          'patient':
-              patients[(i + doctorNames.indexOf(name)) % patients.length],
-          'note':
-              i % 4 == 0
-                  ? 'Suivi régulier'
-                  : i % 4 == 1
-                  ? 'Première visite'
-                  : '',
-        };
-      });
+    for (final doctor in doctorNames) {
+      schedules[doctor] = [];
+      for (int day = 1; day <= daysInMonth; day++) {
+        if (day % 3 == 0) {
+          schedules[doctor]!.add({
+            'date': DateFormat(
+              'MM/dd/yyyy',
+            ).format(DateTime(now.year, now.month, day)),
+            'type': types[day % types.length],
+            'location': locations[day % locations.length],
+            'patient': patients[day % patients.length],
+            'time': '${8 + (day % 8)}:00',
+          });
+        }
+      }
     }
     return schedules;
-  }
-
-  void _showDoctorMonthSchedule(
-    BuildContext context,
-    String doctor,
-    List<Map<String, String>> planning,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder:
-          (context) => DrMonthPlanningSheet(doctor: doctor, planning: planning),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final schedules = getMonthlySchedules();
-    final filteredDoctors =
-        allDoctors
-            .where(
-              (d) => d['name'].toLowerCase().contains(search.toLowerCase()),
-            )
-            .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Plannings des Médecins')),
+      appBar: AppBar(title: const Text('All Doctor Schedules')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Rechercher un médecin',
+                labelText: 'Search for a doctor',
                 prefixIcon: Icon(Icons.search),
               ),
-              onChanged: (v) => setState(() => search = v),
+              onChanged: (value) => setState(() => search = value),
             ),
             const SizedBox(height: 8),
             Expanded(
-              child:
-                  filteredDoctors.isEmpty
-                      ? const Center(child: Text('Aucun médecin trouvé.'))
-                      : ListView.builder(
-                        itemCount: filteredDoctors.length,
-                        itemBuilder: (context, i) {
-                          final doctor = filteredDoctors[i]['name'];
-                          final planning = schedules[doctor] ?? [];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            child: ListTile(
-                              leading: const Icon(
-                                Icons.medical_services,
-                                color: Colors.teal,
-                              ),
-                              title: Text(
-                                doctor,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text(
-                                '${planning.length} créneaux ce mois-ci',
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.calendar_month,
-                                  color: Colors.deepPurple,
-                                ),
-                                tooltip: 'Voir planning du mois',
-                                onPressed:
-                                    () => _showDoctorMonthSchedule(
-                                      context,
-                                      doctor,
-                                      planning,
-                                    ),
-                              ),
-                            ),
+              child: ListView(
+                children:
+                    allDoctors
+                        .where(
+                          (d) => d['name'].toLowerCase().contains(
+                            search.toLowerCase(),
+                          ),
+                        )
+                        .map((doctor) {
+                          final doctorSchedules =
+                              schedules[doctor['name']] ?? [];
+                          return ExpansionTile(
+                            title: Text(doctor['name']),
+                            children:
+                                doctorSchedules.isEmpty
+                                    ? [
+                                      const ListTile(
+                                        title: Text(
+                                          'No schedules for this month.',
+                                        ),
+                                      ),
+                                    ]
+                                    : doctorSchedules
+                                        .map(
+                                          (s) => ListTile(
+                                            title: Text(
+                                              '${s['type']} with ${s['patient']}',
+                                            ),
+                                            subtitle: Text(
+                                              '${s['date']} at ${s['time']} - ${s['location']}',
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                           );
-                        },
-                      ),
+                        })
+                        .toList(),
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class DrMonthPlanningSheet extends StatelessWidget {
-  final String doctor;
-  final List<Map<String, String>> planning;
-  const DrMonthPlanningSheet({
-    super.key,
-    required this.doctor,
-    required this.planning,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      expand: false,
-      builder:
-          (context, scrollController) => Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 24,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.medical_services, color: Colors.teal),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Planning de $doctor',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                if (planning.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('Aucun créneau ce mois-ci.')),
-                  )
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: planning.length,
-                      itemBuilder: (context, i) {
-                        final slot = planning[i];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.event_available,
-                              color: Colors.deepPurple,
-                            ),
-                            title: Text('${slot['date']} — ${slot['heure']}'),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Type : ${slot['type']}'),
-                                Text('Lieu : ${slot['lieu']}'),
-                                Text('Patient : ${slot['patient']}'),
-                                if ((slot['note'] ?? '').isNotEmpty)
-                                  Text('Note : ${slot['note']}'),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
     );
   }
 }

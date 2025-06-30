@@ -11,7 +11,7 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  // Données fictives pour la démo
+  // Demo data
   List<Map<String, dynamic>> doctors = [
     {'name': 'Dr. Dupont', 'active': true},
     {'name': 'Dr. Martin', 'active': true},
@@ -29,14 +29,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Paramètres du planning'),
+            title: const Text('Schedule Settings'),
             content: const Text(
-              'Gestion des paramètres globaux du planning (à implémenter).',
+              'Manage global schedule settings (to be implemented).',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -46,7 +46,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Espace Admin')),
+      appBar: AppBar(title: const Text('Admin Area')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -57,7 +57,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               children: [
                 ElevatedButton.icon(
                   icon: const Icon(Icons.medical_services),
-                  label: const Text('Voir les Médecins'),
+                  label: const Text('View Doctors'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                   onPressed: () {
                     Navigator.push(
@@ -83,7 +83,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.people),
-                  label: const Text('Voir les Patients'),
+                  label: const Text('View Patients'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   onPressed: () {
                     Navigator.push(
@@ -113,7 +113,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             const SizedBox(height: 32),
             ListTile(
               leading: const Icon(Icons.settings, color: Colors.grey),
-              title: const Text('Paramètres du planning'),
+              title: const Text('Schedule Settings'),
               onTap: _manageScheduleSettings,
               tileColor: Colors.grey[100],
               shape: RoundedRectangleBorder(
@@ -126,7 +126,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Icons.calendar_month,
                 color: Colors.deepPurple,
               ),
-              title: const Text('Voir tous les plannings des médecins'),
+              title: const Text('All Doctor Schedules'),
               onTap: () {
                 Navigator.push(
                   context,

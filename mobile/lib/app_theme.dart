@@ -17,6 +17,7 @@ final ThemeData appTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: AppColors.primary,
     secondary: AppColors.secondary,
+    tertiary: AppColors.accent,
     background: AppColors.background,
     error: Colors.red,
   ),
