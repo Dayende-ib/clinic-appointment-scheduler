@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'appointments_page.dart';
-import 'doctors_list_body.dart';
+import 'doctor_list_page.dart';
 import '../profile_page.dart';
 
 class MedicalDashboard extends StatefulWidget {
@@ -24,7 +24,7 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
         body = AppointmentsScreen();
         break;
       case 2:
-        body = DoctorsListBody();
+        body = DoctorsListScreen();
         break;
       case 3:
         body = ProfileScreen();

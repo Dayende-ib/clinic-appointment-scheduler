@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../patients/patient_dashboard_screen.dart';
+import '../patients/patient_dashboard_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

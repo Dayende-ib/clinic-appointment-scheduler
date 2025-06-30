@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
-import 'doctor_directory_screen.dart'; // Import pour accéder à la classe Doctor
-import 'appointments_page.dart'; // Import pour accéder à la page de rendez-vous
-import 'doctor_profile_header.dart';
-import 'doctor_profile_calendar.dart';
-import 'doctor_profile_availability.dart';
-import 'doctor_profile_bottom_sheet.dart';
+import 'doctor_list_page.dart'; // Import pour accéder à la classe Doctor
 
 class DoctorProfileScreen extends StatefulWidget {
   final Doctor doctor;
@@ -17,7 +12,6 @@ class DoctorProfileScreen extends StatefulWidget {
 }
 
 class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
-  int _selectedIndex = 2; // 2 = Médecins
   int selectedDay = 15;
   String selectedMonth = 'January 2025';
   List<String> availableTimes = [
@@ -29,98 +23,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     '08:30 PM',
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  // --- Déclaration des méthodes privées AVANT le build ---
-  Widget _doctorProfileBody(Doctor doctor) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DoctorProfileHeader(
-            image: doctor.image,
-            specialty: doctor.specialty,
-            name: doctor.name,
-            rating: doctor.rating,
-          ),
-          const SizedBox(height: 30),
-          DoctorProfileCalendar(
-            selectedMonth: selectedMonth,
-            selectedDay: selectedDay,
-            onDaySelected: (day) => setState(() => selectedDay = day),
-          ),
-          const SizedBox(height: 30),
-          DoctorProfileAvailability(
-            slots: availableTimes.length,
-            onBookPressed: _showTimeSlotBottomSheet,
-          ),
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
-
-  void _showTimeSlotBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder:
-          (context) => DoctorProfileBottomSheet(
-            availableTimes: availableTimes,
-            onTimeSelected: _showAppointmentConfirmation,
-          ),
-    );
-  }
-
-  void _showAppointmentConfirmation(String time) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: const Text('Rendez-vous confirmé'),
-            content: Text(
-              'Votre rendez-vous avec ${widget.doctor.name} à $time a été réservé avec succès.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final doctor = widget.doctor;
-    Widget body;
-    switch (_selectedIndex) {
-      case 0:
-        body = Center(child: Text('Accueil patient (à personnaliser)'));
-        break;
-      case 1:
-        body = AppointmentsScreen();
-        break;
-      case 2:
-        body = _doctorProfileBody(doctor);
-        break;
-      case 3:
-        body = Center(child: Text('Profil patient (à personnaliser)'));
-        break;
-      default:
-        body = _doctorProfileBody(doctor);
-    }
+    final doctor = widget.doctor; // récupère le docteur passé en paramètre
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -137,67 +43,329 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           ),
         ],
       ),
-      body: body,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: Offset(0, -2),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Doctor Profile Card
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Doctor Image dynamique
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.grey[200],
+                      image: DecorationImage(
+                        image: AssetImage(doctor.image),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Speciality dynamique
+                  Text(
+                    doctor.specialty,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Doctor Name dynamique
+                  Text(
+                    doctor.name,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // ID fictif - tu peux adapter si tu as un champ ID
+                  Text(
+                    'ID: 32145687',
+                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Rating and Actions dynamique
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.file_copy_outlined,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () {},
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.star, color: Colors.white, size: 16),
+                            SizedBox(width: 4),
+                            Text(
+                              'Rating ${doctor.rating.toString()}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.calendar_today_outlined,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // Calendar Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedMonth,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.chevron_left, color: Colors.grey[600]),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.chevron_right, color: Colors.grey[600]),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Days of week
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children:
+                  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                      .map(
+                        (day) => Text(
+                          day,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                      .toList(),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Calendar Days
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children:
+                  [12, 13, 14, 15, 16, 17, 18].map((day) {
+                    bool isSelected = day == selectedDay;
+                    bool isToday = day == 15;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedDay = day;
+                        });
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                          border:
+                              isToday && !isSelected
+                                  ? Border.all(
+                                    color: AppColors.primary,
+                                    width: 2,
+                                  )
+                                  : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            day.toString(),
+                            style: TextStyle(
+                              color:
+                                  isSelected ? Colors.white : Colors.grey[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+            ),
+
+            const SizedBox(height: 30),
+
+            // Today Availability
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Today',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    Text(
+                      'Availability',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                Text(
+                  '6 Slots',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // Time Slots
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 2.5,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: availableTimes.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Center(
+                    child: Text(
+                      availableTimes[index],
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 30),
+
+            // Book Appointment Button
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Rendez-vous réservé avec succès!'),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Book Appointment',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.white,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: Colors.grey[400],
-            selectedLabelStyle: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-            elevation: 0,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Accueil',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_today_outlined),
-                activeIcon: Icon(Icons.calendar_today),
-                label: 'RDV',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.medical_services_outlined),
-                activeIcon: Icon(Icons.medical_services),
-                label: 'Médecins',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Profil',
-              ),
-            ],
-          ),
         ),
       ),
     );

@@ -6,7 +6,7 @@ import 'package:caretime/screens/login/login_screen.dart';
 import 'package:caretime/screens/login/register_screen.dart';
 import 'package:caretime/screens/doctors/home_page.dart';
 import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
-import 'package:caretime/screens/patients/patient_dashboard_screen.dart';
+import 'package:caretime/screens/patients/patient_dashboard_page.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
