@@ -6,6 +6,7 @@ const {
   getAllUsers,
   deleteUser,
   disableUser,
+  enableUser,
   getAllAppointments
 } = require("../controllers/admin.controller");
 
@@ -14,5 +15,8 @@ router.get("/users", auth(["admin"]), getAllUsers);
 router.delete("/users/:id", auth(["admin"]), deleteUser);
 router.patch("/users/:id/disable", auth(["admin"]), disableUser);
 router.get("/appointments", auth(["admin"]), getAllAppointments);
+router.patch("/users/:id/enable", auth(["admin"]), enableUser);
+
 
 module.exports = router;
+

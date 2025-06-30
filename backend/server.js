@@ -7,6 +7,8 @@ const cors = require("cors");
 
 const app = express();
 
+
+
 // Middlewares
 app.use(express.json());
 app.use(helmet());
@@ -22,6 +24,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Démarrer serveur
 const PORT = process.env.PORT || 5000;
+
+
 app.listen(PORT, () => console.log(`🚀 Serveur en écoute sur le port ${PORT}`));
 
 app.use("/api/appointments", require("./routes/appointment.routes"));
