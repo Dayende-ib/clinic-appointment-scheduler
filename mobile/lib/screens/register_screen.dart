@@ -1,4 +1,4 @@
-//import 'package:caretime/screens/login_screen.dart';
+import 'package:caretime/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -100,20 +100,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
 
-        if (role == 'doctor') {
-          Navigator.pushReplacementNamed(context, '/doctor');
-        } else {
-          Navigator.pushReplacementNamed(context, '/patient');
+          if (role == 'doctor') {
+            Navigator.pushReplacementNamed(context, '/doctor');
+          } else {
+            Navigator.pushReplacementNamed(context, '/patient');
+          }
         }
       } else {
         final msg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur : $msg')));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Erreur : $msg')));
+        }
       }
     }
   }
@@ -357,12 +361,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 12),
                         TextButton(
                           onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => const LoginScreen(),
-                            //   ),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
                           },
                           child: const Text('Already have an account? Login'),
                         ),

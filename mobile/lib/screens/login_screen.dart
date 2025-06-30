@@ -110,18 +110,7 @@ class _LoginPageState extends State<LoginScreen> {
                     // Connexion
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const LinearGradient(
-                                  colors: [
-                                    Color(0xFF00B4DB),
-                                    Color(0xFF0083B0),
-                                  ],
-                                ).createShader(
-                                  Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
-                                ) !=
-                                null
-                            ? Colors.transparent
-                            : Colors.teal,
+                    backgroundColor: Colors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

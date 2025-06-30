@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
 import 'package:caretime/screens/login_screen.dart';
 import 'package:caretime/screens/register_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
