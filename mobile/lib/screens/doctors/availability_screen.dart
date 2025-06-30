@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../app_strings.dart';
+import '../../strings.dart';
 import '../../app_colors.dart';
 
 class AvailabilityScreen extends StatefulWidget {

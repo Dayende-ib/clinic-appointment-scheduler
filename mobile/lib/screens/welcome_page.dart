@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:caretime/app_colors.dart';
-import 'package:caretime/app_strings.dart';
-// import 'package:caretime/screens/login_screen.dart';
-import 'package:caretime/screens/register_screen.dart';
-import 'package:caretime/screens/doctor/doctor_home.dart';
+import 'package:caretime/strings.dart';
+import 'package:caretime/screens/login/login_screen.dart';
+import 'package:caretime/screens/login/register_screen.dart';
+import 'package:caretime/screens/doctors/home_page.dart';
 import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
+import 'package:caretime/screens/patients/patient_dashboard_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -20,11 +21,11 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'images/caretime_2x1.png',
+                'images/logo-caretime.png',
                 height: 90,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               Text(
                 AppStrings.enSubtitle,
                 style: GoogleFonts.poppins(
@@ -44,22 +45,28 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-              // SizedBox(
-              //   width: double.infinity,
-              //   child: ElevatedButton(
-              //     onPressed:
-              //         () => Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (context) => const LoginScreen(),
-              //           ),
-              //         ),
-              //     child: Text(
-              //       AppStrings.enLogin,
-              //       style: Theme.of(context).textTheme.labelLarge,
-              //     ),
-              //   ),
-              // ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      ),
+                  child: Text(
+                    AppStrings.enLogin,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -111,6 +118,25 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                   child: Text(
                     'Espace Admin',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: AppColors.primary),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MedicalDashboard(),
+                        ),
+                      ),
+                  child: Text(
+                    'Espace Patient',
                     style: Theme.of(
                       context,
                     ).textTheme.labelLarge?.copyWith(color: AppColors.primary),

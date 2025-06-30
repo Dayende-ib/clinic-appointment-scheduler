@@ -1,8 +1,8 @@
-import 'package:caretime/screens/login_screen.dart';
+import 'package:caretime/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../app_strings.dart';
+import '../../strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {

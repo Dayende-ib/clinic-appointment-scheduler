@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'DoctorProfileScreen.dart';
-import 'MedicalDashboard.dart';
+import 'patient_dashboard_screen.dart';
 import 'AppointmentsScreen.dart';
 
 class DoctorsListScreen extends StatefulWidget {
@@ -71,49 +71,24 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
       'Endocrinologist',
       'General Physician',
       'Physician',
-      'Arthropathic'
+      'Arthropathic',
     ];
   }
 
   List<Doctor> get filteredDoctors {
-    if (selectedSpecialty == null || selectedSpecialty == 'Toutes les spécialités') {
+    if (selectedSpecialty == null ||
+        selectedSpecialty == 'Toutes les spécialités') {
       return doctors;
     }
-    return doctors.where((doctor) => doctor.specialty == selectedSpecialty).toList();
+    return doctors
+        .where((doctor) => doctor.specialty == selectedSpecialty)
+        .toList();
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    
-    // Navigation selon l'index sélectionné
-    switch (index) {
-      case 0:
-        // Accueil
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MedicalDashboard(),
-          ),
-        );
-        break;
-      case 1:
-        // RDV
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AppointmentsScreen(),
-          ),
-        );
-        break;
-      case 2:
-        // Médecins - déjà sur cette page
-        break;
-      case 3:
-        // Profil - À implémenter
-        break;
-    }
   }
 
   void _showFilterBottomSheet() {
@@ -121,171 +96,145 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => FilterBottomSheet(
-        specialties: specialties,
-        selectedSpecialty: selectedSpecialty,
-        primaryColor: primaryColor,
-        onSpecialtySelected: (specialty) {
-          setState(() {
-            selectedSpecialty = specialty;
-          });
-          Navigator.pop(context);
-        },
+      builder:
+          (context) => FilterBottomSheet(
+            specialties: specialties,
+            selectedSpecialty: selectedSpecialty,
+            primaryColor: primaryColor,
+            onSpecialtySelected: (specialty) {
+              setState(() {
+                selectedSpecialty = specialty;
+              });
+              Navigator.pop(context);
+            },
+          ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppointmentsHeader() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(100),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF03A6A1), Color(0xFF0891B2)],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'My appointments',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Manage your medical appointments',
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    PreferredSizeWidget? appBar;
+    switch (_selectedIndex) {
+      case 0:
+        body = MedicalDashboard();
+        appBar = AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            "Accueil",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+        );
+        break;
+      case 1:
+        body = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildAppointmentsHeader(),
+            Expanded(child: AppointmentsScreen()),
+          ],
+        );
+        appBar = null;
+        break;
+      case 2:
+        body = _doctorsListBody();
+        appBar = AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            "Doctors List",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.more_horiz, color: Colors.black87),
+              onPressed: () {},
+            ),
+          ],
+        );
+        break;
+      case 3:
+        body = Center(child: Text('Profil patient (à personnaliser)'));
+        appBar = AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            "Profil",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+        );
+        break;
+      default:
+        body = _doctorsListBody();
+        appBar = null;
+    }
     return Scaffold(
       backgroundColor: Color(0xFFF5F7FA),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          "Doctors List",
-          style: TextStyle(
-            color: Colors.black87,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_horiz, color: Colors.black87),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search for doctor...",
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.tune,
-                      color: selectedSpecialty != null && selectedSpecialty != 'Toutes les spécialités'
-                          ? primaryColor
-                          : Colors.grey[400],
-                    ),
-                    onPressed: _showFilterBottomSheet,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
-            ),
-          ),
-          if (selectedSpecialty != null && selectedSpecialty != 'Toutes les spécialités')
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primaryColor.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          selectedSpecialty!,
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedSpecialty = null;
-                            });
-                          },
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    "${filteredDoctors.length} docteur(s) trouvé(s)",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          SizedBox(height: 8),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 16, right: 16, bottom: 80), // Ajout du padding bottom pour la nav bar
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: filteredDoctors.length,
-                itemBuilder: (context, index) {
-                  final doctor = filteredDoctors[index];
-                  final isSelected = selectedDoctorIndex == index;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedDoctorIndex = index;
-                      });
-                    },
-                    child: DoctorCard(
-                      doctor: doctor,
-                      primaryColor: primaryColor,
-                      isSelected: isSelected,
-                      onArrowTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DoctorProfileScreen(doctor: doctor),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: appBar,
+      body: body,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -311,7 +260,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
             currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
+            onTap: (index) => setState(() => _selectedIndex = index),
             selectedItemColor: Color(0xFF03A6A1),
             unselectedItemColor: Colors.grey[400],
             selectedLabelStyle: TextStyle(
@@ -327,68 +276,44 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
               BottomNavigationBarItem(
                 icon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.home_outlined,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.home_outlined, size: 24),
                 ),
                 activeIcon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.home,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.home, size: 24),
                 ),
                 label: 'Accueil',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.calendar_today_outlined,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.calendar_today_outlined, size: 24),
                 ),
                 activeIcon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.calendar_today,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.calendar_today, size: 24),
                 ),
                 label: 'RDV',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.medical_services_outlined,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.medical_services_outlined, size: 24),
                 ),
                 activeIcon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.medical_services,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.medical_services, size: 24),
                 ),
                 label: 'Médecins',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.person_outline,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.person_outline, size: 24),
                 ),
                 activeIcon: Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Icon(
-                    Icons.person,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.person, size: 24),
                 ),
                 label: 'Profil',
               ),
@@ -396,6 +321,136 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _doctorsListBody() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search for doctor...",
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.tune,
+                    color:
+                        selectedSpecialty != null &&
+                                selectedSpecialty != 'Toutes les spécialités'
+                            ? primaryColor
+                            : Colors.grey[400],
+                  ),
+                  onPressed: _showFilterBottomSheet,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (selectedSpecialty != null &&
+            selectedSpecialty != 'Toutes les spécialités')
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: primaryColor.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        selectedSpecialty!,
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedSpecialty = null;
+                          });
+                        },
+                        child: Icon(Icons.close, size: 16, color: primaryColor),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  "${filteredDoctors.length} docteur(s) trouvé(s)",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        SizedBox(height: 8),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(left: 16, right: 16, bottom: 80),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: filteredDoctors.length,
+              itemBuilder: (context, index) {
+                final doctor = filteredDoctors[index];
+                final isSelected = selectedDoctorIndex == index;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedDoctorIndex = index;
+                    });
+                  },
+                  child: DoctorCard(
+                    doctor: doctor,
+                    primaryColor: primaryColor,
+                    isSelected: isSelected,
+                    onArrowTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DoctorProfileScreen(doctor: doctor),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -437,7 +492,10 @@ class DoctorCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: isSelected ? Colors.white.withOpacity(0.2) : Colors.grey[200],
+                  backgroundColor:
+                      isSelected
+                          ? Colors.white.withOpacity(0.2)
+                          : Colors.grey[200],
                   child: Icon(
                     Icons.person,
                     color: isSelected ? Colors.white : Colors.grey[600],
@@ -463,7 +521,10 @@ class DoctorCard extends StatelessWidget {
               doctor.specialty,
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? Colors.white.withOpacity(0.8) : Colors.grey[600],
+                color:
+                    isSelected
+                        ? Colors.white.withOpacity(0.8)
+                        : Colors.grey[600],
               ),
             ),
             Spacer(),
@@ -485,7 +546,10 @@ class DoctorCard extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.white.withOpacity(0.2) : Colors.grey[100],
+                      color:
+                          isSelected
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.grey[100],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -502,7 +566,10 @@ class DoctorCard extends StatelessWidget {
               "${doctor.reviews} Reviews",
               style: TextStyle(
                 fontSize: 10,
-                color: isSelected ? Colors.white.withOpacity(0.7) : Colors.grey[500],
+                color:
+                    isSelected
+                        ? Colors.white.withOpacity(0.7)
+                        : Colors.grey[500],
               ),
             ),
           ],
