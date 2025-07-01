@@ -339,8 +339,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   }
 }
 
-/// Widget représentant une seule cellule de créneau horaire.
-/// Le sortir du `build` principal améliore la lisibilité et la réutilisabilité.
 class _SlotCell extends StatelessWidget {
   final bool isBusy;
   final bool isAvailable;

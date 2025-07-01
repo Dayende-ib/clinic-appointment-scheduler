@@ -18,7 +18,7 @@ final ThemeData appTheme = ThemeData(
     primary: AppColors.primary,
     secondary: AppColors.secondary,
     tertiary: AppColors.accent,
-    background: AppColors.background,
+    surface: AppColors.background,
     error: Colors.red,
   ),
   appBarTheme: const AppBarTheme(

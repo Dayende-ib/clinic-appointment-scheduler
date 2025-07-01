@@ -24,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
           'My Profile',
           style: const TextStyle(
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF0891B2),
+            color: Color(0xFF0891B2),
           ),
         ),
         centerTitle: true,

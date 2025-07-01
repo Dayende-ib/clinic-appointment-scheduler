@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'doctor_profile_page.dart';
 
 class DoctorsListScreen extends StatefulWidget {
+  const DoctorsListScreen({super.key});
+
   @override
   _DoctorsListScreenState createState() => _DoctorsListScreenState();
 }
@@ -270,12 +272,12 @@ class DoctorCard extends StatelessWidget {
   final VoidCallback onArrowTap;
 
   const DoctorCard({
-    Key? key,
+    super.key,
     required this.doctor,
     required this.primaryColor,
     required this.isSelected,
     required this.onArrowTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -419,12 +421,12 @@ class FilterBottomSheet extends StatelessWidget {
   final Function(String) onSpecialtySelected;
 
   const FilterBottomSheet({
-    Key? key,
+    super.key,
     required this.specialties,
     required this.selectedSpecialty,
     required this.primaryColor,
     required this.onSpecialtySelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 32),
               // Logo Caretime
-              Container(
+              SizedBox(
                 height: 120,
                 width: 200,
                 child: Image.asset(
