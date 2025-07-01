@@ -11,7 +11,6 @@ exports.register = async (req, res) => {
       password,
       dateOfBirth,
       gender,
-      address,
       role,
       specialty,
       licenseNumber
@@ -28,7 +27,6 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       dateOfBirth,
       gender,
-      address,
       role,
       specialty,
       licenseNumber
@@ -90,4 +88,53 @@ exports.login = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+
+// Récupérer le profil de l'utilisateur connecté
+exports.getMe = async (req, res) => {
+  console.log(req.user)
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 };
+
+// Modifier le profil de l'utilisateur connecté
+exports.updateMe = async (req, res) => {
+  try {
+    const fields = ['name', 'specialty', 'email', 'phone', 'city'];
+    const updates = {};
+    fields.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
+
+    // Empêcher la modification de l'email en double
+    if (updates.email) {
+      const emailExists = await User.findOne({ email: updates.email, _id: { $ne: req.user.id } });
+      if (emailExists) return res.status(400).json({ message: 'Email déjà utilisé' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updates },
+      { new: true, runValidators: true, context: 'query' }
+    ).select('-password');
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    // Retourne un objet filtré
+    res.json({
+      id: user._id,
+      name: user.name,
+      lastname: user.lastname,
+      firstname: user.firstname,
+      email: user.email,
+      role: user.role,
+      specialty: user.specialty,
+      licenseNumber: user.licenseNumber,
+      phone: user.phone,
+      city: user.city
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+};
+}

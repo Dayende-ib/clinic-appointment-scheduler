@@ -5,6 +5,9 @@ import 'dart:convert';
 import '../../strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// URL de base de l'API
+const String apiBaseUrl = 'http://localhost:5000';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -28,8 +31,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isDoctor = false;
   DateTime? _selectedDate;
 
-  // Only English
-  final List<String> _genders = ['Male', 'Female', 'Other'];
+  final List<String> _genders = [
+    'male',
+    'female',
+    'other',
+    'prefer_not_to_say',
+  ];
   final List<String> _specialties = [
     'Cardiology',
     'Dermatology',
@@ -81,13 +88,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'password': _passwordController.text, // À hasher plus tard
         'dateOfBirth': _selectedDate?.toIso8601String(),
         'gender': _genderController.text,
-        'address': {'country': _countryController.text},
+        'country': _countryController.text,
         'role': _isDoctor ? 'doctor' : 'patient',
         if (_isDoctor) 'specialty': _specialtyController.text,
         if (_isDoctor) 'licenseNumber': _licenseNumberController.text,
       };
       final response = await http.post(
-        Uri.parse('http://localhost:5000/api/users/register'),
+        Uri.parse('$apiBaseUrl/api/users/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(userData),
       );
@@ -100,16 +107,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
 
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
-
-          if (role == 'doctor') {
-            Navigator.pushReplacementNamed(context, '/doctor');
-          } else {
-            Navigator.pushReplacementNamed(context, '/patient');
-          }
+        // Affiche le snackbar puis redirige après un court délai
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
+        await Future.delayed(const Duration(milliseconds: 800));
+        if (!mounted) return;
+        if (role == 'doctor') {
+          Navigator.pushReplacementNamed(context, '/doctor');
+        } else if (role == 'admin') {
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else {
+          Navigator.pushReplacementNamed(context, '/patient');
         }
       } else {
         final msg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
@@ -226,6 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: TextFormField(
@@ -247,7 +257,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   labelText: 'Gender',
                                   prefixIcon: Icon(Icons.wc_outlined),
                                   border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                 ),
+                                isExpanded: true,
                                 items:
                                     _genders
                                         .map(

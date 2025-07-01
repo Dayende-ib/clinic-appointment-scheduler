@@ -5,10 +5,10 @@ class DoctorsListScreen extends StatefulWidget {
   const DoctorsListScreen({super.key});
 
   @override
-  _DoctorsListScreenState createState() => _DoctorsListScreenState();
+  DoctorsListScreenState createState() => DoctorsListScreenState();
 }
 
-class _DoctorsListScreenState extends State<DoctorsListScreen> {
+class DoctorsListScreenState extends State<DoctorsListScreen> {
   final Color primaryColor = Color(0xFF03A6A1);
   final Color secondaryColor = Color(0xFF0891B2);
 
@@ -175,9 +175,11 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primaryColor.withOpacity(0.3)),
+                      border: Border.all(
+                        color: primaryColor.withAlpha((0.3 * 255).toInt()),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -306,14 +308,14 @@ class DoctorCard extends StatelessWidget {
                       backgroundImage: AssetImage(doctor.image),
                       backgroundColor:
                           isSelected
-                              ? Colors.white.withOpacity(0.2)
+                              ? Colors.white.withAlpha((0.2 * 255).toInt())
                               : Colors.grey[200],
                     )
                     : CircleAvatar(
                       radius: 20,
                       backgroundColor:
                           isSelected
-                              ? Colors.white.withOpacity(0.2)
+                              ? Colors.white.withAlpha((0.2 * 255).toInt())
                               : Colors.grey[200],
                       child: Icon(
                         Icons.person,
@@ -342,7 +344,7 @@ class DoctorCard extends StatelessWidget {
                 fontSize: 12,
                 color:
                     isSelected
-                        ? Colors.white.withOpacity(0.8)
+                        ? Colors.white.withAlpha((0.8 * 255).toInt())
                         : Colors.grey[600],
               ),
             ),
@@ -367,7 +369,7 @@ class DoctorCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isSelected
-                              ? Colors.white.withOpacity(0.2)
+                              ? Colors.white.withAlpha((0.2 * 255).toInt())
                               : Colors.grey[100],
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -387,7 +389,7 @@ class DoctorCard extends StatelessWidget {
                 fontSize: 10,
                 color:
                     isSelected
-                        ? Colors.white.withOpacity(0.7)
+                        ? Colors.white.withAlpha((0.7 * 255).toInt())
                         : Colors.grey[500],
               ),
             ),
@@ -493,7 +495,7 @@ class FilterBottomSheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isSelected
-                              ? primaryColor.withOpacity(0.2)
+                              ? primaryColor.withAlpha((0.2 * 255).toInt())
                               : Colors.transparent,
                     ),
                     child: Text(

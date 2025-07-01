@@ -1,9 +1,11 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'doctor_appointments_screen.dart';
 import 'availability_screen.dart';
 import '../profile_page.dart';
-import 'doctor_dashboard_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DoctorDashboardScreen extends StatefulWidget {
   const DoctorDashboardScreen({super.key});
@@ -14,6 +16,54 @@ class DoctorDashboardScreen extends StatefulWidget {
 
 class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   int _selectedIndex = 0;
+  List<Map<String, dynamic>> appointments = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+    _fetchAppointments();
+  }
+
+  Future<void> _checkAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    }
+  }
+
+  Future<void> _fetchAppointments() async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) return;
+    final response = await http.get(
+      Uri.parse('http://localhost:5000/api/appointments/doctor'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        appointments = data.cast<Map<String, dynamic>>();
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erreur lors du chargement des rendez-vous.'),
+        ),
+      );
+    }
+  }
 
   void showNotificationsSheet() {
     showModalBottomSheet(
@@ -119,24 +169,15 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateFormat.yMMMMd('en_US').format(DateTime.now());
-    final appointments = [
-      {'patient': 'Karim Sanou', 'time': '09:00'},
-      {'patient': 'Fatou Ouédraogo', 'time': '11:00'},
-      {'patient': 'Djakari Konan', 'time': '09:00'},
-      {'patient': 'Clémence Zongo', 'time': '11:00'},
-    ];
-
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final List<Widget> pages = [
-      HomeDoctorScreen(
-        appointments: appointments,
-        onQuickAction: (int idx) => setState(() => _selectedIndex = idx),
-      ),
+      DoctorDashboardContent(appointments: appointments),
       const DoctorAppointmentsScreen(),
       const AvailabilityScreen(),
       const ProfileScreen(),
     ];
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: _buildAppBar(),
@@ -145,21 +186,55 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: (index) {
-          if (index == 3) {
-            showNotificationsSheet();
-          } else {
-            setState(() => _selectedIndex = index);
-          }
+          setState(() => _selectedIndex = index);
         },
         selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
-          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'RDV'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.schedule),
+            label: 'Appointments',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.event),
-            label: 'Disponibilité',
+            label: 'Availability',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DoctorDashboardContent extends StatelessWidget {
+  final List<Map<String, dynamic>> appointments;
+  const DoctorDashboardContent({super.key, required this.appointments});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Today's appointments (${appointments.length})",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 12),
+          ...appointments.map(
+            (rdv) => Card(
+              child: ListTile(
+                title: Text(rdv['patientName'] ?? ''),
+                subtitle: Text(rdv['date'] ?? ''),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );

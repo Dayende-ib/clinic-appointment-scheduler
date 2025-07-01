@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import '../patients/patient_dashboard_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'forgot_password_screen.dart';
+
+// URL de base de l'API
+const String apiBaseUrl = 'http://localhost:5000';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +18,68 @@ class _LoginPageState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
+
+  String? _validateEmail(String value) {
+    final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}');
+    if (value.isEmpty) return 'Veuillez entrer votre email';
+    if (!emailRegex.hasMatch(value)) return 'Email invalide';
+    return null;
+  }
+
+  String? _validatePassword(String value) {
+    if (value.isEmpty) return 'Veuillez entrer un mot de passe';
+    return null;
+  }
+
+  Future<void> _login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+    final emailError = _validateEmail(email);
+    final passwordError = _validatePassword(password);
+    if (emailError != null || passwordError != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(emailError ?? passwordError!)));
+      return;
+    }
+    try {
+      final response = await http.post(
+        Uri.parse('$apiBaseUrl/api/users/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final role = data['user']?['role'] ?? 'patient';
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        // Affiche le snackbar puis redirige après un court délai
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Connexion réussie !')));
+        await Future.delayed(const Duration(milliseconds: 800));
+        if (!mounted) return;
+        if (role == 'doctor') {
+          Navigator.pushReplacementNamed(context, '/doctor');
+        } else if (role == 'admin') {
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else {
+          Navigator.pushReplacementNamed(context, '/patient');
+        }
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Identifiants invalides.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur réseau ou serveur.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +97,7 @@ class _LoginPageState extends State<LoginScreen> {
                 height: 120,
                 width: 200,
                 child: Image.asset(
-                  'images/Logo-caretime.png',
+                  'assets/images/Logo-caretime.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -136,10 +204,15 @@ class _LoginPageState extends State<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // Naviguer vers page oubli
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen(),
+                      ),
+                    );
                   },
                   child: const Text(
-                    'Forgot password?',
+                    'Mot de passe oublié ?',
                     style: TextStyle(color: Color(0xFF0891B2)),
                   ),
                 ),
@@ -157,16 +230,7 @@ class _LoginPageState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Connexion
-                    // Navigation vers le dashboard patient
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MedicalDashboard(),
-                      ),
-                    );
-                  },
+                  onPressed: _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,

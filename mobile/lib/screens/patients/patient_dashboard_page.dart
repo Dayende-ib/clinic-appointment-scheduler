@@ -2,16 +2,33 @@ import 'package:flutter/material.dart';
 import 'appointments_page.dart';
 import 'doctor_list_page.dart';
 import '../profile_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MedicalDashboard extends StatefulWidget {
-  const MedicalDashboard({super.key});
+class PatientDashboardScreen extends StatefulWidget {
+  const PatientDashboardScreen({super.key});
 
   @override
-  State<MedicalDashboard> createState() => _MedicalDashboardState();
+  State<PatientDashboardScreen> createState() => _PatientDashboardScreenState();
 }
 
-class _MedicalDashboardState extends State<MedicalDashboard> {
+class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,115 +190,6 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Prochain rendez-vous card
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 10,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Next appointment',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    // Avatar du docteur
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF03A6A1).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        color: Color(0xFF03A6A1),
-                        size: 30,
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Dr. Sophie Martin',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Cardiologist',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 16,
-                                color: Colors.grey[600],
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                '15 Jul 2024, 10:00',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF0891B2).withOpacity(0.1),
-                        foregroundColor: Color(0xFF0891B2),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'see details',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 24),
-
           // Actions rapides
           Text(
             'Fast actions',
@@ -304,10 +212,10 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xFF0891B2).withOpacity(0.1),
+                      color: Color(0xFF0891B2).withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Color(0xFF0891B2).withOpacity(0.2),
+                        color: Color(0xFF0891B2).withAlpha((0.2 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -325,11 +233,7 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                         SizedBox(height: 12),
                         Text(
                           'New Appointment',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF0891B2),
-                          ),
+                          style: TextStyle(color: Color(0xFF0891B2)),
                         ),
                       ],
                     ),
@@ -347,12 +251,9 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xFF03A6A1).withOpacity(0.1),
+                      color: Color(0xFF03A6A1).withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Color(0xFF03A6A1).withOpacity(0.2),
-                        width: 1,
-                      ),
+                      border: Border.all(width: 1),
                     ),
                     child: Column(
                       children: [
@@ -401,9 +302,9 @@ class _MedicalDashboardState extends State<MedicalDashboard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  Icons.notifications_active,
-                  color: Colors.orange[600],
+                  Icons.warning_amber_rounded,
                   size: 20,
+                  color: Colors.orange,
                 ),
                 SizedBox(width: 12),
                 Expanded(

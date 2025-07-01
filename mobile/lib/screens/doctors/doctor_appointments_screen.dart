@@ -10,29 +10,8 @@ class DoctorAppointmentsScreen extends StatefulWidget {
 }
 
 class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
-  // Simule une liste de rendez-vous
-  List<Map<String, dynamic>> allAppointments = [
-    {
-      'date': DateTime.now().add(const Duration(hours: 2)),
-      'patient': 'Alice Martin',
-      'status': 'Upcoming',
-    },
-    {
-      'date': DateTime.now().add(const Duration(days: 1, hours: 1)),
-      'patient': 'Jean Dupont',
-      'status': 'Upcoming',
-    },
-    {
-      'date': DateTime.now().subtract(const Duration(days: 1)),
-      'patient': 'Sophie Bernard',
-      'status': 'Completed',
-    },
-    {
-      'date': DateTime.now().add(const Duration(days: 2)),
-      'patient': 'Paul Durand',
-      'status': 'Cancelled',
-    },
-  ];
+  // Liste des rendez-vous à fournir dynamiquement
+  List<Map<String, dynamic>> allAppointments = [];
 
   String filterStatus = 'All';
   String search = '';
@@ -120,7 +99,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                             elevation: 2,
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: statusColor.withOpacity(0.15),
+                                backgroundColor: statusColor.withAlpha(
+                                  (0.15 * 255).toInt(),
+                                ),
                                 child: Icon(Icons.person, color: statusColor),
                               ),
                               title: Text(

@@ -11,15 +11,9 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  // Demo data
-  List<Map<String, dynamic>> doctors = [
-    {'name': 'Dr. Dupont', 'active': true},
-    {'name': 'Dr. Martin', 'active': true},
-  ];
-  List<Map<String, dynamic>> patients = [
-    {'name': 'Alice Durand', 'active': true},
-    {'name': 'Bob Leroy', 'active': true},
-  ];
+  // Les listes doivent être alimentées dynamiquement
+  List<Map<String, dynamic>> doctors = [];
+  List<Map<String, dynamic>> patients = [];
 
   String doctorSearch = '';
   String patientSearch = '';

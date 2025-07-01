@@ -15,68 +15,7 @@ class AppointmentsScreen extends StatefulWidget {
 class _AppointmentsScreenState extends State<AppointmentsScreen> {
   String selectedFilter = 'all';
 
-  final List<Appointment> appointments = [
-    Appointment(
-      id: '1',
-      doctorName: 'Dr. Sophie Martin',
-      specialty: 'General Practitioner',
-      date: 'July 15, 2024',
-      time: '10:00',
-      status: AppointmentStatus.confirmed,
-      type: AppointmentType.upcoming,
-      avatar: '👩‍⚕️',
-    ),
-    Appointment(
-      id: '2',
-      doctorName: 'Dr. Pierre Dubois',
-      specialty: 'Endocrinologist',
-      date: 'July 20, 2024',
-      time: '14:30',
-      status: AppointmentStatus.pending,
-      type: AppointmentType.upcoming,
-      avatar: '👨‍⚕️',
-    ),
-    Appointment(
-      id: '3',
-      doctorName: 'Dr. Marie Leroy',
-      specialty: 'Endocrinologist',
-      date: 'July 25, 2024',
-      time: '16:00',
-      status: AppointmentStatus.confirmed,
-      type: AppointmentType.upcoming,
-      avatar: '👩‍⚕️',
-    ),
-    Appointment(
-      id: '4',
-      doctorName: 'Dr. Jean Dupont',
-      specialty: 'Physician',
-      date: 'June 10, 2024',
-      time: '09:30',
-      status: AppointmentStatus.completed,
-      type: AppointmentType.past,
-      avatar: '👨‍⚕️',
-    ),
-    Appointment(
-      id: '5',
-      doctorName: 'Dr. Anne Moreau',
-      specialty: 'Dentist',
-      date: 'May 15, 2024',
-      time: '15:00',
-      status: AppointmentStatus.completed,
-      type: AppointmentType.past,
-      avatar: '👩‍⚕️',
-    ),
-    Appointment(
-      id: '6',
-      doctorName: 'Dr. Paul Bernard',
-      specialty: 'Physician',
-      date: 'July 12, 2024',
-      time: '14:00',
-      status: AppointmentStatus.cancelled,
-      type: AppointmentType.cancelled,
-      avatar: '👨‍⚕️',
-    ),
-  ];
+  final List<Appointment> appointments = [];
 
   List<Appointment> get filteredAppointments {
     if (selectedFilter == 'all') return appointments;
@@ -494,13 +433,13 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   }
 
   void _modifyAppointment(Appointment appointment) =>
-      print('Modify appointment: ${appointment.doctorName}');
+      debugPrint('Modify appointment: \\${appointment.doctorName}');
   void _cancelAppointment(Appointment appointment) =>
-      print('Cancel appointment: ${appointment.doctorName}');
+      debugPrint('Cancel appointment: \\${appointment.doctorName}');
   void _viewReport(Appointment appointment) =>
-      print('View report: ${appointment.doctorName}');
+      debugPrint('View report: \\${appointment.doctorName}');
   void _rescheduleAppointment(Appointment appointment) =>
-      print('Reschedule appointment: ${appointment.doctorName}');
+      debugPrint('Reschedule appointment: \\${appointment.doctorName}');
 }
 
 class Appointment {

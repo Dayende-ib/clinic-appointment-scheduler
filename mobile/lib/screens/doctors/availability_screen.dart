@@ -42,10 +42,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   ];
   // Map<date, Set<heure>>
   Map<String, Set<String>> availableSlots = {};
-  Map<String, Set<String>> busySlots = {
-    // Exemples de créneaux déjà pris
-    _dbDateFormat.format(DateTime.now()): {'09:00', '15:00'},
-  };
+  Map<String, Set<String>> busySlots = {};
 
   DateTime selectedWeekStart = DateTime.now();
 
@@ -245,7 +242,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   headingRowColor: WidgetStateProperty.all(
-                    AppColors.secondary.withOpacity(0.1),
+                    AppColors.secondary.withAlpha((0.1 * 255).toInt()),
                   ),
                   columns: [
                     DataColumn(
@@ -261,10 +258,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                           onTap: () => toggleDay(day),
                           child: Column(
                             children: [
-                              Text(weekDays[i], textAlign: TextAlign.center),
+                              Text(weekDays[i]),
                               Text(
                                 _displayDateFormat.format(day),
-                                textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.primary,

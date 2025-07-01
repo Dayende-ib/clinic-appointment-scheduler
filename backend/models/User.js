@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   firstname: { type: String, required: true },
   lastname: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
+  phone: { type: String }, // optionnel
   password: { type: String, required: true },
   role: {
     type: String,
@@ -11,6 +12,9 @@ const userSchema = new mongoose.Schema({
     default: "patient"
   },
   specialty: { type: String }, // optionnel si doctor
+  licenseNumber: { type: String }, // optionnel si doctor
+  country: { type: String }, // optionnel
+  city: { type: String }, // optionnel
   dateOfBirth: { type: Date, required: true },
   gender: {
     type: String,

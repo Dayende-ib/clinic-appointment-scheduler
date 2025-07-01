@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AllDoctorSchedulesScreen extends StatefulWidget {
   final List<Map<String, dynamic>> doctors;
@@ -13,75 +12,12 @@ class AllDoctorSchedulesScreen extends StatefulWidget {
 class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
   String search = '';
 
-  // Add more fake doctors
-  List<Map<String, dynamic>> get allDoctors => [
-    {'name': 'Dr. Smith', 'active': true},
-    {'name': 'Dr. Johnson', 'active': true},
-    {'name': 'Dr. Williams', 'active': true},
-    {'name': 'Dr. Brown', 'active': true},
-    {'name': 'Dr. Jones', 'active': true},
-    {'name': 'Dr. Miller', 'active': true},
-    {'name': 'Dr. Davis', 'active': true},
-    {'name': 'Dr. Garcia', 'active': true},
-    {'name': 'Dr. Rodriguez', 'active': true},
-    {'name': 'Dr. Wilson', 'active': true},
-    {'name': 'Dr. Martinez', 'active': true},
-    {'name': 'Dr. Anderson', 'active': true},
-    {'name': 'Dr. Taylor', 'active': true},
-    {'name': 'Dr. Thomas', 'active': true},
-    {'name': 'Dr. Hernandez', 'active': true},
-  ];
+  // Les médecins doivent être fournis dynamiquement via widget.doctors
+  List<Map<String, dynamic>> get allDoctors => widget.doctors;
 
-  // Generate enriched fake schedules for each doctor for a month
+  // Les plannings doivent être fournis dynamiquement ou via une source réelle
   Map<String, List<Map<String, String>>> getMonthlySchedules() {
-    final now = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
-    final List<String> doctorNames =
-        allDoctors.map((d) => d['name'] as String).toList();
-    final Map<String, List<Map<String, String>>> schedules = {};
-    final List<String> types = [
-      'Consultation',
-      'Operation',
-      'Visit',
-      'Teleconsultation',
-      'Emergency',
-    ];
-    final List<String> locations = [
-      'Office A',
-      'Office B',
-      'Clinic X',
-      'Online',
-      'Hospital Y',
-    ];
-    final List<String> patients = [
-      'Alice Smith',
-      'Bob Johnson',
-      'John Williams',
-      'Sophie Brown',
-      'Paul Jones',
-      'Emma Miller',
-      'Lucas Davis',
-      'Olivia Garcia',
-      'Liam Rodriguez',
-      'Mia Wilson',
-    ];
-    for (final doctor in doctorNames) {
-      schedules[doctor] = [];
-      for (int day = 1; day <= daysInMonth; day++) {
-        if (day % 3 == 0) {
-          schedules[doctor]!.add({
-            'date': DateFormat(
-              'MM/dd/yyyy',
-            ).format(DateTime(now.year, now.month, day)),
-            'type': types[day % types.length],
-            'location': locations[day % locations.length],
-            'patient': patients[day % patients.length],
-            'time': '${8 + (day % 8)}:00',
-          });
-        }
-      }
-    }
-    return schedules;
+    return {};
   }
 
   @override

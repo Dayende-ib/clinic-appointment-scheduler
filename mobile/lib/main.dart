@@ -3,6 +3,9 @@ import 'package:caretime/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:caretime/screens/welcome_page.dart';
+import 'package:caretime/screens/doctors/home_page.dart';
+import 'package:caretime/screens/patients/patient_dashboard_page.dart';
+import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +26,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         textTheme: GoogleFonts.poppinsTextTheme(textTheme),
       ),
-      home: const WelcomeScreen(),
+      // home: const WelcomeScreen(),
+      initialRoute: '/',
+      // Define routes for navigation
+      routes: {
+        '/': (context) => const WelcomeScreen(),
+        '/doctor': (context) => DoctorDashboardScreen(),
+        '/patient': (context) => PatientDashboardScreen(),
+        '/admin': (context) => AdminDashboardScreen(),
+      },
     );
   }
 }
