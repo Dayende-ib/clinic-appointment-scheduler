@@ -88,10 +88,10 @@ exports.login = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
 
 // Récupérer le profil de l'utilisateur connecté
 exports.getMe = async (req, res) => {
-  console.log(req.user)
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
@@ -104,7 +104,7 @@ exports.getMe = async (req, res) => {
 // Modifier le profil de l'utilisateur connecté
 exports.updateMe = async (req, res) => {
   try {
-    const fields = ['name', 'specialty', 'email', 'phone', 'city'];
+    const fields = ['firstname', 'lastname', 'specialty', 'email', 'phone', 'city'];
     const updates = {};
     fields.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
@@ -123,7 +123,6 @@ exports.updateMe = async (req, res) => {
     // Retourne un objet filtré
     res.json({
       id: user._id,
-      name: user.name,
       lastname: user.lastname,
       firstname: user.firstname,
       email: user.email,
@@ -137,4 +136,3 @@ exports.updateMe = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
-}

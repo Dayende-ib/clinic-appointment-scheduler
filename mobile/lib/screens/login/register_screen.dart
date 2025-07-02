@@ -44,8 +44,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Pediatrics',
     'Ophthalmology',
     'General practitioner',
+    'Neurology',
+    'Psychiatry',
+    'Orthopedics',
+    'ENT',
+    'Urology',
+    'Oncology',
+    'Radiology',
+    'Anesthesiology',
+    'Endocrinology',
+    'Nephrology',
+    'Pulmonology',
+    'Rheumatology',
+    'Infectious diseases',
+    'Hematology',
+    'Gastroenterology',
     'Other',
   ];
+
+  final List<String> _westAfricanCountries = [
+    'Bénin',
+    'Burkina Faso',
+    'Cap-Vert',
+    'Côte d’Ivoire',
+    'Gambie',
+    'Ghana',
+    'Guinée',
+    'Guinée-Bissau',
+    'Libéria',
+    'Mali',
+    'Mauritanie',
+    'Niger',
+    'Nigéria',
+    'Sénégal',
+    'Sierra Leone',
+    'Togo',
+  ];
+  String? _selectedCountry;
   String? _selectedGender;
   String? _selectedSpecialty;
 
@@ -287,13 +322,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _countryController,
+                        // Champ pays remplacé par un dropdown
+                        DropdownButtonFormField<String>(
+                          value: _selectedCountry,
                           decoration: const InputDecoration(
                             labelText: 'Country',
                             prefixIcon: Icon(Icons.flag_outlined),
                             border: OutlineInputBorder(),
                           ),
+                          items:
+                              _westAfricanCountries
+                                  .map(
+                                    (c) => DropdownMenuItem(
+                                      value: c,
+                                      child: Text(c),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedCountry = val;
+                              _countryController.text = val ?? '';
+                            });
+                          },
+                          validator:
+                              (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Required field'
+                                      : null,
                         ),
                         const SizedBox(height: 24),
                         CheckboxListTile(

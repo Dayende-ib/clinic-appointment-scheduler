@@ -6,6 +6,8 @@ import 'package:caretime/screens/welcome_page.dart';
 import 'package:caretime/screens/doctors/home_page.dart';
 import 'package:caretime/screens/patients/patient_dashboard_page.dart';
 import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
+import 'package:caretime/screens/login/login_screen.dart';
+import 'package:caretime/screens/login/register_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,11 +28,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         textTheme: GoogleFonts.poppinsTextTheme(textTheme),
       ),
-      // home: const WelcomeScreen(),
-      initialRoute: '/',
+      home: const WelcomeScreen(),
       // Define routes for navigation
       routes: {
-        '/': (context) => const WelcomeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
         '/doctor': (context) => DoctorDashboardScreen(),
         '/patient': (context) => PatientDashboardScreen(),
         '/admin': (context) => AdminDashboardScreen(),

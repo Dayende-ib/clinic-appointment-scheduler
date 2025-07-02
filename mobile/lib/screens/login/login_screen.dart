@@ -54,6 +54,7 @@ class _LoginPageState extends State<LoginScreen> {
         final role = data['user']?['role'] ?? 'patient';
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
+        await prefs.setString('role', role);
         // Affiche le snackbar puis redirige après un court délai
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -244,6 +245,29 @@ class _LoginPageState extends State<LoginScreen> {
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(color: Color(0xFF374151)),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/register');
+                    },
+                    child: const Text(
+                      "Sign up",
+                      style: TextStyle(
+                        color: Color(0xFF0891B2),
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

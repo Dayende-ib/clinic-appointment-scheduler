@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// URL de base de l'API
+const String apiBaseUrl = 'http://localhost:5000';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -24,23 +27,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetchUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    if (token == null) return;
-    final response = await http.get(
-      Uri.parse('http://localhost:5000/api/users/me'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      setState(() {
-        userData = jsonDecode(response.body);
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur lors du chargement du profil.')),
+    // Si le token est null, on arrête le chargement. _checkAuth s'occupera de la redirection.
+    if (token == null) {
+      if (mounted) setState(() => isLoading = false);
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$apiBaseUrl/api/users/me'),
+        headers: {'Authorization': 'Bearer $token'},
       );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          userData = data;
+          isLoading = false;
+        });
+        // Stocke localement les données utilisateur
+        await prefs.setString('userData', jsonEncode(data));
+      } else {
+        // Si erreur serveur, tente de charger les données locales
+        final local = prefs.getString('userData');
+        if (local != null) {
+          setState(() {
+            userData = jsonDecode(local);
+            isLoading = false;
+          });
+        } else {
+          setState(() => isLoading = false);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur lors du chargement du profil.')),
+        );
+      }
+    } catch (e) {
+      // Si erreur réseau, tente de charger les données locales
+      final local = prefs.getString('userData');
+      if (local != null) {
+        setState(() {
+          userData = jsonDecode(local);
+          isLoading = false;
+        });
+      } else {
+        if (mounted) setState(() => isLoading = false);
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur de connexion : $e')));
     }
   }
 
@@ -54,10 +91,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
+  Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    Navigator.pushReplacementNamed(context, '/login');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Déconnexion'),
+          content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirmer'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -144,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      userData!['name'] ?? '',
+                      "${userData!['firstname'] ?? ''} ${userData!['lastname'] ?? ''}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -194,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      final updated = await Navigator.push(
+                      final updatedUserData = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder:
@@ -202,7 +268,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   EditProfileScreen(userData: userData!),
                         ),
                       );
-                      if (updated == true) _fetchUserData();
+                      if (updatedUserData != null && mounted) {
+                        setState(() {
+                          userData = updatedUserData;
+                        });
+                        // Met à jour le cache local après modification
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString(
+                          'userData',
+                          jsonEncode(updatedUserData),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.edit),
                     label: const Text("Modifier"),
@@ -217,9 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      _logout(context);
-                    },
+                    onPressed: _showLogoutConfirmationDialog,
                     icon: const Icon(Icons.logout, color: Colors.red),
                     label: const Text("Déconnexion"),
                     style: OutlinedButton.styleFrom(
@@ -278,7 +352,9 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late TextEditingController nameController;
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController firstnameController;
+  late TextEditingController lastnameController;
   late TextEditingController specialtyController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
@@ -288,7 +364,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.userData['name'] ?? '');
+    firstnameController = TextEditingController(
+      text: widget.userData['firstname'] ?? '',
+    );
+    lastnameController = TextEditingController(
+      text: widget.userData['lastname'] ?? '',
+    );
     specialtyController = TextEditingController(
       text: widget.userData['specialty'] ?? '',
     );
@@ -303,7 +384,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    firstnameController.dispose();
+    lastnameController.dispose();
     specialtyController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -312,18 +394,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() => isSaving = true);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token == null) return;
     final response = await http.put(
-      Uri.parse('http://localhost:5000/api/users/me'),
+      Uri.parse('$apiBaseUrl/api/users/me'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'name': nameController.text.trim(),
+        'firstname': firstnameController.text.trim(),
+        'lastname': lastnameController.text.trim(),
         'specialty': specialtyController.text.trim(),
         'email': emailController.text.trim(),
         'phone': phoneController.text.trim(),
@@ -333,59 +420,104 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => isSaving = false);
     if (response.statusCode == 200) {
       if (mounted) {
-        Navigator.pop(context, true);
+        final updatedData = jsonDecode(response.body);
+        Navigator.pop(context, updatedData);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur lors de la sauvegarde.')),
-      );
+      final errorData = jsonDecode(response.body);
+      final message = errorData['message'] ?? 'Erreur lors de la sauvegarde.';
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Modifier le profil')),
+      // Suppression de l'AppBar ici pour n'avoir qu'un seul AppBar sur la page principale
       body: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Nom'),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: firstnameController,
+                  decoration: const InputDecoration(labelText: 'Prénom'),
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? 'Champ requis'
+                              : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: lastnameController,
+                  decoration: const InputDecoration(labelText: 'Nom'),
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? 'Champ requis'
+                              : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: specialtyController,
+                  decoration: const InputDecoration(labelText: 'Spécialité'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Champ requis';
+                    }
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
+                      return 'Veuillez entrer un email valide';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(labelText: 'Téléphone'),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: cityController,
+                  decoration: const InputDecoration(labelText: 'Ville'),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isSaving ? null : _save,
+                    child:
+                        isSaving
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 3,
+                              ),
+                            )
+                            : const Text('Enregistrer'),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: specialtyController,
-              decoration: const InputDecoration(labelText: 'Spécialité'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(labelText: 'Téléphone'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: cityController,
-              decoration: const InputDecoration(labelText: 'Ville'),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isSaving ? null : _save,
-                child:
-                    isSaving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Enregistrer'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
