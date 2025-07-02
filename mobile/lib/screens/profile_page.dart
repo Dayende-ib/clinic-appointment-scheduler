@@ -20,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // _redirectByRole(); // Suppression de la redirection automatique ici
     _checkAuth();
     _fetchUserData();
   }
@@ -49,6 +50,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         // Stocke localement les données utilisateur
         await prefs.setString('userData', jsonEncode(data));
+        // Met à jour le rôle local si besoin
+        if (data['role'] != null) {
+          await prefs.setString('role', data['role']);
+        }
       } else {
         // Si erreur serveur, tente de charger les données locales
         final local = prefs.getString('userData');
@@ -168,12 +173,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
         title: const Text(
-          'Mon Profil',
+          'Profile',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: Color(0xFF0891B2),

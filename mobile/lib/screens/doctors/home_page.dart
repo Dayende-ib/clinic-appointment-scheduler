@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'doctor_appointments_screen.dart';
-import 'availability_screen.dart';
+import 'doctor_availability_page.dart';
 import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -175,7 +175,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     final List<Widget> pages = [
       DoctorDashboardContent(appointments: appointments),
       const DoctorAppointmentsScreen(),
-      const AvailabilityScreen(),
+      const DoctorAvailabilityPage(),
       const ProfileScreen(),
     ];
     return Scaffold(

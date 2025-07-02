@@ -1,9 +1,14 @@
 const Availability = require("../models/Availability");
 
+// Sauvegarde ou met à jour les créneaux d'un docteur pour une date donnée
 exports.setAvailability = async (req, res) => {
   try {
     const doctorId = req.user.id;
     const { date, slots } = req.body;
+
+    if (!date || !Array.isArray(slots) || slots.length === 0) {
+      return res.status(400).json({ message: "Date ou créneaux manquants" });
+    }
 
     // Vérifie s'il existe déjà une dispo pour cette date
     let availability = await Availability.findOne({ doctorId, date });
@@ -21,10 +26,15 @@ exports.setAvailability = async (req, res) => {
   }
 };
 
+// Récupère les créneaux d'un docteur pour une date donnée
 exports.getAvailability = async (req, res) => {
   try {
     const { doctorId } = req.params;
     const { date } = req.query;
+
+    if (!doctorId || !date) {
+      return res.status(400).json({ message: "Paramètres manquants" });
+    }
 
     const availability = await Availability.findOne({ doctorId, date });
 
