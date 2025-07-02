@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:caretime/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:caretime/screens/welcome_page.dart';
 import 'package:caretime/screens/doctors/home_page.dart';
 import 'package:caretime/screens/patients/patient_dashboard_page.dart';
 import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
@@ -34,7 +33,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/doctor': (context) => DoctorDashboardScreen(),
+        '/doctor': (context) => DoctorHomeScreen(),
         '/patient': (context) => PatientDashboardScreen(),
         '/admin': (context) => AdminDashboardScreen(),
       },

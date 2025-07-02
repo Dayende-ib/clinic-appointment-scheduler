@@ -47,3 +47,18 @@ exports.getAvailability = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Supprimer toutes les disponibilités d'un docteur pour une date donnée
+exports.deleteAvailability = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const { date } = req.query;
+    if (!date) {
+      return res.status(400).json({ message: "Date manquante" });
+    }
+    await Availability.deleteOne({ doctorId, date });
+    res.status(200).json({ message: "Disponibilité supprimée" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

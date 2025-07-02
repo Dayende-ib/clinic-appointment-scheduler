@@ -1,29 +1,28 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'doctor_dashboard_screen.dart';
 import 'doctor_appointments_screen.dart';
-import 'doctor_availability_page.dart';
+import 'doctor_quick_availability_page.dart';
 import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DoctorDashboardScreen extends StatefulWidget {
-  const DoctorDashboardScreen({super.key});
+class DoctorHomeScreen extends StatefulWidget {
+  const DoctorHomeScreen({super.key});
 
   @override
-  State<DoctorDashboardScreen> createState() => _DoctorDashboardScreenState();
+  State<DoctorHomeScreen> createState() => _DoctorHomeScreenState();
 }
 
-class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
+class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   int _selectedIndex = 0;
-  List<Map<String, dynamic>> appointments = [];
-  bool isLoading = true;
+  bool isLoading = false;
+  String doctorName = '';
 
   @override
   void initState() {
     super.initState();
     _checkAuth();
-    _fetchAppointments();
+    _loadDoctorName();
   }
 
   Future<void> _checkAuth() async {
@@ -36,33 +35,12 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     }
   }
 
-  Future<void> _fetchAppointments() async {
-    setState(() {
-      isLoading = true;
-    });
+  Future<void> _loadDoctorName() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    if (token == null) return;
-    final response = await http.get(
-      Uri.parse('http://localhost:5000/api/appointments/doctor'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      setState(() {
-        appointments = data.cast<Map<String, dynamic>>();
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erreur lors du chargement des rendez-vous.'),
-        ),
-      );
-    }
+    final firstname = prefs.getString('firstname') ?? '';
+    setState(() {
+      doctorName = firstname;
+    });
   }
 
   void showNotificationsSheet() {
@@ -114,16 +92,16 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     String title;
     String? subtitle;
     if (_selectedIndex == 0) {
-      title = "Welcome Doctor 👨‍⚕️";
+      title =
+          doctorName.isNotEmpty
+              ? "Welcome Dr. $doctorName 👨‍⚕️"
+              : "Welcome Doctor 👨‍⚕️";
       subtitle = "Today is $today";
     } else if (_selectedIndex == 1) {
       title = "Appointments";
       subtitle = null;
     } else if (_selectedIndex == 2) {
       title = "Availability";
-      subtitle = null;
-    } else if (_selectedIndex == 3) {
-      title = "Profile";
       subtitle = null;
     } else {
       title = "";
@@ -173,9 +151,9 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final List<Widget> pages = [
-      DoctorDashboardContent(appointments: appointments),
+      const DoctorDashboardScreen(),
       const DoctorAppointmentsScreen(),
-      const DoctorAvailabilityPage(),
+      const DoctorQuickAvailabilityPage(),
       const ProfileScreen(),
     ];
     return Scaffold(
@@ -200,41 +178,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             icon: Icon(Icons.event),
             label: 'Availability',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class DoctorDashboardContent extends StatelessWidget {
-  final List<Map<String, dynamic>> appointments;
-  const DoctorDashboardContent({super.key, required this.appointments});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Today's appointments (${appointments.length})",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          ...appointments.map(
-            (rdv) => Card(
-              child: ListTile(
-                title: Text(rdv['patientName'] ?? ''),
-                subtitle: Text(rdv['date'] ?? ''),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
         ],
       ),
     );

@@ -55,6 +55,12 @@ class _LoginPageState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
         await prefs.setString('role', role);
+        final userId = data['user']?['_id'] ?? data['user']?['id'];
+        if (userId != null) {
+          await prefs.setString('userId', userId);
+        }
+        await prefs.setString('firstname', data['user']?['firstname'] ?? '');
+        await prefs.setString('lastname', data['user']?['lastname'] ?? '');
         // Affiche le snackbar puis redirige après un court délai
         if (!mounted) return;
         ScaffoldMessenger.of(

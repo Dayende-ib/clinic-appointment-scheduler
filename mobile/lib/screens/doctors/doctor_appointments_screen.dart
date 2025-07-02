@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../services/doctor_appointment_service.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
   const DoctorAppointmentsScreen({super.key});
@@ -10,16 +11,51 @@ class DoctorAppointmentsScreen extends StatefulWidget {
 }
 
 class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
-  // Liste des rendez-vous à fournir dynamiquement
   List<Map<String, dynamic>> allAppointments = [];
-
   String filterStatus = 'All';
   String search = '';
-
   List<String> statusOptions = ['All', 'Upcoming', 'Completed', 'Cancelled'];
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppointments();
+  }
+
+  Future<void> _loadAppointments() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final data = await DoctorAppointmentService.fetchDoctorAppointments();
+      setState(() {
+        allAppointments = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (error != null) {
+      return Center(
+        child: Text(
+          'Erreur: '
+          '$error',
+        ),
+      );
+    }
     List<Map<String, dynamic>> filtered =
         allAppointments.where((rdv) {
           final matchesStatus =
@@ -121,7 +157,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  if (status == 'To come up')
+                                  if (status == 'Upcoming')
                                     TextButton(
                                       onPressed: () {},
                                       child: const Text('Show Details'),
