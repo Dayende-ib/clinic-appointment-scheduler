@@ -13,7 +13,9 @@ exports.register = async (req, res) => {
       gender,
       role,
       specialty,
-      licenseNumber
+      licenseNumber,
+      country,
+      city
     } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -29,7 +31,9 @@ exports.register = async (req, res) => {
       gender,
       role,
       specialty,
-      licenseNumber
+      licenseNumber,
+      country,
+      city
     });
 
     // Générer un token JWT
@@ -49,7 +53,9 @@ exports.register = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         specialty: newUser.specialty,
-        licenseNumber: newUser.licenseNumber
+        licenseNumber: newUser.licenseNumber,
+        country: newUser.country,
+        city: newUser.city
       }
     });
   } catch (err) {

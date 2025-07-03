@@ -15,6 +15,9 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
 
   String? selectedSpecialty;
   int? selectedDoctorIndex;
+  String? selectedCountry;
+  String? selectedCity;
+  String search = '';
 
   List<Map<String, dynamic>> doctors = [];
   bool isLoading = true;
@@ -57,28 +60,66 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
     'Rheumatology',
   ];
 
-  List<Doctor> get filteredDoctors {
-    if (selectedSpecialty == null || selectedSpecialty == 'All specialties') {
-      return doctors
-          .map(
-            (d) => Doctor(
-              id: d['_id'] ?? d['id'] ?? '',
-              name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
-              specialty: d['specialty'] ?? '',
-              rating:
-                  d['rating'] is double
-                      ? d['rating']
-                      : double.tryParse(d['rating']?.toString() ?? '') ?? 0.0,
-              reviews:
-                  d['reviews'] is int
-                      ? d['reviews']
-                      : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
-              image: d['image'] ?? 'assets/images/male-doctor-icon.png',
-            ),
-          )
-          .toList();
+  List<String> get countries {
+    final set = <String>{};
+    for (final d in doctors) {
+      final c = (d['country'] ?? '').toString().trim();
+      if (c.isNotEmpty) set.add(c);
     }
+    return ['All countries', ...set.toList()..sort()];
+  }
+
+  List<String> get cities {
+    final set = <String>{};
+    for (final d in doctors) {
+      if (selectedCountry != null && selectedCountry != 'All countries') {
+        if ((d['country'] ?? '') != selectedCountry) continue;
+      }
+      final c = (d['city'] ?? '').toString().trim();
+      if (c.isNotEmpty) set.add(c);
+    }
+    return ['All cities', ...set.toList()..sort()];
+  }
+
+  List<Doctor> get filteredDoctors {
+    final searchLower = search.toLowerCase();
     return doctors
+        .where((d) {
+          final matchesSpecialty =
+              selectedSpecialty == null ||
+              selectedSpecialty == 'All specialties' ||
+              d['specialty'] == selectedSpecialty;
+          final matchesCountry =
+              selectedCountry == null ||
+              selectedCountry == 'All countries' ||
+              d['country'] == selectedCountry;
+          final matchesCity =
+              selectedCity == null ||
+              selectedCity == 'All cities' ||
+              d['city'] == selectedCity;
+          final matchesSearch =
+              searchLower.isEmpty ||
+              (d['firstname'] ?? '').toString().toLowerCase().contains(
+                searchLower,
+              ) ||
+              (d['lastname'] ?? '').toString().toLowerCase().contains(
+                searchLower,
+              ) ||
+              ((d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''))
+                  .toLowerCase()
+                  .contains(searchLower) ||
+              (d['specialty'] ?? '').toString().toLowerCase().contains(
+                searchLower,
+              ) ||
+              (d['country'] ?? '').toString().toLowerCase().contains(
+                searchLower,
+              ) ||
+              (d['city'] ?? '').toString().toLowerCase().contains(searchLower);
+          return matchesSpecialty &&
+              matchesCountry &&
+              matchesCity &&
+              matchesSearch;
+        })
         .map(
           (d) => Doctor(
             id: d['_id'] ?? d['id'] ?? '',
@@ -93,9 +134,10 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                     ? d['reviews']
                     : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
             image: d['image'] ?? 'assets/images/male-doctor-icon.png',
+            country: d['country'] ?? '',
+            city: d['city'] ?? '',
           ),
         )
-        .where((doctor) => doctor.specialty == selectedSpecialty)
         .toList();
   }
 
@@ -142,12 +184,6 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_horiz, color: Colors.black87),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -167,7 +203,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
               ),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: "Search for doctor...",
+                  hintText: "Search for a doctor...",
                   hintStyle: TextStyle(color: Colors.grey[400]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                   suffixIcon: IconButton(
@@ -187,6 +223,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                     vertical: 12,
                   ),
                 ),
+                onChanged: (v) => setState(() => search = v),
               ),
             ),
           ),
@@ -240,6 +277,49 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                 ],
               ),
             ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: selectedCountry ?? 'All countries',
+                    isExpanded: true,
+                    items:
+                        countries
+                            .map(
+                              (c) => DropdownMenuItem(value: c, child: Text(c)),
+                            )
+                            .toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedCountry = val;
+                        selectedCity = null; // reset city when country changes
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: selectedCity ?? 'All cities',
+                    isExpanded: true,
+                    items:
+                        cities
+                            .map(
+                              (c) => DropdownMenuItem(value: c, child: Text(c)),
+                            )
+                            .toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedCity = val;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: 8),
           Expanded(
             child: Padding(
@@ -311,20 +391,22 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final country = doctor.country ?? '';
+    final city = doctor.city ?? '';
     return Container(
       decoration: BoxDecoration(
         color: isSelected ? primaryColor : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -332,7 +414,7 @@ class DoctorCard extends StatelessWidget {
               children: [
                 doctor.image.isNotEmpty
                     ? CircleAvatar(
-                      radius: 20,
+                      radius: 16,
                       backgroundImage: AssetImage(doctor.image),
                       backgroundColor:
                           isSelected
@@ -340,7 +422,7 @@ class DoctorCard extends StatelessWidget {
                               : Colors.grey[200],
                     )
                     : CircleAvatar(
-                      radius: 20,
+                      radius: 16,
                       backgroundColor:
                           isSelected
                               ? Colors.white.withAlpha((0.2 * 255).toInt())
@@ -350,7 +432,7 @@ class DoctorCard extends StatelessWidget {
                         color: isSelected ? Colors.white : Colors.grey[600],
                       ),
                     ),
-                SizedBox(width: 12),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     doctor.name,
@@ -365,7 +447,7 @@ class DoctorCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 4),
             Text(
               doctor.specialty,
               style: TextStyle(
@@ -376,6 +458,22 @@ class DoctorCard extends StatelessWidget {
                         : Colors.grey[600],
               ),
             ),
+            if (city.isNotEmpty || country.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: Text(
+                  [city, country].where((s) => s.isNotEmpty).join(', '),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color:
+                        isSelected
+                            ? Colors.white.withAlpha((0.7 * 255).toInt())
+                            : Colors.grey[500],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             Spacer(),
             Row(
               children: [
@@ -383,7 +481,7 @@ class DoctorCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onArrowTap,
                   child: Container(
-                    padding: EdgeInsets.all(6),
+                    padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color:
                           isSelected
@@ -393,7 +491,7 @@ class DoctorCard extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.arrow_forward,
-                      size: 16,
+                      size: 14,
                       color: isSelected ? Colors.white : Colors.grey[600],
                     ),
                   ),
@@ -414,6 +512,8 @@ class Doctor {
   final double rating;
   final int reviews;
   final String image;
+  final String? country;
+  final String? city;
 
   Doctor({
     required this.id,
@@ -422,6 +522,8 @@ class Doctor {
     required this.rating,
     required this.reviews,
     required this.image,
+    this.country,
+    this.city,
   });
 }
 

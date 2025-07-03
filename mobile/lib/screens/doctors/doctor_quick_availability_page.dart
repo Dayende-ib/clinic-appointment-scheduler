@@ -140,122 +140,208 @@ class _DoctorQuickAvailabilityPageState
   @override
   Widget build(BuildContext context) {
     final weekDates = getWeekDates();
+    final Color mainColor = const Color(0xFF03A6A1);
+    final Color accentColor = const Color(0xFF0891B2);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Availabilities'),
-        actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: _showAddSlotSheet),
-        ],
+        backgroundColor: mainColor,
+        elevation: 0,
+        title: const Text(
+          'My Availabilities',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        centerTitle: false,
+        automaticallyImplyLeading: true,
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: accentColor,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Add'),
+        onPressed: _showAddSlotSheet,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+      ),
+      backgroundColor: const Color(0xFFF5F7FA),
       body:
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : weekAvailabilities.isEmpty
-              ? const Center(child: Text('No availabilities yet.'))
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.event_busy, size: 64, color: Colors.grey[300]),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'No availabilities yet.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              )
               : ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 children:
                     weekDates.map((date) {
                       final key = DateFormat('yyyy-MM-dd').format(date);
                       final slots = weekAvailabilities[key] ?? [];
                       if (slots.isEmpty) return const SizedBox.shrink();
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      DateFormat(
-                                        'EEEE, dd MMMM',
-                                        'en_US',
-                                      ).format(date),
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleMedium,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                    ),
-                                    tooltip: 'Delete all slots for this day',
-                                    onPressed: () async {
-                                      final success =
-                                          await DoctorAvailabilityService.deleteAvailabilityForDate(
-                                            date,
-                                          );
-                                      await _loadWeekAvailabilities();
-                                      if (!mounted) return;
-                                      if (success) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'All slots deleted for this day.',
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Error while deleting slots.',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                children: [
-                                  for (int i = 0; i < slots.length; i++)
-                                    Chip(
-                                      label: Text(
-                                        '${slots[i]['start']} - ${slots[i]['end']}',
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        margin: const EdgeInsets.only(bottom: 22),
+                        child: Card(
+                          elevation: 6,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          color: const Color(0xFFE6F7FA),
+                          child: Padding(
+                            padding: const EdgeInsets.all(22),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 6,
                                       ),
-                                      onDeleted: () async {
-                                        // Suppression d'un créneau
-                                        slots.removeAt(i);
-                                        await DoctorAvailabilityService.addAvailability(
-                                          date: date,
-                                          slots: slots,
-                                        );
+                                      decoration: BoxDecoration(
+                                        color: mainColor.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Text(
+                                        DateFormat(
+                                          'EEE, dd MMM',
+                                          'en_US',
+                                        ).format(date),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0891B2),
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () async {
+                                        final success =
+                                            await DoctorAvailabilityService.deleteAvailabilityForDate(
+                                              date,
+                                            );
                                         await _loadWeekAvailabilities();
                                         if (!mounted) return;
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Slot deleted.'),
+                                          SnackBar(
+                                            content: Row(
+                                              children: const [
+                                                Icon(
+                                                  Icons.delete_forever,
+                                                  color: Colors.white,
+                                                ),
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  'All slots deleted for this day.',
+                                                ),
+                                              ],
+                                            ),
+                                            backgroundColor: Colors.redAccent,
                                           ),
                                         );
                                       },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.12),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.delete_forever,
+                                          color: Colors.red,
+                                          size: 24,
+                                        ),
+                                      ),
                                     ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _addFullWeekSlots,
-                                    child: const Text('Full Week'),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 10,
+                                  children: [
+                                    for (int i = 0; i < slots.length; i++)
+                                      AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 250,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        child: Chip(
+                                          label: Text(
+                                            '${slots[i]['start']} - ${slots[i]['end']}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF0891B2),
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.white,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                          deleteIcon: const Icon(
+                                            Icons.close,
+                                            size: 18,
+                                            color: Colors.redAccent,
+                                          ),
+                                          onDeleted: () async {
+                                            slots.removeAt(i);
+                                            await DoctorAvailabilityService.addAvailability(
+                                              date: date,
+                                              slots: slots,
+                                            );
+                                            await _loadWeekAvailabilities();
+                                            if (!mounted) return;
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: const [
+                                                    Icon(
+                                                      Icons.check_circle,
+                                                      color: Colors.white,
+                                                    ),
+                                                    SizedBox(width: 8),
+                                                    Text('Slot deleted.'),
+                                                  ],
+                                                ),
+                                                backgroundColor: mainColor,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -284,18 +370,29 @@ class _AddSlotSheet extends StatefulWidget {
 class _AddSlotSheetState extends State<_AddSlotSheet> {
   DateTime selectedDate = DateTime.now();
   Set<String> selectedSlots = {};
+  DateTime displayedMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
-  List<DateTime> getWeekDates() {
-    final today = DateTime.now();
-    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-    return List.generate(7, (i) => startOfWeek.add(Duration(days: i)))
-        .where((d) => !d.isBefore(DateTime(today.year, today.month, today.day)))
-        .toList();
+  List<DateTime> getMonthDates() {
+    final firstDay = DateTime(displayedMonth.year, displayedMonth.month, 1);
+    final lastDay =
+        DateTime(displayedMonth.year, displayedMonth.month + 1, 0).day;
+    return List.generate(
+      lastDay,
+      (i) => DateTime(displayedMonth.year, displayedMonth.month, i + 1),
+    ).where((d) {
+      // Si mois courant, on ne montre que les jours >= aujourd'hui
+      if (displayedMonth.year == DateTime.now().year &&
+          displayedMonth.month == DateTime.now().month) {
+        return !d.isBefore(DateTime.now());
+      }
+      return true;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final weekDates = getWeekDates();
+    final monthDates = getMonthDates();
+    final monthLabel = DateFormat('MMMM yyyy').format(displayedMonth);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -307,14 +404,65 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
+          // Sélecteur de mois
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () {
+                  setState(() {
+                    displayedMonth = DateTime(
+                      displayedMonth.year,
+                      displayedMonth.month - 1,
+                    );
+                    // Si on revient sur le mois courant et la date sélectionnée est passée, on la remet à aujourd'hui
+                    if (displayedMonth.year == DateTime.now().year &&
+                        displayedMonth.month == DateTime.now().month &&
+                        selectedDate.isBefore(DateTime.now())) {
+                      selectedDate = DateTime.now();
+                    }
+                  });
+                },
+              ),
+              Text(
+                monthLabel,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  setState(() {
+                    displayedMonth = DateTime(
+                      displayedMonth.year,
+                      displayedMonth.month + 1,
+                    );
+                    // Si on avance, on sélectionne le 1er du mois si la date sélectionnée n'est pas dans ce mois
+                    if (displayedMonth.month != selectedDate.month ||
+                        displayedMonth.year != selectedDate.year) {
+                      selectedDate = DateTime(
+                        displayedMonth.year,
+                        displayedMonth.month,
+                        1,
+                      );
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           SizedBox(
             height: 70,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: weekDates.length,
+              itemCount: monthDates.length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, i) {
-                final date = weekDates[i];
+                final date = monthDates[i];
                 final isSelected = DateUtils.isSameDay(date, selectedDate);
                 return GestureDetector(
                   onTap: () => setState(() => selectedDate = date),
@@ -373,8 +521,8 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
               const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: () async {
-                  final weekDates = getWeekDates();
-                  for (final date in weekDates) {
+                  final monthDates = getMonthDates();
+                  for (final date in monthDates) {
                     final slots = [
                       {'start': '08:00', 'end': '09:00'},
                       {'start': '09:00', 'end': '10:00'},
@@ -407,7 +555,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                         (context) => AlertDialog(
                           title: const Text('Success'),
                           content: const Text(
-                            'Full week availabilities added!',
+                            'Full month availabilities added!',
                           ),
                           actions: [
                             TextButton(
@@ -418,7 +566,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                         ),
                   );
                 },
-                child: const Text('Full Week'),
+                child: const Text('Full Month'),
               ),
             ],
           ),

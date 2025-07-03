@@ -36,7 +36,38 @@ class MyApp extends StatelessWidget {
       title: 'Caretime - Your Clinic Appointment Scheduler',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        textTheme: GoogleFonts.poppinsTextTheme(textTheme),
+        textTheme: GoogleFonts.nunitoTextTheme(textTheme).copyWith(
+          headlineLarge: GoogleFonts.nunito(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1F2937),
+          ),
+          headlineMedium: GoogleFonts.nunito(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1F2937),
+          ),
+          titleLarge: GoogleFonts.nunito(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF0891B2),
+          ),
+          bodyLarge: GoogleFonts.nunito(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF374151),
+          ),
+          bodyMedium: GoogleFonts.nunito(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF374151),
+          ),
+          labelLarge: GoogleFonts.nunito(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF0891B2),
+          ),
+        ),
       ),
       home: const SplashScreen(),
       // Define routes for navigation

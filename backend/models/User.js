@@ -4,17 +4,17 @@ const userSchema = new mongoose.Schema({
   firstname: { type: String, required: true },
   lastname: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
-  phone: { type: String }, // optionnel
+  phone: { type: String, unique: true }, // optionnel
   password: { type: String, required: true },
   role: {
     type: String,
     enum: ["patient", "doctor", "admin"],
     default: "patient"
   },
-  specialty: { type: String }, // optionnel si doctor
-  licenseNumber: { type: String }, // optionnel si doctor
-  country: { type: String }, // optionnel
-  city: { type: String }, // optionnel
+  specialty: { type: String }, // optionnel si patient
+  licenseNumber: { type: String }, // optionnel si patient
+  country: { type: String, required: true },
+  city: { type: String },
   dateOfBirth: { type: Date, required: true },
   gender: {
     type: String,

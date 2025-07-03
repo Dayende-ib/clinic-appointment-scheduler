@@ -6,6 +6,11 @@ exports.createAppointment = async (req, res) => {
     const { doctorId, datetime, reason, patientNotes } = req.body;
     const patientId = req.user.id;
 
+    // Vérifier que la date/heure est dans le futur
+    if (new Date(datetime) < new Date()) {
+      return res.status(400).json({ message: "Impossible de réserver un créneau passé." });
+    }
+
     // Empêcher la double réservation du même créneau
     const existing = await Appointment.findOne({
       doctorId,
@@ -70,8 +75,16 @@ exports.updateAppointmentStatus = async (req, res) => {
 
     //  Règles de rôle
     if (status === "canceled") {
-      if (role !== "patient" || appointment.patientId.toString() !== userId) {
-        return res.status(403).json({ message: "Seul le patient peut annuler ce rendez-vous" });
+      // Le patient peut annuler son propre rendez-vous
+      if (role === "patient" && appointment.patientId.toString() === userId) {
+        // OK
+      }
+      // Le médecin peut aussi annuler/refuser un rendez-vous dont il est responsable
+      else if (role === "doctor" && appointment.doctorId.toString() === userId) {
+        // OK
+      }
+      else {
+        return res.status(403).json({ message: "Seul le patient ou le médecin concerné peut annuler ce rendez-vous" });
       }
     }
 

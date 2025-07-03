@@ -419,28 +419,23 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         final filter = widget.arguments!['filter'] as String;
         switch (filter) {
           case 'today':
-            return 'Rendez-vous d\'aujourd\'hui';
+            return 'Today\'s appointments';
           case 'completed':
-            return 'Rendez-vous terminés';
+            return 'Completed appointments';
           case 'booked':
-            return 'Rendez-vous en attente';
+            return 'Pending appointments';
           case 'upcoming':
-            return 'Rendez-vous à venir';
+            return 'Upcoming appointments';
           case 'all':
-            return 'Tous mes rendez-vous';
+            return 'All my appointments';
           default:
-            return 'Mes rendez-vous';
+            return 'My appointments';
         }
       }
-      return 'Mes rendez-vous';
+      return 'My appointments';
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(getTitle()),
-        backgroundColor: kPrimaryColor,
-        foregroundColor: Colors.white,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -450,7 +445,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
-                      hintText: 'Rechercher un patient...',
+                      hintText: 'Search for a patient...',
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(),
                       isDense: true,

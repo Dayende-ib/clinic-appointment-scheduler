@@ -43,50 +43,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     });
   }
 
-  void showNotificationsSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (context) {
-        final notifications = [
-          "Nouveau rendez-vous réservé à 09:00",
-          "Fatou Ouédraogo a annulé son rendez-vous",
-        ];
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Notifications",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0891B2),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...notifications.map(
-                (notif) => ListTile(
-                  leading: const Icon(
-                    Icons.notifications,
-                    color: Color(0xFF03A6A1),
-                  ),
-                  title: Text(
-                    notif,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   PreferredSizeWidget _buildAppBar() {
     final today = DateFormat.yMMMMd('en_US').format(DateTime.now());
     String title;
@@ -97,7 +53,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
       title = "Appointments";
       subtitle = null;
     } else if (_selectedIndex == 2) {
-      title = "Availability";
+      title = "";
       subtitle = null;
     } else {
       title = "";
@@ -126,10 +82,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none, color: Color(0xFF0891B2)),
-          onPressed: showNotificationsSheet,
-        ),
-        IconButton(
           icon: const Icon(Icons.person_outline, color: Color(0xFF0891B2)),
           onPressed:
               () => Navigator.push(
@@ -154,7 +106,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     ];
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: _buildAppBar(),
+      appBar: (_selectedIndex == 2) ? null : _buildAppBar(),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

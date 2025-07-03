@@ -4,6 +4,7 @@ import 'doctor_list_page.dart';
 import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/patient_api_service.dart';
+import 'package:intl/intl.dart';
 
 class PatientDashboardScreen extends StatefulWidget {
   const PatientDashboardScreen({super.key});
@@ -201,10 +202,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                           Spacer(),
                           IconButton(
                             icon: Icon(
-                              Icons.notifications,
+                              Icons.person_outline,
                               color: Color(0xFF0891B2),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/profile');
+                            },
                           ),
                         ],
                       ),
@@ -267,11 +270,6 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                 activeIcon: Icon(Icons.medical_services, size: 24),
                 label: 'Doctors',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline, size: 24),
-                activeIcon: Icon(Icons.person, size: 24),
-                label: 'Profile',
-              ),
             ],
           ),
         ),
@@ -280,6 +278,19 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   }
 
   Widget _dashboardHome() {
+    // Récupérer le prochain rendez-vous à venir
+    final now = DateTime.now();
+    Map<String, dynamic>? nextAppointment;
+    for (final apt in appointments) {
+      final dt =
+          apt['datetime'] != null ? DateTime.tryParse(apt['datetime']) : null;
+      if (dt != null && dt.isAfter(now)) {
+        if (nextAppointment == null ||
+            dt.isBefore(DateTime.parse(nextAppointment['datetime']))) {
+          nextAppointment = apt;
+        }
+      }
+    }
     return SingleChildScrollView(
       padding: EdgeInsets.all(16),
       child: Column(
@@ -287,7 +298,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
         children: [
           // Actions rapides
           Text(
-            'Fast actions',
+            'Quick actions',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -327,7 +338,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          'New Appointment',
+                          'Book an appointment',
                           style: TextStyle(color: Color(0xFF0891B2)),
                         ),
                       ],
@@ -385,42 +396,150 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           SizedBox(height: 24),
 
           // Rappel important
+          if (nextAppointment != null)
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange[200]!, width: 1),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 20,
+                    color: Colors.orange,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Important reminder',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.orange[700],
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Builder(
+                          builder: (context) {
+                            final dt = DateTime.tryParse(
+                              nextAppointment!['datetime'] ?? '',
+                            );
+                            final doctor = nextAppointment['doctorId'] ?? {};
+                            final doctorName =
+                                ((doctor['firstname'] ?? '') +
+                                        ' ' +
+                                        (doctor['lastname'] ?? ''))
+                                    .trim();
+                            if (dt == null) return SizedBox();
+                            final dateStr = DateFormat(
+                              'EEEE d MMMM',
+                              'en_US',
+                            ).format(dt);
+                            final timeStr = DateFormat('HH:mm').format(dt);
+                            return Text(
+                              "Don't forget your appointment with Dr. $doctorName on $dateStr at $timeStr",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.orange[700],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          SizedBox(height: 20),
+
+          // Conseil santé
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.orange[50],
+              color: Colors.green[50],
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.orange[200]!, width: 1),
+              border: Border.all(color: Colors.green[200]!, width: 1),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  size: 20,
-                  color: Colors.orange,
-                ),
+                Icon(Icons.health_and_safety, color: Colors.green, size: 22),
                 SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Important reminder',
+                        'Health tip',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.orange[700],
+                          color: Colors.green[700],
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Don\'t forget your appointment with Dr. Martin tomorrow at 10:00 AM',
+                        _getHealthTip(),
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.orange[700],
+                          color: Colors.green[700],
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // Numéros d'urgence
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.red[200]!, width: 1),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.local_phone, color: Colors.red, size: 22),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Emergency numbers',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red[700],
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '''Burkina Faso:
+- SAMU: 10
+- Firefighters: 18
+- Police: 17
+- Gendarmerie: 16
+- Red Cross: 80 00 11 12''',
+                        style: TextStyle(fontSize: 14, color: Colors.red[700]),
                       ),
                     ],
                   ),
@@ -434,5 +553,22 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
         ],
       ),
     );
+  }
+
+  String _getHealthTip() {
+    final tips = [
+      "Drink at least 1.5L of water per day.",
+      "Exercise regularly.",
+      "Eat 5 fruits and vegetables a day.",
+      "Get enough sleep to recover.",
+      "Wash your hands regularly.",
+      "Limit sugar and salt intake.",
+      "Take time to relax and manage your stress.",
+      "See your doctor regularly.",
+      "Protect yourself from the sun.",
+      "Listen to your body's signals.",
+    ];
+    final now = DateTime.now();
+    return tips[now.day % tips.length];
   }
 }

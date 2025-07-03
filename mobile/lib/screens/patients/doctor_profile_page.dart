@@ -33,6 +33,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     setState(() {
       isLoading = true;
       error = null;
+      selectedSlotIndices.clear();
+      selectedDates.clear();
     });
     try {
       final dateStr =
@@ -44,11 +46,15 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       setState(() {
         slots = s;
         isLoading = false;
+        selectedSlotIndices.clear();
+        selectedDates.clear();
       });
     } catch (e) {
       setState(() {
         error = e.toString();
         isLoading = false;
+        selectedSlotIndices.clear();
+        selectedDates.clear();
       });
     }
   }
@@ -57,7 +63,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil du docteur'),
+        title: Text('Doctor profile'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -66,7 +72,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : error != null
-              ? Center(child: Text('Erreur: $error'))
+              ? Center(child: Text('Error: $error'))
               : ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
@@ -267,7 +273,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Créneaux disponibles pour le ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}',
+                    'Available slots for ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -285,7 +291,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            "Aucune disponibilité pour ce jour.",
+                            "No availability for this day.",
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.black54,
@@ -300,51 +306,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       runSpacing: 10,
                       children: [
                         for (int i = 0; i < slots.length; i++)
-                          FilterChip(
-                            label: Text(
-                              slots[i]['time'] ?? '',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            selected: selectedSlotIndices.contains(i),
-                            selectedColor: Colors.teal,
-                            backgroundColor: Colors.white,
-                            labelStyle: TextStyle(
-                              color:
-                                  selectedSlotIndices.contains(i)
-                                      ? Colors.white
-                                      : Colors.teal,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(
-                                color: Colors.teal.withOpacity(0.2),
-                              ),
-                            ),
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedSlotIndices.add(i);
-                                  if (!selectedDates.contains(selectedDate)) {
-                                    selectedDates.add(selectedDate);
-                                  }
-                                } else {
-                                  selectedSlotIndices.remove(i);
-                                  // Si plus aucun créneau sélectionné pour ce jour, on retire la date
-                                  if (!selectedSlotIndices.any(
-                                    (idx) => slots[idx]['date'] == selectedDate,
-                                  )) {
-                                    selectedDates.remove(selectedDate);
-                                  }
-                                }
-                              });
-                            },
-                          ),
+                          _buildSlotChip(i, slots[i]['time'], selectedDate),
                       ],
                     ),
                   const SizedBox(height: 30),
-                  if (selectedSlotIndices.isNotEmpty)
+                  if (selectedSlotIndices.isNotEmpty && slots.isNotEmpty)
                     Card(
                       color: Colors.grey[50],
                       margin: const EdgeInsets.only(bottom: 20),
@@ -354,7 +320,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Résumé de la réservation',
+                              'Booking summary',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -362,20 +328,21 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             ),
                             const SizedBox(height: 10),
                             for (int idx in selectedSlotIndices)
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_today,
-                                    size: 16,
-                                    color: Colors.teal,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year} - ${slots[idx]['time']}',
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ],
-                              ),
+                              if (idx >= 0 && idx < slots.length)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      size: 16,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year} - ${slots[idx]['time']}',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
                           ],
                         ),
                       ),
@@ -392,7 +359,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                         onPressed:
-                            selectedSlotIndices.isEmpty || isBooking
+                            selectedSlotIndices.isEmpty ||
+                                    isBooking ||
+                                    slots.isEmpty
                                 ? null
                                 : () async {
                                   setState(() {
@@ -400,6 +369,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                   });
                                   bool allSuccess = true;
                                   for (int idx in selectedSlotIndices) {
+                                    if (idx < 0 || idx >= slots.length)
+                                      continue;
                                     String startTime = slots[idx]['time'];
                                     String hour =
                                         startTime.contains('-')
@@ -427,8 +398,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                       SnackBar(
                                         content: Text(
                                           allSuccess
-                                              ? 'Tous les rendez-vous ont été réservés !'
-                                              : 'Certains créneaux n\'ont pas pu être réservés.',
+                                              ? 'All appointments have been booked!'
+                                              : 'Some appointments could not be booked.',
                                         ),
                                         backgroundColor:
                                             allSuccess
@@ -449,7 +420,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                   ),
                                 )
                                 : const Text(
-                                  'Confirmer la réservation',
+                                  'Confirm booking',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -481,5 +452,85 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       'Décembre',
     ];
     return months[month - 1];
+  }
+
+  bool _isSlotInFuture(String slotTime, DateTime date) {
+    if (slotTime == null || slotTime.isEmpty) return false;
+    final now = DateTime.now();
+    final startHour = int.tryParse(slotTime.split(':')[0]) ?? 0;
+    final startMinute = int.tryParse(slotTime.split(':')[1].split('-')[0]) ?? 0;
+    final slotDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      startHour,
+      startMinute,
+    );
+    return slotDateTime.isAfter(now);
+  }
+
+  Widget _buildSlotChip(int i, String? slotTime, DateTime date) {
+    final now = DateTime.now();
+    final isPastDay = date.isBefore(DateTime(now.year, now.month, now.day));
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
+    bool isPastSlot = false;
+    if (slotTime != null && slotTime.isNotEmpty) {
+      final startHour = int.tryParse(slotTime.split(':')[0]) ?? 0;
+      final startMinute =
+          int.tryParse(slotTime.split(':')[1].split('-')[0]) ?? 0;
+      final slotDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        startHour,
+        startMinute,
+      );
+      isPastSlot = slotDateTime.isBefore(now);
+    }
+    final isDisabled = isPastDay || (isToday && isPastSlot);
+    return FilterChip(
+      label: Text(
+        slotTime ?? '',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color:
+              isDisabled
+                  ? Colors.grey
+                  : (selectedSlotIndices.contains(i)
+                      ? Colors.white
+                      : Colors.teal),
+        ),
+      ),
+      selected: selectedSlotIndices.contains(i),
+      selectedColor: isDisabled ? Colors.grey[300] : Colors.teal,
+      backgroundColor: isDisabled ? Colors.grey[200] : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isDisabled ? Colors.grey[300]! : Colors.teal.withOpacity(0.2),
+        ),
+      ),
+      onSelected:
+          isDisabled
+              ? null
+              : (selected) {
+                setState(() {
+                  if (selected) {
+                    selectedSlotIndices.add(i);
+                    if (!selectedDates.contains(date)) {
+                      selectedDates.add(date);
+                    }
+                  } else {
+                    selectedSlotIndices.remove(i);
+                    if (!selectedSlotIndices.any(
+                      (idx) => slots[idx]['date'] == date,
+                    )) {
+                      selectedDates.remove(date);
+                    }
+                  }
+                });
+              },
+    );
   }
 }

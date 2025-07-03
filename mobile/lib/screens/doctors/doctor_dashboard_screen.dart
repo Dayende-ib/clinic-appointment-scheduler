@@ -795,7 +795,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Bonjour, $doctorName',
+                          'Hello, $doctorName',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -826,7 +826,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
               // Statistiques du jour
               Text(
-                'Aujourd\'hui',
+                'Today',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -880,7 +880,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Vue d\'ensemble',
+                    'Overview',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -933,7 +933,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
               // Actions rapides
               Text(
-                'Actions rapides',
+                'Quick actions',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -973,7 +973,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Rendez-vous d\'aujourd\'hui',
+                    'Today\'s appointments',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -1017,7 +1017,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Prochains rendez-vous',
+                    'Upcoming appointments',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
