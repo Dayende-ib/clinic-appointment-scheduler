@@ -38,7 +38,20 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
     try {
       final data = await AdminService.getAllPatients();
       setState(() {
-        patients = data;
+        patients =
+            data
+                .map<Map<String, dynamic>>(
+                  (p) => {
+                    ...p,
+                    'name':
+                        ((p['firstname'] ?? '') + ' ' + (p['lastname'] ?? ''))
+                            .trim(),
+                    'email': p['email'] ?? '',
+                    'phone': p['phone'] ?? '',
+                    'active': p['isActive'] ?? true,
+                  },
+                )
+                .toList();
         isLoading = false;
       });
     } catch (e) {
@@ -162,9 +175,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                         radius: 30,
                         backgroundColor: kSecondaryColor,
                         child: Text(
-                          (patient['name'] as String).isNotEmpty
-                              ? (patient['name'] as String)[0]
-                              : '?',
+                          (patient['name'] ?? '')[0],
                           style: const TextStyle(
                             fontSize: 24,
                             color: Colors.white,
@@ -361,7 +372,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
     return patients.where((patient) {
       final matchesSearch =
           searchQuery.isEmpty ||
-          (patient['name'] as String).toLowerCase().contains(
+          (patient['name'] ?? '').toLowerCase().contains(
             searchQuery.toLowerCase(),
           ) ||
           (patient['email'] as String).toLowerCase().contains(
@@ -513,9 +524,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 radius: 25,
                                 backgroundColor: kSecondaryColor,
                                 child: Text(
-                                  (patient['name'] as String).isNotEmpty
-                                      ? (patient['name'] as String)[0]
-                                      : '?',
+                                  (patient['name'] ?? '')[0],
                                   style: const TextStyle(
                                     fontSize: 18,
                                     color: Colors.white,

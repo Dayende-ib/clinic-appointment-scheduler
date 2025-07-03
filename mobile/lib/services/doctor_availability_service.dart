@@ -38,13 +38,14 @@ class DoctorAvailabilityService {
   }
 
   static Future<List<Map<String, String>>> getAvailabilityForDate(
-    DateTime date,
-  ) async {
+    DateTime date, {
+    String? doctorId,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final doctorId = prefs.getString('userId') ?? '';
+    final id = doctorId ?? prefs.getString('userId') ?? '';
     final url = Uri.parse(
-      '$baseUrl/$doctorId?date=${date.toIso8601String().split('T')[0]}',
+      '$baseUrl/$id?date=${date.toIso8601String().split('T')[0]}',
     );
     final response = await http.get(
       url,
@@ -53,8 +54,6 @@ class DoctorAvailabilityService {
         'Authorization': 'Bearer $token',
       },
     );
-    print('GET $url');
-    print('API response: ${response.body}');
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List slots = data['slots'] ?? [];

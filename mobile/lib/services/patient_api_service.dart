@@ -106,4 +106,21 @@ class PatientApiService {
     );
     return response.statusCode == 200;
   }
+
+  static Future<bool> rescheduleAppointment(
+    String appointmentId,
+    String newDatetime,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final response = await http.patch(
+      Uri.parse('$baseUrl/appointments/$appointmentId/reschedule'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'datetime': newDatetime}),
+    );
+    return response.statusCode == 200;
+  }
 }

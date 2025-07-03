@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
@@ -38,7 +37,19 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
     try {
       final data = await AdminService.getAllDoctors();
       setState(() {
-        doctors = data;
+        doctors =
+            data
+                .map<Map<String, dynamic>>(
+                  (d) => {
+                    ...d,
+                    'name':
+                        ((d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''))
+                            .trim(),
+                    'specialization': d['specialty'] ?? '',
+                    'active': d['isActive'] ?? true,
+                  },
+                )
+                .toList();
         isLoading = false;
       });
     } catch (e) {
@@ -159,7 +170,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                         radius: 30,
                         backgroundColor: kPrimaryColor,
                         child: Text(
-                          (doctor['name'] as String).isNotEmpty
+                          (doctor['name'] ?? '').isNotEmpty
                               ? (doctor['name'] as String)[0]
                               : '?',
                           style: const TextStyle(
@@ -183,8 +194,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                               ),
                             ),
                             Text(
-                              doctor['specialization'] ??
-                                  'Spécialisation non définie',
+                              doctor['specialization'] ?? '',
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF6B7280),
@@ -357,23 +367,19 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
 
   List<Map<String, dynamic>> get filteredDoctors {
     return doctors.where((doctor) {
+      final name = (doctor['name'] ?? '').toLowerCase();
+      final specialization = (doctor['specialization'] ?? '').toLowerCase();
+      final email = (doctor['email'] ?? '').toLowerCase();
+      final search = searchQuery.toLowerCase();
       final matchesSearch =
-          searchQuery.isEmpty ||
-          (doctor['name'] as String).toLowerCase().contains(
-            searchQuery.toLowerCase(),
-          ) ||
-          (doctor['specialization'] as String).toLowerCase().contains(
-            searchQuery.toLowerCase(),
-          ) ||
-          (doctor['email'] as String).toLowerCase().contains(
-            searchQuery.toLowerCase(),
-          );
-
+          search.isEmpty ||
+          name.contains(search) ||
+          specialization.contains(search) ||
+          email.contains(search);
       final matchesFilter =
           filterStatus == 'Tous' ||
           (filterStatus == 'Actifs' && doctor['active'] == true) ||
           (filterStatus == 'Inactifs' && doctor['active'] == false);
-
       return matchesSearch && matchesFilter;
     }).toList();
   }
@@ -515,7 +521,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                 radius: 25,
                                 backgroundColor: kPrimaryColor,
                                 child: Text(
-                                  (doctor['name'] as String).isNotEmpty
+                                  (doctor['name'] ?? '').isNotEmpty
                                       ? (doctor['name'] as String)[0]
                                       : '?',
                                   style: const TextStyle(
@@ -535,10 +541,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    doctor['specialization'] ??
-                                        'Spécialisation non définie',
-                                  ),
+                                  Text(doctor['specialization'] ?? ''),
                                   Text(
                                     doctor['email'] ?? 'Email non renseigné',
                                     style: const TextStyle(fontSize: 12),
@@ -630,15 +633,6 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigation vers l'écran d'ajout de docteur
-          Navigator.pushNamed(context, '/admin/doctors/add');
-        },
-        backgroundColor: kPrimaryColor,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }

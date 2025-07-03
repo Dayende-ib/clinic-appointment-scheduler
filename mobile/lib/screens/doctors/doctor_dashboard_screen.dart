@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/doctor_service.dart';
 import '../../services/doctor_appointment_service.dart';
-import '../../services/doctor_availability_service.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);

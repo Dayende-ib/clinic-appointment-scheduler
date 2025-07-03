@@ -90,3 +90,48 @@ exports.updateAppointmentStatus = async (req, res) => {
   }
 };
 
+// ✅ Reprogrammer un rendez-vous (patient ou médecin)
+exports.rescheduleAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { datetime } = req.body;
+    const { role, id: userId } = req.user;
+
+    if (!datetime) {
+      return res.status(400).json({ message: "Nouvelle date/heure requise" });
+    }
+
+    const appointment = await Appointment.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Rendez-vous non trouvé" });
+    }
+
+    // Seul le patient ou le médecin concerné peut reprogrammer
+    if (
+      appointment.patientId.toString() !== userId &&
+      appointment.doctorId.toString() !== userId
+    ) {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    // Vérifier qu'il n'y a pas déjà un rendez-vous à ce créneau pour ce médecin
+    const existing = await Appointment.findOne({
+      doctorId: appointment.doctorId,
+      datetime,
+      status: { $ne: "canceled" },
+      _id: { $ne: id }
+    });
+    if (existing) {
+      return res.status(400).json({ message: "Ce créneau est déjà réservé." });
+    }
+
+    appointment.datetime = datetime;
+    appointment.status = "booked"; // repasse en attente de validation
+    await appointment.save();
+
+    res.status(200).json({ message: "Rendez-vous reprogrammé", appointment });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

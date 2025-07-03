@@ -43,7 +43,29 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
     try {
       final data = await AdminService.getAllAppointments();
       setState(() {
-        appointments = data;
+        appointments =
+            data
+                .map<Map<String, dynamic>>(
+                  (apt) => {
+                    ...apt,
+                    'patientName':
+                        ((apt['patientId']?['firstname'] ?? '') +
+                                ' ' +
+                                (apt['patientId']?['lastname'] ?? ''))
+                            .trim(),
+                    'doctorName':
+                        ((apt['doctorId']?['firstname'] ?? '') +
+                                ' ' +
+                                (apt['doctorId']?['lastname'] ?? ''))
+                            .trim(),
+                    'patientEmail': apt['patientId']?['email'] ?? '',
+                    'patientPhone': apt['patientId']?['phone'] ?? '',
+                    'doctorEmail': apt['doctorId']?['email'] ?? '',
+                    'doctorPhone': apt['doctorId']?['phone'] ?? '',
+                    'date': apt['datetime'] ?? '',
+                  },
+                )
+                .toList();
         isLoading = false;
       });
     } catch (e) {
@@ -108,18 +130,30 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
   void _showAppointmentDetails(Map<String, dynamic> appointment) {
     final patientDetails = appointment['patientDetails'] ?? {};
     final doctorDetails = appointment['doctorDetails'] ?? {};
-    final DateTime date = appointment['date'];
+    final dynamic dateRaw = appointment['date'];
+    DateTime? date;
+    if (dateRaw is DateTime) {
+      date = dateRaw;
+    } else if (dateRaw is String) {
+      try {
+        date = DateTime.parse(dateRaw);
+      } catch (_) {
+        date = null;
+      }
+    } else {
+      date = null;
+    }
     final String status = appointment['status'] ?? '';
     final String reason = appointment['reason'] ?? '';
     final String patientName = appointment['patientName'] ?? '';
     final String doctorName = appointment['doctorName'] ?? '';
-    final String patientEmail = patientDetails['email'] ?? '';
-    final String patientPhone = patientDetails['phone'] ?? '';
-    final String doctorEmail = doctorDetails['email'] ?? '';
-    final String doctorPhone = doctorDetails['phone'] ?? '';
-    final String patientNotes = appointment['notes']?['patientNotes'] ?? '';
-    final String doctorNotes = appointment['notes']?['doctorNotes'] ?? '';
-    final String aptId = appointment['id'] ?? '';
+    final String patientEmail = (patientDetails['email']) ?? '';
+    final String patientPhone = (patientDetails['phone']) ?? '';
+    final String doctorEmail = (doctorDetails['email']) ?? '';
+    final String doctorPhone = (doctorDetails['phone']) ?? '';
+    final String patientNotes = (appointment['notes']?['patientNotes']) ?? '';
+    final String doctorNotes = (appointment['notes']?['doctorNotes']) ?? '';
+    final String aptId = appointment['id']?.toString() ?? '';
 
     showModalBottomSheet(
       context: context,
@@ -196,8 +230,8 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildDetailSection('📅 Rendez-vous', [
-                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
-                          'Heure: ${DateFormat('HH:mm').format(date)}',
+                          '${date != null ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}' : 'Date inconnue'}',
+                          '${date != null ? 'Heure: ${DateFormat('HH:mm').format(date)}' : ''}',
                         ]),
                         const SizedBox(height: 20),
                         _buildDetailSection('👨‍⚕️ Docteur', [
@@ -378,18 +412,19 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
     return appointments.where((appointment) {
       final matchesSearch =
           searchQuery.isEmpty ||
-          (appointment['patientName'] as String).toLowerCase().contains(
+          ((appointment['patientName'] ?? '') as String).toLowerCase().contains(
             searchQuery.toLowerCase(),
           ) ||
-          (appointment['doctorName'] as String).toLowerCase().contains(
+          ((appointment['doctorName'] ?? '') as String).toLowerCase().contains(
             searchQuery.toLowerCase(),
           ) ||
-          (appointment['reason'] as String).toLowerCase().contains(
+          ((appointment['reason'] ?? '') as String).toLowerCase().contains(
             searchQuery.toLowerCase(),
           );
 
       final matchesStatus =
-          filterStatus == 'Tous' || appointment['status'] == filterStatus;
+          filterStatus == 'Tous' ||
+          (appointment['status'] ?? '') == filterStatus;
 
       final matchesType =
           filterType == 'Tous' ||
@@ -401,14 +436,38 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
     }).toList();
   }
 
-  bool _isToday(DateTime date) {
+  bool _isToday(dynamic dateRaw) {
+    DateTime? date;
+    if (dateRaw is DateTime) {
+      date = dateRaw;
+    } else if (dateRaw is String) {
+      try {
+        date = DateTime.parse(dateRaw);
+      } catch (_) {
+        return false;
+      }
+    } else {
+      return false;
+    }
     final now = DateTime.now();
     return date.year == now.year &&
         date.month == now.month &&
         date.day == now.day;
   }
 
-  bool _isThisWeek(DateTime date) {
+  bool _isThisWeek(dynamic dateRaw) {
+    DateTime? date;
+    if (dateRaw is DateTime) {
+      date = dateRaw;
+    } else if (dateRaw is String) {
+      try {
+        date = DateTime.parse(dateRaw);
+      } catch (_) {
+        return false;
+      }
+    } else {
+      return false;
+    }
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
@@ -416,7 +475,19 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         date.isBefore(endOfWeek.add(const Duration(days: 1)));
   }
 
-  bool _isThisMonth(DateTime date) {
+  bool _isThisMonth(dynamic dateRaw) {
+    DateTime? date;
+    if (dateRaw is DateTime) {
+      date = dateRaw;
+    } else if (dateRaw is String) {
+      try {
+        date = DateTime.parse(dateRaw);
+      } catch (_) {
+        return false;
+      }
+    } else {
+      return false;
+    }
     final now = DateTime.now();
     return date.year == now.year && date.month == now.month;
   }
@@ -610,8 +681,20 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                         itemCount: filteredAppointments.length,
                         itemBuilder: (context, index) {
                           final appointment = filteredAppointments[index];
-                          final date = appointment['date'] as DateTime;
-                          final status = appointment['status'] as String;
+                          final dynamic dateRaw = appointment['date'];
+                          DateTime? date;
+                          if (dateRaw is DateTime) {
+                            date = dateRaw;
+                          } else if (dateRaw is String) {
+                            try {
+                              date = DateTime.parse(dateRaw);
+                            } catch (_) {
+                              date = null;
+                            }
+                          } else {
+                            date = null;
+                          }
+                          final status = appointment['status'] ?? '';
 
                           return Card(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -624,9 +707,9 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                 radius: 25,
                                 backgroundColor: kAccentColor,
                                 child: Text(
-                                  (appointment['patientName'] as String)
+                                  ((appointment['patientName'] ?? '') as String)
                                           .isNotEmpty
-                                      ? (appointment['patientName']
+                                      ? ((appointment['patientName'] ?? '')
                                           as String)[0]
                                       : '?',
                                   style: const TextStyle(
@@ -637,7 +720,8 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                 ),
                               ),
                               title: Text(
-                                appointment['patientName'] ?? 'Patient inconnu',
+                                appointment['patientName'] ??
+                                    'Nom patient inconnu',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -647,10 +731,10 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Dr. ${appointment['doctorName'] ?? 'Docteur inconnu'}',
+                                    'Dr. ${appointment['doctorName'] ?? 'Nom médecin inconnu'}',
                                   ),
                                   Text(
-                                    '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}',
+                                    '${date != null ? '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}' : 'Date inconnue'}',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -668,8 +752,8 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                           break;
                                         case 'delete':
                                           _deleteAppointment(
-                                            appointment['id'],
-                                            appointment['patientName'],
+                                            appointment['id']?.toString() ?? '',
+                                            appointment['patientName'] ?? '',
                                           );
                                           break;
                                       }

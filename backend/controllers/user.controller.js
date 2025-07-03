@@ -158,3 +158,12 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getPatients = async (req, res) => {
+  try {
+    const patients = await require('../models/User').find({ role: "patient", isActive: true }).select("-password");
+    res.status(200).json(patients);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

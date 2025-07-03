@@ -49,3 +49,50 @@ exports.getAllAppointments = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ✅ Statistiques globales pour le dashboard admin
+exports.getAdminStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalPatients = await User.countDocuments({ role: "patient" });
+    const totalDoctors = await User.countDocuments({ role: "doctor" });
+    const totalAdmins = await User.countDocuments({ role: "admin" });
+
+    const totalAppointments = await Appointment.countDocuments();
+    const confirmedAppointments = await Appointment.countDocuments({ status: "confirmed" });
+    const canceledAppointments = await Appointment.countDocuments({ status: "canceled" });
+    const bookedAppointments = await Appointment.countDocuments({ status: "booked" });
+    const completedAppointments = await Appointment.countDocuments({ status: "completed" });
+
+    // Calcul du nombre de rendez-vous du jour
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    const todayAppointments = await Appointment.countDocuments({
+      datetime: { $gte: startOfDay, $lte: endOfDay }
+    });
+    // Rendez-vous en attente (status 'booked')
+    const pendingAppointments = await Appointment.countDocuments({ status: "booked" });
+
+    res.status(200).json({
+      users: {
+        total: totalUsers,
+        patients: totalPatients,
+        doctors: totalDoctors,
+        admins: totalAdmins
+      },
+      appointments: {
+        total: totalAppointments,
+        confirmed: confirmedAppointments,
+        canceled: canceledAppointments,
+        booked: bookedAppointments,
+        completed: completedAppointments,
+        today: todayAppointments,
+        pending: pendingAppointments
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -37,7 +37,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     try {
       final data = await AdminService.getDashboardStats();
       setState(() {
-        stats = data;
+        stats = {
+          'totalDoctors': data['users']?['doctors'] ?? 0,
+          'totalPatients': data['users']?['patients'] ?? 0,
+          'totalAdmins': data['users']?['admins'] ?? 0,
+          'totalUsers': data['users']?['total'] ?? 0,
+          'totalAppointments': data['appointments']?['total'] ?? 0,
+          'confirmedAppointments': data['appointments']?['confirmed'] ?? 0,
+          'canceledAppointments': data['appointments']?['canceled'] ?? 0,
+          'bookedAppointments': data['appointments']?['booked'] ?? 0,
+          'completedAppointments': data['appointments']?['completed'] ?? 0,
+          'todayAppointments': data['appointments']?['today'] ?? 0,
+          'pendingAppointments': data['appointments']?['pending'] ?? 0,
+        };
         isLoading = false;
       });
     } catch (e) {
@@ -432,34 +444,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 subtitle: 'Voir tous les plannings et disponibilités',
                 icon: Icons.schedule,
                 color: kPurple,
-                onTap: () => Navigator.pushNamed(context, '/admin/schedules'),
-              ),
-              const SizedBox(height: 30),
-
-              // Paramètres système
-              Text(
-                'Paramètres système',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildActionCard(
-                title: 'Paramètres généraux',
-                subtitle: 'Configurer les paramètres de l\'application',
-                icon: Icons.settings,
-                color: kSoftRed,
-                onTap: () => Navigator.pushNamed(context, '/admin/settings'),
-              ),
-              const SizedBox(height: 12),
-              _buildActionCard(
-                title: 'Logs système',
-                subtitle: 'Consulter les logs et l\'activité',
-                icon: Icons.analytics,
-                color: kPurple,
-                onTap: () => Navigator.pushNamed(context, '/admin/logs'),
+                onTap: () async {
+                  final doctors = await AdminService.getAllDoctors();
+                  if (!mounted) return;
+                  Navigator.pushNamed(
+                    context,
+                    '/admin/schedules',
+                    arguments: {'doctors': doctors},
+                  );
+                },
               ),
               const SizedBox(height: 30),
 

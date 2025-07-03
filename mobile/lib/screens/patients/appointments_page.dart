@@ -62,8 +62,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   }
 
   List<Appointment> get filteredAppointments {
-    if (selectedFilter == 'all')
+    if (selectedFilter == 'all') {
       return appointments.map((e) => Appointment.fromMap(e)).toList();
+    }
     return appointments
         .where((apt) => apt['type'] == selectedFilter)
         .map((e) => Appointment.fromMap(e))
@@ -85,8 +86,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         itemCount: appointments.length,
         itemBuilder: (context, index) {
           final apt = appointments[index];
-          if (deletedAppointments.contains(apt['_id'] ?? apt['id']))
+          if (deletedAppointments.contains(apt['_id'] ?? apt['id'])) {
             return const SizedBox.shrink();
+          }
           final doctor = apt['doctorId'] ?? {};
           final patient = apt['patientId'] ?? {};
           final DateTime? dt =
@@ -234,6 +236,65 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                             style: TextStyle(color: kSecondaryColor),
                           ),
                           onPressed: () => _showAppointmentDetails(apt),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton.icon(
+                          icon: const Icon(
+                            Icons.calendar_today,
+                            color: kSecondaryColor,
+                          ),
+                          label: const Text(
+                            'Reprogrammer',
+                            style: TextStyle(color: kSecondaryColor),
+                          ),
+                          onPressed: () async {
+                            final pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: dt ?? DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365),
+                              ),
+                            );
+                            if (pickedDate == null) return;
+                            final pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(
+                                dt ?? DateTime.now(),
+                              ),
+                            );
+                            if (pickedTime == null) return;
+                            final newDateTime = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                            final iso = newDateTime.toIso8601String();
+                            final success =
+                                await PatientApiService.rescheduleAppointment(
+                                  aptId,
+                                  iso,
+                                );
+                            if (!mounted) return;
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Rendez-vous reprogrammé !'),
+                                ),
+                              );
+                              _loadAppointments();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Erreur lors de la reprogrammation.',
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                         const SizedBox(width: 8),
                         TextButton.icon(
