@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'doctor_profile_page.dart';
+import '../../services/patient_api_service.dart';
 
 class DoctorsListScreen extends StatefulWidget {
   const DoctorsListScreen({super.key});
@@ -15,50 +16,34 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   String? selectedSpecialty;
   int? selectedDoctorIndex;
 
-  final List<Doctor> doctors = [
-    Doctor(
-      name: "Dr. Johan Janson",
-      specialty: "Endocrinologist",
-      rating: 4.5,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-    Doctor(
-      name: "Dr. Marilyn Stanton",
-      specialty: "General Practitioner",
-      rating: 5.0,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-    Doctor(
-      name: "Dr. Marvin McKinney",
-      specialty: "Cardiologist",
-      rating: 4.3,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-    Doctor(
-      name: "Dr. Arlene McCoy",
-      specialty: "Physician",
-      rating: 4.5,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-    Doctor(
-      name: "Dr. Eleanor Pena",
-      specialty: "Rheumatologist",
-      rating: 4.4,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-    Doctor(
-      name: "Dr. Katya Donin",
-      specialty: "Endocrinologist",
-      rating: 5.0,
-      reviews: 85,
-      image: "assets/images/male-doctor-icon.png",
-    ),
-  ];
+  List<Map<String, dynamic>> doctors = [];
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDoctors();
+  }
+
+  Future<void> _loadDoctors() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final data = await PatientApiService.getDoctorsList();
+      setState(() {
+        doctors = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   final List<String> specialties = [
     'All specialties',
@@ -74,9 +59,42 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
 
   List<Doctor> get filteredDoctors {
     if (selectedSpecialty == null || selectedSpecialty == 'All specialties') {
-      return doctors;
+      return doctors
+          .map(
+            (d) => Doctor(
+              id: d['_id'] ?? d['id'] ?? '',
+              name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
+              specialty: d['specialty'] ?? '',
+              rating:
+                  d['rating'] is double
+                      ? d['rating']
+                      : double.tryParse(d['rating']?.toString() ?? '') ?? 0.0,
+              reviews:
+                  d['reviews'] is int
+                      ? d['reviews']
+                      : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
+              image: d['image'] ?? 'assets/images/male-doctor-icon.png',
+            ),
+          )
+          .toList();
     }
     return doctors
+        .map(
+          (d) => Doctor(
+            id: d['_id'] ?? d['id'] ?? '',
+            name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
+            specialty: d['specialty'] ?? '',
+            rating:
+                d['rating'] is double
+                    ? d['rating']
+                    : double.tryParse(d['rating']?.toString() ?? '') ?? 0.0,
+            reviews:
+                d['reviews'] is int
+                    ? d['reviews']
+                    : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
+            image: d['image'] ?? 'assets/images/male-doctor-icon.png',
+          ),
+        )
         .where((doctor) => doctor.specialty == selectedSpecialty)
         .toList();
   }
@@ -103,6 +121,12 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (error != null) {
+      return Center(child: Text('Erreur: $error'));
+    }
     return Scaffold(
       backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -237,9 +261,13 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                   final isSelected = selectedDoctorIndex == index;
                   return GestureDetector(
                     onTap: () {
-                      setState(() {
-                        selectedDoctorIndex = index;
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DoctorProfileScreen(doctor: doctor),
+                        ),
+                      );
                     },
                     child: DoctorCard(
                       doctor: doctor,
@@ -351,16 +379,6 @@ class DoctorCard extends StatelessWidget {
             Spacer(),
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  doctor.rating.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : Colors.black87,
-                  ),
-                ),
                 Spacer(),
                 GestureDetector(
                   onTap: onArrowTap,
@@ -382,17 +400,6 @@ class DoctorCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 4),
-            Text(
-              "${doctor.reviews} reviews",
-              style: TextStyle(
-                fontSize: 10,
-                color:
-                    isSelected
-                        ? Colors.white.withAlpha((0.7 * 255).toInt())
-                        : Colors.grey[500],
-              ),
-            ),
           ],
         ),
       ),
@@ -401,6 +408,7 @@ class DoctorCard extends StatelessWidget {
 }
 
 class Doctor {
+  final String id;
   final String name;
   final String specialty;
   final double rating;
@@ -408,6 +416,7 @@ class Doctor {
   final String image;
 
   Doctor({
+    required this.id,
     required this.name,
     required this.specialty,
     required this.rating,

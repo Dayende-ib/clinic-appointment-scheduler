@@ -92,11 +92,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     String title;
     String? subtitle;
     if (_selectedIndex == 0) {
-      title =
-          doctorName.isNotEmpty
-              ? "Welcome Dr. $doctorName 👨‍⚕️"
-              : "Welcome Doctor 👨‍⚕️";
-      subtitle = "Today is $today";
+      title = "Dashboard";
     } else if (_selectedIndex == 1) {
       title = "Appointments";
       subtitle = null;

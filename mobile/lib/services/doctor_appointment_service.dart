@@ -20,13 +20,17 @@ class DoctorAppointmentService {
     if (response.statusCode == 200) {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) {
+        final patient = item['patientId'] ?? {};
         return {
-          'patient':
-              "${item['patientId']['firstname']} ${item['patientId']['lastname']}",
+          'patient': "${patient['firstname']} ${patient['lastname']}",
+          'patientDetails': patient,
           'date': DateTime.parse(item['datetime']),
           'status': _mapStatus(item['status']),
+          'originalStatus': item['status'],
           'reason': item['reason'],
+          'notes': item['notes'] ?? {},
           'id': item['_id'],
+          'datetime': item['datetime'],
         };
       }).toList();
     } else {
@@ -47,6 +51,38 @@ class DoctorAppointmentService {
       default:
         return 'Unknown';
     }
+  }
+
+  static Future<bool> confirmAppointment(String appointmentId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final response = await http.patch(
+      Uri.parse('http://localhost:5000/api/appointments/$appointmentId/status'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'status': 'confirmed'}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> rejectAppointment(String appointmentId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final response = await http.patch(
+      Uri.parse('http://localhost:5000/api/appointments/$appointmentId/status'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'status': 'canceled'}),
+    );
+
+    return response.statusCode == 200;
   }
 
   static Future<List<Map<String, dynamic>>> fetchTodayAppointments() async {

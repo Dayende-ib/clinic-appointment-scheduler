@@ -3,11 +3,17 @@ import 'package:caretime/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:caretime/screens/doctors/home_page.dart';
+import 'package:caretime/screens/doctors/doctor_dashboard_screen.dart';
+import 'package:caretime/screens/doctors/doctor_appointments_screen.dart';
+import 'package:caretime/screens/doctors/doctor_quick_availability_page.dart';
 import 'package:caretime/screens/patients/patient_dashboard_page.dart';
+import 'package:caretime/screens/patients/doctor_list_page.dart';
+import 'package:caretime/screens/patients/appointments_page.dart';
 import 'package:caretime/screens/admin/admin_dashboard_screen.dart';
 import 'package:caretime/screens/login/login_screen.dart';
 import 'package:caretime/screens/login/register_screen.dart';
 import 'package:caretime/screens/splash_screen.dart';
+import 'package:caretime/screens/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,8 +40,20 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/doctor': (context) => DoctorHomeScreen(),
+        '/doctor/dashboard': (context) => const DoctorDashboardScreen(),
+        '/doctor/appointments': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          return DoctorAppointmentsScreen(arguments: args);
+        },
+        '/doctor/availability':
+            (context) => const DoctorQuickAvailabilityPage(),
         '/patient': (context) => PatientDashboardScreen(),
+        '/patient/doctors': (context) => const DoctorsListScreen(),
+        '/patient/appointments': (context) => const AppointmentsScreen(),
         '/admin': (context) => AdminDashboardScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

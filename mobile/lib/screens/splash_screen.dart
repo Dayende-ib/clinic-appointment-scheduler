@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
@@ -46,14 +46,12 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(
               height: 120,
               width: 200,
-              child: FlutterLogo(
-                size: 100,
-              ), // Remplace par Image.asset si tu veux ton logo
+              child: Image.asset('assets/images/Logo-caretime.png'),
             ),
             SizedBox(height: 24),
-            CircularProgressIndicator(),
+            LinearProgressIndicator(),
             SizedBox(height: 16),
-            Text('Loading...', style: TextStyle(fontSize: 18)),
+            Text('Welcome...', style: TextStyle(fontSize: 18)),
           ],
         ),
       ),

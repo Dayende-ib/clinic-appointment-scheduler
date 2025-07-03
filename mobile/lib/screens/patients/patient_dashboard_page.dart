@@ -3,6 +3,7 @@ import 'appointments_page.dart';
 import 'doctor_list_page.dart';
 import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/patient_api_service.dart';
 
 class PatientDashboardScreen extends StatefulWidget {
   const PatientDashboardScreen({super.key});
@@ -13,11 +14,20 @@ class PatientDashboardScreen extends StatefulWidget {
 
 class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   int _selectedIndex = 0;
+  List<Map<String, dynamic>> appointments = [];
+  bool isLoading = true;
+  String? error;
+  Doctor? _selectedDoctor;
+  List<Doctor> _doctors = [];
+  bool _isLoadingDoctors = true;
+  String? _doctorError;
 
   @override
   void initState() {
     super.initState();
     _checkAuth();
+    _loadAppointments();
+    _loadDoctors();
   }
 
   Future<void> _checkAuth() async {
@@ -30,24 +40,109 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
     }
   }
 
+  Future<void> _loadAppointments() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final data = await PatientApiService.getMyAppointments();
+      setState(() {
+        appointments = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadDoctors() async {
+    setState(() {
+      _isLoadingDoctors = true;
+      _doctorError = null;
+    });
+    try {
+      final data = await PatientApiService.getDoctorsList();
+      final doctors =
+          data
+              .map(
+                (d) => Doctor(
+                  id: d['_id'] ?? d['id'] ?? '',
+                  name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
+                  specialty: d['specialty'] ?? '',
+                  rating:
+                      d['rating'] is double
+                          ? d['rating']
+                          : double.tryParse(d['rating']?.toString() ?? '') ??
+                              0.0,
+                  reviews:
+                      d['reviews'] is int
+                          ? d['reviews']
+                          : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
+                  image: d['image'] ?? 'assets/images/male-doctor-icon.png',
+                ),
+              )
+              .toList();
+      setState(() {
+        _doctors = doctors;
+        _selectedDoctor = doctors.isNotEmpty ? doctors[0] : null;
+        _isLoadingDoctors = false;
+      });
+    } catch (e) {
+      setState(() {
+        _doctorError = e.toString();
+        _isLoadingDoctors = false;
+      });
+    }
+  }
+
+  List<Widget> get _pages => [
+    _dashboardHome(),
+    AppointmentsScreen(),
+    DoctorsListScreen(),
+    ProfileScreen(),
+    _isLoadingDoctors
+        ? const Center(child: CircularProgressIndicator())
+        : _doctorError != null
+        ? Center(child: Text('Erreur: $_doctorError'))
+        : Column(
+          children: [
+            if (_doctors.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: DropdownButton<Doctor>(
+                  value: _selectedDoctor,
+                  isExpanded: true,
+                  items:
+                      _doctors
+                          .map(
+                            (doc) => DropdownMenuItem(
+                              value: doc,
+                              child: Text(doc.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (doc) {
+                    setState(() {
+                      _selectedDoctor = doc;
+                    });
+                  },
+                ),
+              ),
+          ],
+        ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    Widget body;
-    switch (_selectedIndex) {
-      case 0:
-        body = _dashboardHome();
-        break;
-      case 1:
-        body = AppointmentsScreen();
-        break;
-      case 2:
-        body = DoctorsListScreen();
-        break;
-      case 3:
-        body = ProfileScreen();
-        break;
-      default:
-        body = _dashboardHome();
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (error != null) {
+      return Center(child: Text('Erreur: $error'));
     }
     return Scaffold(
       backgroundColor: Colors.white,
@@ -118,7 +213,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                 ),
               )
               : null,
-      body: body,
+      body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

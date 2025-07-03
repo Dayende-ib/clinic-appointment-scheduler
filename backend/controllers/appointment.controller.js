@@ -6,6 +6,16 @@ exports.createAppointment = async (req, res) => {
     const { doctorId, datetime, reason, patientNotes } = req.body;
     const patientId = req.user.id;
 
+    // Empêcher la double réservation du même créneau
+    const existing = await Appointment.findOne({
+      doctorId,
+      datetime,
+      status: { $ne: "canceled" }
+    });
+    if (existing) {
+      return res.status(400).json({ message: "Ce créneau est déjà réservé." });
+    }
+
     const appointment = new Appointment({
       doctorId,
       patientId,
@@ -41,7 +51,7 @@ exports.getMyAppointments = async (req, res) => {
   }
 };
 
-// ✅ Mettre à jour le statut d’un rendez-vous
+// ✅ Mettre à jour le statut d'un rendez-vous
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { id } = req.params;

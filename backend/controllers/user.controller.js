@@ -136,3 +136,25 @@ exports.updateMe = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
+
+exports.getDoctors = async (req, res) => {
+  console.log('Appel GET /api/users/doctors');
+  try {
+    const doctors = await require('../models/User').find({ role: "doctor", isActive: true }).select("-password");
+    console.log('Résultat MongoDB (doctors):', doctors);
+    res.status(200).json(doctors);
+  } catch (err) {
+    console.error('Erreur dans getDoctors:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await require('../models/User').findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
