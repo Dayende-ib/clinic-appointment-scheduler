@@ -8,20 +8,42 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _fadeAnim;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _scaleAnim = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _fadeAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    _controller.forward();
     _navigateByRole();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _navigateByRole() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final role = prefs.getString('role');
-    await Future.delayed(
-      const Duration(milliseconds: 800),
-    ); // petit délai pour l'effet splash
+    await Future.delayed(const Duration(milliseconds: 1200));
     if (token == null || token.isEmpty) {
       if (mounted) Navigator.pushReplacementNamed(context, '/login');
       return;
@@ -43,15 +65,26 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 120,
-              width: 200,
-              child: Image.asset('assets/images/Logo-caretime.png'),
+            AnimatedBuilder(
+              animation: _controller,
+              builder:
+                  (context, child) => Opacity(
+                    opacity: _fadeAnim.value,
+                    child: Transform.scale(
+                      scale: _scaleAnim.value,
+                      child: child,
+                    ),
+                  ),
+              child: SizedBox(
+                height: 120,
+                width: 200,
+                child: Image.asset('assets/images/Logo-caretime.png'),
+              ),
             ),
-            SizedBox(height: 24),
-            LinearProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Welcome...', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 24),
+            const LinearProgressIndicator(),
+            const SizedBox(height: 16),
+            const Text('Welcome...', style: TextStyle(fontSize: 18)),
           ],
         ),
       ),

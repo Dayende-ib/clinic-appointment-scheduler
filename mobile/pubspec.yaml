@@ -23,7 +23,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
 
@@ -43,3 +44,15 @@ flutter:
         - asset: assets/fonts/NotoSans-Medium.ttf
         - asset: assets/fonts/NotoSans-Bold.ttf
         - asset: assets/fonts/NotoSans-SemiBold.ttf
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Logo-caretime.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/Logo-caretime.png
+  android: true
+  ios: true
+  web: false
