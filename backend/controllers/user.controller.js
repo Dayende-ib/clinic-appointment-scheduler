@@ -64,6 +64,10 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Email non trouvé" });
 
+    if (user.isActive === false) {
+      return res.status(403).json({ message: "Votre compte a été désactivé par l'administrateur." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Mot de passe incorrect" });
 
@@ -95,6 +99,9 @@ exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    if (user.isActive === false) {
+      return res.status(403).json({ message: "Votre compte a été désactivé par l'administrateur." });
+    }
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur' });
@@ -140,7 +147,8 @@ exports.updateMe = async (req, res) => {
 exports.getDoctors = async (req, res) => {
   console.log('Appel GET /api/users/doctors');
   try {
-    const doctors = await require('../models/User').find({ role: "doctor", isActive: true }).select("-password");
+    // Pour l'admin, retourne tous les docteurs, actifs ou non
+    const doctors = await require('../models/User').find({ role: "doctor" }).select("-password");
     console.log('Résultat MongoDB (doctors):', doctors);
     res.status(200).json(doctors);
   } catch (err) {
@@ -161,7 +169,8 @@ exports.getUserById = async (req, res) => {
 
 exports.getPatients = async (req, res) => {
   try {
-    const patients = await require('../models/User').find({ role: "patient", isActive: true }).select("-password");
+    // Pour l'admin, retourne tous les patients, actifs ou non
+    const patients = await require('../models/User').find({ role: "patient" }).select("-password");
     res.status(200).json(patients);
   } catch (err) {
     res.status(500).json({ message: err.message });

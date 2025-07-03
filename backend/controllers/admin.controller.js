@@ -11,12 +11,14 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// ✅ Supprimer un utilisateur
+// ✅ Supprimer un utilisateur et ses rendez-vous liés
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
+    // Supprimer tous les rendez-vous où ce user est patient ou docteur
+    await Appointment.deleteMany({ $or: [ { doctorId: id }, { patientId: id } ] });
     await User.findByIdAndDelete(id);
-    res.status(200).json({ message: "Utilisateur supprimé" });
+    res.status(200).json({ message: "Utilisateur et ses rendez-vous supprimés" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -32,6 +34,20 @@ exports.disableUser = async (req, res) => {
     user.isActive = false;
     await user.save();
     res.status(200).json({ message: "Utilisateur désactivé", user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ Réactiver un utilisateur (admin)
+exports.enableUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    user.isActive = true;
+    await user.save();
+    res.status(200).json({ message: "Utilisateur réactivé", user });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

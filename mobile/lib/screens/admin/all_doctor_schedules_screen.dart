@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/doctor_availability_service.dart';
 import '../../app_theme.dart';
+import 'package:intl/intl.dart';
 
 class AllDoctorSchedulesScreen extends StatefulWidget {
   final List<Map<String, dynamic>> doctors;
@@ -12,28 +13,61 @@ class AllDoctorSchedulesScreen extends StatefulWidget {
 }
 
 class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
-  String search = '';
-  Map<String, List<Map<String, String>>> doctorPlannings = {};
+  Map<String, Map<String, List<Map<String, String>>>> weekPlannings =
+      {}; // doctorId -> {dateStr: [slots]}
   Set<String> loadingDoctors = {};
+  String search = '';
+
+  final List<Color> doctorCardColors = [
+    Colors.blue.shade50,
+    Colors.green.shade50,
+    Colors.orange.shade50,
+    Colors.purple.shade50,
+    Colors.teal.shade50,
+    Colors.pink.shade50,
+    Colors.amber.shade50,
+    Colors.cyan.shade50,
+    Colors.lime.shade50,
+    Colors.indigo.shade50,
+  ];
 
   @override
   void initState() {
     super.initState();
-    _loadAllPlannings();
+    print('[AllDoctorSchedulesScreen] Liste des docteurs reçue :');
+    print(widget.doctors);
+    if (widget.doctors.isEmpty) {
+      print('[AllDoctorSchedulesScreen] Aucun médecin sélectionné !');
+    }
+    _loadAllWeekPlannings();
   }
 
-  Future<void> _loadAllPlannings() async {
+  List<DateTime> getWeekDates() {
+    final today = DateTime.now();
+    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+    return List.generate(7, (i) => startOfWeek.add(Duration(days: i)));
+  }
+
+  Future<void> _loadAllWeekPlannings() async {
+    final weekDates = getWeekDates();
     for (final doctor in widget.doctors) {
       final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
+      print(
+        '[AllDoctorSchedulesScreen] Chargement du planning pour doctorId=$doctorId, doctor=$doctor',
+      );
       if (doctorId.isEmpty) continue;
       setState(() => loadingDoctors.add(doctorId));
-      final today = DateTime.now();
-      final slots = await DoctorAvailabilityService.getAvailabilityForDate(
-        today,
-        doctorId: doctorId,
-      );
+      Map<String, List<Map<String, String>>> planning = {};
+      for (final date in weekDates) {
+        final slots = await DoctorAvailabilityService.getAvailabilityForDate(
+          date,
+          doctorId: doctorId,
+        );
+        final dateStr = DateFormat('yyyy-MM-dd').format(date);
+        planning[dateStr] = slots;
+      }
       setState(() {
-        doctorPlannings[doctorId] = slots;
+        weekPlannings[doctorId] = planning;
         loadingDoctors.remove(doctorId);
       });
     }
@@ -50,15 +84,16 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> doctors = widget.doctors;
+    final weekDates = getWeekDates();
     return Scaffold(
-      appBar: AppBar(title: const Text('Plannings des docteurs')),
+      appBar: AppBar(title: const Text('Doctors Schedules')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Rechercher un médecin',
+                labelText: 'Search for a doctor',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (value) => setState(() => search = value),
@@ -69,437 +104,127 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                   doctors.isEmpty
                       ? const Center(
                         child: Text(
-                          'Aucun médecin sélectionné.',
+                          'No doctor selected.',
                           style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
                       )
-                      : ListView(
-                        children:
-                            doctors.map((doctor) {
-                              final String name =
-                                  ((doctor['firstname'] ?? '') +
-                                          ' ' +
-                                          (doctor['lastname'] ?? ''))
-                                      .trim();
-                              final String displayName =
-                                  name.isNotEmpty ? name : 'Nom inconnu';
-                              final String email = doctor['email'] ?? '';
-                              final String specialty =
-                                  doctor['specialty'] ?? 'Spécialité inconnue';
-                              final doctorId =
-                                  doctor['id'] ?? doctor['_id'] ?? '';
-                              final planning = doctorPlannings[doctorId] ?? [];
-                              final isLoading = loadingDoctors.contains(
-                                doctorId,
-                              );
-                              final isSingle = doctors.length == 1;
-                              if (isSingle) {
-                                // Affichage direct sans ExpansionTile
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 0,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          displayName,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '$email\n$specialty',
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        if (isLoading)
-                                          const Text(
-                                            'Chargement du planning...',
-                                          )
-                                        else if (planning.isEmpty)
-                                          const Text(
-                                            'Aucun planning disponible pour ce médecin.',
-                                            style: TextStyle(
-                                              color: Colors.redAccent,
-                                            ),
-                                          )
-                                        else
-                                          ...planning
-                                              .take(3)
-                                              .map(
-                                                (s) => Container(
-                                                  margin:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 4,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.primary
-                                                        .withOpacity(0.08),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
-                                                        ),
-                                                  ),
-                                                  child: ListTile(
-                                                    leading: const Icon(
-                                                      Icons.access_time,
-                                                      color: AppColors.primary,
-                                                    ),
-                                                    title: Text(
-                                                      '${s['start']} - ${s['end']}',
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    subtitle: Text(
-                                                      'Créneau disponible',
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColors
-                                                                .textSecondary,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                        if (!isLoading && planning.length > 3)
-                                          TextButton(
-                                            style: TextButton.styleFrom(
-                                              foregroundColor: Colors.white,
-                                              backgroundColor: AppColors.accent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              showModalBottomSheet(
-                                                context: context,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                  20,
-                                                                ),
-                                                          ),
-                                                    ),
-                                                builder:
-                                                    (context) => Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            20,
-                                                          ),
-                                                      height: 400,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            AppColors
-                                                                .background,
-                                                        borderRadius:
-                                                            const BorderRadius.vertical(
-                                                              top:
-                                                                  Radius.circular(
-                                                                    20,
-                                                                  ),
-                                                            ),
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          const Text(
-                                                            'Tous les créneaux',
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 16,
-                                                          ),
-                                                          Expanded(
-                                                            child: ListView.builder(
-                                                              itemCount:
-                                                                  planning
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (
-                                                                    context,
-                                                                    i,
-                                                                  ) => Container(
-                                                                    margin: const EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          4,
-                                                                      horizontal:
-                                                                          8,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color:
-                                                                          i % 2 == 0
-                                                                              ? AppColors.primary.withOpacity(
-                                                                                0.08,
-                                                                              )
-                                                                              : AppColors.secondary.withOpacity(0.08),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10,
-                                                                          ),
-                                                                    ),
-                                                                    child: ListTile(
-                                                                      leading: const Icon(
-                                                                        Icons
-                                                                            .access_time,
-                                                                        color:
-                                                                            AppColors.primary,
-                                                                      ),
-                                                                      title: Text(
-                                                                        '${planning[i]['start']} - ${planning[i]['end']}',
-                                                                        style: const TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                      subtitle: Text(
-                                                                        'Créneau disponible',
-                                                                        style: TextStyle(
-                                                                          color:
-                                                                              AppColors.textSecondary,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                              );
-                                            },
-                                            child: const Text(
-                                              'Voir tout le planning',
-                                            ),
-                                          ),
-                                      ],
+                      : ListView.builder(
+                        itemCount: doctors.length,
+                        itemBuilder: (context, idx) {
+                          final doctor = doctors[idx];
+                          final cardColor =
+                              doctorCardColors[idx % doctorCardColors.length];
+                          final String name =
+                              ((doctor['firstname'] ?? '') +
+                                      ' ' +
+                                      (doctor['lastname'] ?? ''))
+                                  .trim();
+                          final String displayName =
+                              name.isNotEmpty ? name : 'Nom inconnu';
+                          final String email = doctor['email'] ?? '';
+                          final String specialty =
+                              doctor['specialty'] ?? 'Spécialité inconnue';
+                          final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
+                          final planning = weekPlannings[doctorId] ?? {};
+                          final isLoading = loadingDoctors.contains(doctorId);
+                          final isSingle = doctors.length == 1;
+                          return Card(
+                            color: cardColor,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 0,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    displayName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                );
-                              } else {
-                                // Cas multi-docteurs (ExpansionTile)
-                                return ExpansionTile(
-                                  title: Text(displayName),
-                                  subtitle: Text('$email\n$specialty'),
-                                  children:
-                                      isLoading
-                                          ? [
-                                            const ListTile(
-                                              title: Text(
-                                                'Chargement du planning...',
-                                              ),
-                                            ),
-                                          ]
-                                          : planning.isEmpty
-                                          ? [
-                                            const ListTile(
-                                              title: Text(
-                                                'Aucun planning disponible.',
-                                              ),
-                                            ),
-                                          ]
-                                          : [
-                                            ...List<Map<String, String>>.from(
-                                              planning.take(3),
-                                            ).asMap().entries.map((entry) {
-                                              final i = entry.key;
-                                              final s = entry.value;
-                                              return Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 4,
-                                                      horizontal: 8,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      i % 2 == 0
-                                                          ? AppColors.primary
-                                                              .withOpacity(0.08)
-                                                          : AppColors.secondary
-                                                              .withOpacity(
-                                                                0.08,
-                                                              ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: ListTile(
-                                                  leading: const Icon(
-                                                    Icons.access_time,
-                                                    color: AppColors.primary,
-                                                  ),
-                                                  title: Text(
-                                                    '${s['start']} - ${s['end']}',
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  subtitle: Text(
-                                                    'Créneau disponible',
-                                                    style: TextStyle(
-                                                      color:
-                                                          AppColors
-                                                              .textSecondary,
-                                                    ),
+                                  Text(
+                                    '$email\n$specialty',
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  if (isLoading)
+                                    const Text('Loading schedule...')
+                                  else
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          weekDates.map((date) {
+                                            final dateStr = DateFormat(
+                                              'yyyy-MM-dd',
+                                            ).format(date);
+                                            final slots =
+                                                planning[dateStr] ?? [];
+                                            final dayName = DateFormat(
+                                              'EEEE',
+                                              'fr_FR',
+                                            ).format(date);
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  dayName[0].toUpperCase() +
+                                                      dayName.substring(1) +
+                                                      ' :',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
                                                   ),
                                                 ),
-                                              );
-                                            }),
-                                            if (planning.length > 3)
-                                              ListTile(
-                                                title: TextButton(
-                                                  style: TextButton.styleFrom(
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    backgroundColor:
-                                                        AppColors.accent,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8,
-                                                          ),
+                                                if (slots.isEmpty)
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left: 12,
+                                                      bottom: 8,
                                                     ),
-                                                  ),
-                                                  onPressed: () {
-                                                    showModalBottomSheet(
-                                                      context: context,
-                                                      shape: const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.vertical(
-                                                              top:
-                                                                  Radius.circular(
-                                                                    20,
-                                                                  ),
-                                                            ),
+                                                    child: Text(
+                                                      'No slots available',
+                                                      style: TextStyle(
+                                                        color: Colors.red,
                                                       ),
-                                                      builder:
-                                                          (
-                                                            context,
-                                                          ) => Container(
-                                                            padding:
-                                                                const EdgeInsets.all(
-                                                                  20,
-                                                                ),
-                                                            height: 400,
-                                                            decoration: BoxDecoration(
-                                                              color:
-                                                                  AppColors
-                                                                      .background,
-                                                              borderRadius:
-                                                                  const BorderRadius.vertical(
-                                                                    top:
-                                                                        Radius.circular(
-                                                                          20,
-                                                                        ),
-                                                                  ),
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                const Text(
-                                                                  'Tous les créneaux',
-                                                                  style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        18,
+                                                    ),
+                                                  )
+                                                else
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          left: 12,
+                                                          bottom: 8,
+                                                        ),
+                                                    child: Wrap(
+                                                      spacing: 8,
+                                                      runSpacing: 4,
+                                                      children:
+                                                          slots
+                                                              .map(
+                                                                (s) => Chip(
+                                                                  label: Text(
+                                                                    '${s['start']} - ${s['end']}',
                                                                   ),
                                                                 ),
-                                                                const SizedBox(
-                                                                  height: 16,
-                                                                ),
-                                                                Expanded(
-                                                                  child: ListView.builder(
-                                                                    itemCount:
-                                                                        planning
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (
-                                                                          context,
-                                                                          i,
-                                                                        ) => Container(
-                                                                          margin: const EdgeInsets.symmetric(
-                                                                            vertical:
-                                                                                4,
-                                                                            horizontal:
-                                                                                8,
-                                                                          ),
-                                                                          decoration: BoxDecoration(
-                                                                            color:
-                                                                                i %
-                                                                                            2 ==
-                                                                                        0
-                                                                                    ? AppColors.primary.withOpacity(
-                                                                                      0.08,
-                                                                                    )
-                                                                                    : AppColors.secondary.withOpacity(
-                                                                                      0.08,
-                                                                                    ),
-                                                                            borderRadius: BorderRadius.circular(
-                                                                              10,
-                                                                            ),
-                                                                          ),
-                                                                          child: ListTile(
-                                                                            leading: const Icon(
-                                                                              Icons.access_time,
-                                                                              color:
-                                                                                  AppColors.primary,
-                                                                            ),
-                                                                            title: Text(
-                                                                              '${planning[i]['start']} - ${planning[i]['end']}',
-                                                                              style: const TextStyle(
-                                                                                fontWeight:
-                                                                                    FontWeight.bold,
-                                                                              ),
-                                                                            ),
-                                                                            subtitle: Text(
-                                                                              'Créneau disponible',
-                                                                              style: TextStyle(
-                                                                                color:
-                                                                                    AppColors.textSecondary,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                    );
-                                                  },
-                                                  child: const Text(
-                                                    'Voir tout le planning',
+                                                              )
+                                                              .toList(),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                          ],
-                                );
-                              }
-                            }).toList(),
+                                              ],
+                                            );
+                                          }).toList(),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
             ),
           ],

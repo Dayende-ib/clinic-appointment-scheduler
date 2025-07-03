@@ -89,12 +89,11 @@ class AdminService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.patch(
-      Uri.parse('$baseUrl/doctors/$doctorId/status'),
+      Uri.parse('$baseUrl/users/$doctorId/disable'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: json.encode({'active': active}),
     );
 
     return response.statusCode == 200;
@@ -105,12 +104,11 @@ class AdminService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.patch(
-      Uri.parse('$baseUrl/patients/$patientId/status'),
+      Uri.parse('$baseUrl/users/$patientId/disable'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: json.encode({'active': active}),
     );
 
     return response.statusCode == 200;
@@ -121,7 +119,7 @@ class AdminService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/doctors/$doctorId'),
+      Uri.parse('$baseUrl/users/$doctorId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -136,7 +134,7 @@ class AdminService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/patients/$patientId'),
+      Uri.parse('$baseUrl/users/$patientId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -279,6 +277,19 @@ class AdminService {
       body: json.encode(settings),
     );
 
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> enableUser(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final response = await http.patch(
+      Uri.parse('$baseUrl/users/$userId/enable'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
     return response.statusCode == 200;
   }
 }

@@ -20,7 +20,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
   bool isLoading = true;
   String? error;
   String searchQuery = '';
-  String filterStatus = 'Tous';
+  String filterStatus = 'All';
 
   @override
   void initState() {
@@ -42,6 +42,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                 .map<Map<String, dynamic>>(
                   (d) => {
                     ...d,
+                    'id': d['id'] ?? d['_id'],
                     'name':
                         ((d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''))
                             .trim(),
@@ -72,9 +73,17 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              currentStatus ? 'Docteur désactivé' : 'Docteur activé',
+              currentStatus ? 'Doctor deactivated' : 'Doctor activated',
             ),
             backgroundColor: currentStatus ? kSoftRed : kSuccessGreen,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to deactivate doctor.'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -82,7 +91,39 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur: ${e.toString()}'),
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _enableDoctor(String doctorId) async {
+    try {
+      final success = await AdminService.enableUser(doctorId);
+      if (success) {
+        _loadDoctors();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Doctor reactivated'),
+            backgroundColor: kSuccessGreen,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to reactivate doctor.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -94,19 +135,19 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmer la suppression'),
+            title: const Text('Confirm deletion'),
             content: Text(
-              'Êtes-vous sûr de vouloir supprimer le docteur "$doctorName" ?',
+              'Are you sure you want to delete doctor "$doctorName"?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Supprimer'),
+                child: const Text('Delete'),
               ),
             ],
           ),
@@ -120,8 +161,16 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Docteur "$doctorName" supprimé'),
+              content: Text('Doctor "$doctorName" deleted'),
               backgroundColor: kSuccessGreen,
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to delete doctor.'),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -129,7 +178,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -186,7 +235,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              doctor['name'] ?? 'Nom inconnu',
+                              doctor['name'] ?? 'Unknown name',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -215,100 +264,29 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildDetailSection('📧 Contact', [
-                          'Email: ${doctor['email'] ?? 'Non renseigné'}',
-                          'Téléphone: ${doctor['phone'] ?? 'Non renseigné'}',
+                          'Email: ${doctor['email'] ?? 'Not provided'}',
+                          'Phone: ${doctor['phone'] ?? 'Not provided'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('🏥 Informations professionnelles', [
-                          'Spécialisation: ${doctor['specialization'] ?? 'Non définie'}',
-                          'Numéro de licence: ${doctor['licenseNumber'] ?? 'Non renseigné'}',
-                          'Années d\'expérience: ${doctor['experienceYears'] ?? 'Non renseigné'}',
+                        _buildDetailSection('🏥 Professional Information', [
+                          'Specialization: ${doctor['specialization'] ?? 'Not defined'}',
+                          'License number: ${doctor['licenseNumber'] ?? 'Not provided'}',
+                          'Years of experience: ${doctor['experienceYears'] ?? 'Not provided'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('📅 Horaires de travail', [
-                          'Lundi - Vendredi: ${doctor['workingHours']?['weekdays'] ?? 'Non défini'}',
-                          'Samedi: ${doctor['workingHours']?['saturday'] ?? 'Non défini'}',
-                          'Dimanche: ${doctor['workingHours']?['sunday'] ?? 'Non défini'}',
+                        _buildDetailSection('📅 Working hours', [
+                          'Monday - Friday: ${doctor['workingHours']?['weekdays'] ?? 'Not defined'}',
+                          'Saturday: ${doctor['workingHours']?['saturday'] ?? 'Not defined'}',
+                          'Sunday: ${doctor['workingHours']?['sunday'] ?? 'Not defined'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💰 Tarifs', [
-                          'Consultation: ${doctor['pricing']?['consultation'] ?? 'Non défini'}',
-                          'Suivi: ${doctor['pricing']?['followUp'] ?? 'Non défini'}',
+                        _buildDetailSection('💰 Pricing', [
+                          'Consultation: ${doctor['pricing']?['consultation'] ?? 'Not defined'}',
+                          'Follow-up: ${doctor['pricing']?['followUp'] ?? 'Not defined'}',
                         ]),
                         const SizedBox(height: 30),
                       ],
                     ),
-                  ),
-                ),
-                // Action buttons
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(
-                              context,
-                              '/admin/doctors/appointments',
-                              arguments: {'doctorId': doctor['id']},
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voir rendez-vous',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(
-                              context,
-                              '/admin/doctors/schedule',
-                              arguments: {'doctorId': doctor['id']},
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kSecondaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voir planning',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
@@ -355,7 +333,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         border: Border.all(color: isActive ? kSuccessGreen : kSoftRed),
       ),
       child: Text(
-        isActive ? 'Actif' : 'Inactif',
+        isActive ? 'Active' : 'Inactive',
         style: TextStyle(
           color: isActive ? kSuccessGreen : kSoftRed,
           fontSize: 12,
@@ -377,9 +355,9 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           specialization.contains(search) ||
           email.contains(search);
       final matchesFilter =
-          filterStatus == 'Tous' ||
-          (filterStatus == 'Actifs' && doctor['active'] == true) ||
-          (filterStatus == 'Inactifs' && doctor['active'] == false);
+          filterStatus == 'All' ||
+          (filterStatus == 'Active' && doctor['active'] == true) ||
+          (filterStatus == 'Inactive' && doctor['active'] == false);
       return matchesSearch && matchesFilter;
     }).toList();
   }
@@ -402,11 +380,11 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: $error'),
+              Text('Error: $error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadDoctors,
-                child: const Text('Réessayer'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -418,7 +396,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Gestion des Docteurs',
+          'Doctors Management',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kPrimaryColor,
@@ -427,7 +405,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadDoctors,
-            tooltip: 'Actualiser',
+            tooltip: 'Refresh',
           ),
         ],
       ),
@@ -441,7 +419,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Rechercher un docteur...',
+                    hintText: 'Search for a doctor...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -455,14 +433,14 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Filtre: ',
+                      'Filter: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 8),
                     DropdownButton<String>(
                       value: filterStatus,
                       items:
-                          ['Tous', 'Actifs', 'Inactifs'].map((status) {
+                          ['All', 'Active', 'Inactive'].map((status) {
                             return DropdownMenuItem(
                               value: status,
                               child: Text(status),
@@ -470,7 +448,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                           }).toList(),
                       onChanged:
                           (value) =>
-                              setState(() => filterStatus = value ?? 'Tous'),
+                              setState(() => filterStatus = value ?? 'All'),
                     ),
                   ],
                 ),
@@ -494,7 +472,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              'Aucun docteur trouvé',
+                              'No doctors found',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -532,7 +510,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                 ),
                               ),
                               title: Text(
-                                doctor['name'] ?? 'Nom inconnu',
+                                doctor['name'] ?? 'Unknown name',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -543,7 +521,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                 children: [
                                   Text(doctor['specialization'] ?? ''),
                                   Text(
-                                    doctor['email'] ?? 'Email non renseigné',
+                                    doctor['email'] ?? 'Email not provided',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -560,10 +538,14 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                           _showDoctorDetails(doctor);
                                           break;
                                         case 'toggle':
-                                          _toggleDoctorStatus(
-                                            doctor['id'],
-                                            isActive,
-                                          );
+                                          if (isActive) {
+                                            _toggleDoctorStatus(
+                                              doctor['id'],
+                                              isActive,
+                                            );
+                                          } else {
+                                            _enableDoctor(doctor['id']);
+                                          }
                                           break;
                                         case 'delete':
                                           _deleteDoctor(
@@ -581,7 +563,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Détails'),
+                                                Text('Details'),
                                               ],
                                             ),
                                           ),
@@ -593,12 +575,16 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                                   isActive
                                                       ? Icons.block
                                                       : Icons.check_circle,
+                                                  color:
+                                                      isActive
+                                                          ? null
+                                                          : kSuccessGreen,
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   isActive
-                                                      ? 'Désactiver'
-                                                      : 'Activer',
+                                                      ? 'Deactivate'
+                                                      : 'Activate',
                                                 ),
                                               ],
                                             ),
@@ -613,7 +599,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Supprimer',
+                                                  'Delete',
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),

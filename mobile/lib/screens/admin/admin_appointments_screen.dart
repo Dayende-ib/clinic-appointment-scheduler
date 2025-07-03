@@ -25,8 +25,8 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
   bool isLoading = true;
   String? error;
   String searchQuery = '';
-  String filterStatus = 'Tous';
-  String filterType = 'Tous';
+  String filterStatus = 'All';
+  String filterType = 'All';
 
   @override
   void initState() {
@@ -48,6 +48,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                 .map<Map<String, dynamic>>(
                   (apt) => {
                     ...apt,
+                    'id': apt['id'] ?? apt['_id'],
                     'patientName':
                         ((apt['patientId']?['firstname'] ?? '') +
                                 ' ' +
@@ -84,19 +85,19 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmer la suppression'),
+            title: const Text('Confirm deletion'),
             content: Text(
-              'Êtes-vous sûr de vouloir supprimer le rendez-vous de "$patientName" ?',
+              'Are you sure you want to delete the appointment for "$patientName"?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Supprimer'),
+                child: const Text('Delete'),
               ),
             ],
           ),
@@ -110,8 +111,16 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Rendez-vous supprimé'),
+              content: Text('Appointment successfully deleted'),
               backgroundColor: kSuccessGreen,
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete appointment'),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -119,7 +128,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -266,73 +275,6 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                     ),
                   ),
                 ),
-                // Action buttons
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _deleteAppointment(aptId, patientName);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kSoftRed,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Supprimer',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(
-                              context,
-                              '/admin/appointments/edit',
-                              arguments: {'appointmentId': aptId},
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Modifier',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -372,22 +314,22 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmé';
+        label = 'Confirmed';
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'En attente';
+        label = 'Pending';
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Annulé';
+        label = 'Cancelled';
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Terminé';
+        label = 'Completed';
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -423,14 +365,14 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
           );
 
       final matchesStatus =
-          filterStatus == 'Tous' ||
+          filterStatus == 'All' ||
           (appointment['status'] ?? '') == filterStatus;
 
       final matchesType =
-          filterType == 'Tous' ||
-          (filterType == 'Aujourd\'hui' && _isToday(appointment['date'])) ||
-          (filterType == 'Cette semaine' && _isThisWeek(appointment['date'])) ||
-          (filterType == 'Ce mois' && _isThisMonth(appointment['date']));
+          filterType == 'All' ||
+          (filterType == 'Today' && _isToday(appointment['date'])) ||
+          (filterType == 'This week' && _isThisWeek(appointment['date'])) ||
+          (filterType == 'This month' && _isThisMonth(appointment['date']));
 
       return matchesSearch && matchesStatus && matchesType;
     }).toList();
@@ -497,16 +439,16 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       final filter = widget.arguments!['filter'] as String;
       switch (filter) {
         case 'today':
-          return 'Rendez-vous d\'aujourd\'hui';
+          return 'Today\'s Appointments';
         case 'pending':
-          return 'Rendez-vous en attente';
+          return 'Pending Appointments';
         case 'all':
-          return 'Tous les rendez-vous';
+          return 'All Appointments';
         default:
-          return 'Gestion des rendez-vous';
+          return 'Appointments Management';
       }
     }
-    return 'Gestion des rendez-vous';
+    return 'Appointments Management';
   }
 
   @override
@@ -555,7 +497,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAppointments,
-            tooltip: 'Actualiser',
+            tooltip: 'Refresh',
           ),
         ],
       ),
@@ -569,7 +511,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Rechercher un rendez-vous...',
+                    hintText: 'Search for an appointment...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -586,10 +528,10 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       child: DropdownButton<String>(
                         value: filterStatus,
                         isExpanded: true,
-                        hint: const Text('Statut'),
+                        hint: const Text('Status'),
                         items:
                             [
-                              'Tous',
+                              'All',
                               'booked',
                               'confirmed',
                               'completed',
@@ -598,16 +540,16 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                               String label;
                               switch (status) {
                                 case 'booked':
-                                  label = 'En attente';
+                                  label = 'Pending';
                                   break;
                                 case 'confirmed':
-                                  label = 'Confirmé';
+                                  label = 'Confirmed';
                                   break;
                                 case 'completed':
-                                  label = 'Terminé';
+                                  label = 'Completed';
                                   break;
                                 case 'canceled':
-                                  label = 'Annulé';
+                                  label = 'Cancelled';
                                   break;
                                 default:
                                   label = status;
@@ -619,7 +561,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                             }).toList(),
                         onChanged:
                             (value) =>
-                                setState(() => filterStatus = value ?? 'Tous'),
+                                setState(() => filterStatus = value ?? 'All'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -627,14 +569,11 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       child: DropdownButton<String>(
                         value: filterType,
                         isExpanded: true,
-                        hint: const Text('Période'),
+                        hint: const Text('Period'),
                         items:
-                            [
-                              'Tous',
-                              'Aujourd\'hui',
-                              'Cette semaine',
-                              'Ce mois',
-                            ].map((type) {
+                            ['All', 'Today', 'This week', 'This month'].map((
+                              type,
+                            ) {
                               return DropdownMenuItem(
                                 value: type,
                                 child: Text(type),
@@ -642,7 +581,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                             }).toList(),
                         onChanged:
                             (value) =>
-                                setState(() => filterType = value ?? 'Tous'),
+                                setState(() => filterType = value ?? 'All'),
                       ),
                     ),
                   ],
@@ -667,7 +606,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              'Aucun rendez-vous trouvé',
+                              'No appointments found',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -766,7 +705,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Détails'),
+                                                Text('Details'),
                                               ],
                                             ),
                                           ),
@@ -780,7 +719,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Supprimer',
+                                                  'Delete',
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),
@@ -800,15 +739,6 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigation vers l'écran d'ajout de rendez-vous
-          Navigator.pushNamed(context, '/admin/appointments/add');
-        },
-        backgroundColor: kAccentColor,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }

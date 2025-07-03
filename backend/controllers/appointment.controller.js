@@ -135,3 +135,20 @@ exports.rescheduleAppointment = async (req, res) => {
   }
 };
 
+// Suppression d'un rendez-vous par l'admin
+exports.deleteAppointmentByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('[ADMIN] Suppression RDV, id reçu :', id);
+    const deleted = await Appointment.findByIdAndDelete(id);
+    console.log('[ADMIN] Résultat suppression :', deleted);
+    if (!deleted) {
+      return res.status(404).json({ message: "Rendez-vous non trouvé" });
+    }
+    res.status(200).json({ message: "Rendez-vous supprimé" });
+  } catch (err) {
+    console.error('[ADMIN] Erreur suppression RDV :', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+

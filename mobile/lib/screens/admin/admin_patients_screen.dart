@@ -21,7 +21,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
   bool isLoading = true;
   String? error;
   String searchQuery = '';
-  String filterStatus = 'Tous';
+  String filterStatus = 'All';
 
   @override
   void initState() {
@@ -43,6 +43,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                 .map<Map<String, dynamic>>(
                   (p) => {
                     ...p,
+                    'id': p['id'] ?? p['_id'],
                     'name':
                         ((p['firstname'] ?? '') + ' ' + (p['lastname'] ?? ''))
                             .trim(),
@@ -77,9 +78,17 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              currentStatus ? 'Patient désactivé' : 'Patient activé',
+              currentStatus ? 'Patient deactivated' : 'Patient activated',
             ),
             backgroundColor: currentStatus ? kSoftRed : kSuccessGreen,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to deactivate patient.'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -87,7 +96,39 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur: ${e.toString()}'),
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _enablePatient(String patientId) async {
+    try {
+      final success = await AdminService.enableUser(patientId);
+      if (success) {
+        _loadPatients();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Patient reactivated'),
+            backgroundColor: kSuccessGreen,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to reactivate patient.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -99,19 +140,19 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmer la suppression'),
+            title: const Text('Confirm deletion'),
             content: Text(
-              'Êtes-vous sûr de vouloir supprimer le patient "$patientName" ?',
+              'Are you sure you want to delete patient "$patientName"?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Supprimer'),
+                child: const Text('Delete'),
               ),
             ],
           ),
@@ -125,8 +166,16 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Patient "$patientName" supprimé'),
+              content: Text('Patient "$patientName" deleted'),
               backgroundColor: kSuccessGreen,
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to delete patient.'),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -134,7 +183,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -189,7 +238,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              patient['name'] ?? 'Nom inconnu',
+                              patient['name'] ?? 'Unknown name',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -218,100 +267,29 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildDetailSection('📧 Contact', [
-                          'Email: ${patient['email'] ?? 'Non renseigné'}',
-                          'Téléphone: ${patient['phone'] ?? 'Non renseigné'}',
+                          'Email: ${patient['email'] ?? 'Not provided'}',
+                          'Phone: ${patient['phone'] ?? 'Not provided'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Informations personnelles', [
-                          'Date de naissance: ${patient['dateOfBirth'] != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(patient['dateOfBirth'])) : 'Non renseigné'}',
-                          'Genre: ${patient['gender'] ?? 'Non renseigné'}',
-                          'Adresse: ${patient['address'] ?? 'Non renseigné'}',
+                        _buildDetailSection('👤 Personal Information', [
+                          'Date of birth: ${patient['dateOfBirth'] != null ? DateFormat('MM/dd/yyyy').format(DateTime.parse(patient['dateOfBirth'])) : 'Not provided'}',
+                          'Gender: ${patient['gender'] ?? 'Not provided'}',
+                          'Address: ${patient['address'] ?? 'Not provided'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('🏥 Informations médicales', [
-                          'Groupe sanguin: ${patient['bloodGroup'] ?? 'Non renseigné'}',
-                          'Allergies: ${patient['allergies']?.join(', ') ?? 'Aucune'}',
-                          'Antécédents: ${patient['medicalHistory'] ?? 'Aucun'}',
+                        _buildDetailSection('🏥 Medical Information', [
+                          'Blood group: ${patient['bloodGroup'] ?? 'Not provided'}',
+                          'Allergies: ${patient['allergies']?.join(', ') ?? 'None'}',
+                          'Medical history: ${patient['medicalHistory'] ?? 'None'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('📅 Informations de compte', [
-                          'Date d\'inscription: ${patient['createdAt'] != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(patient['createdAt'])) : 'Non renseigné'}',
-                          'Dernière connexion: ${patient['lastLogin'] != null ? DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(patient['lastLogin'])) : 'Jamais'}',
+                        _buildDetailSection('📅 Account Information', [
+                          'Registration date: ${patient['createdAt'] != null ? DateFormat('MM/dd/yyyy').format(DateTime.parse(patient['createdAt'])) : 'Not provided'}',
+                          'Last login: ${patient['lastLogin'] != null ? DateFormat('MM/dd/yyyy HH:mm').format(DateTime.parse(patient['lastLogin'])) : 'Never'}',
                         ]),
                         const SizedBox(height: 30),
                       ],
                     ),
-                  ),
-                ),
-                // Action buttons
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(
-                              context,
-                              '/admin/patients/appointments',
-                              arguments: {'patientId': patient['id']},
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kSecondaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Voir rendez-vous',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(
-                              context,
-                              '/admin/patients/history',
-                              arguments: {'patientId': patient['id']},
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kAccentColor,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Historique médical',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
@@ -358,7 +336,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         border: Border.all(color: isActive ? kSuccessGreen : kSoftRed),
       ),
       child: Text(
-        isActive ? 'Actif' : 'Inactif',
+        isActive ? 'Active' : 'Inactive',
         style: TextStyle(
           color: isActive ? kSuccessGreen : kSoftRed,
           fontSize: 12,
@@ -383,9 +361,9 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           );
 
       final matchesFilter =
-          filterStatus == 'Tous' ||
-          (filterStatus == 'Actifs' && patient['active'] == true) ||
-          (filterStatus == 'Inactifs' && patient['active'] == false);
+          filterStatus == 'All' ||
+          (filterStatus == 'Active' && patient['active'] == true) ||
+          (filterStatus == 'Inactive' && patient['active'] == false);
 
       return matchesSearch && matchesFilter;
     }).toList();
@@ -409,7 +387,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: $error'),
+              Text('Error: $error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadPatients,
@@ -425,7 +403,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Gestion des Patients',
+          'Patients Management',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kSecondaryColor,
@@ -434,7 +412,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadPatients,
-            tooltip: 'Actualiser',
+            tooltip: 'Refresh',
           ),
         ],
       ),
@@ -448,7 +426,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Rechercher un patient...',
+                    hintText: 'Search for a patient...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -469,7 +447,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                     DropdownButton<String>(
                       value: filterStatus,
                       items:
-                          ['Tous', 'Actifs', 'Inactifs'].map((status) {
+                          ['All', 'Active', 'Inactive'].map((status) {
                             return DropdownMenuItem(
                               value: status,
                               child: Text(status),
@@ -477,7 +455,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                           }).toList(),
                       onChanged:
                           (value) =>
-                              setState(() => filterStatus = value ?? 'Tous'),
+                              setState(() => filterStatus = value ?? 'All'),
                     ),
                   ],
                 ),
@@ -497,7 +475,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                             Icon(Icons.people, size: 64, color: Colors.grey),
                             SizedBox(height: 16),
                             Text(
-                              'Aucun patient trouvé',
+                              'No patients found',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -564,10 +542,14 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                           _showPatientDetails(patient);
                                           break;
                                         case 'toggle':
-                                          _togglePatientStatus(
-                                            patient['id'],
-                                            isActive,
-                                          );
+                                          if (isActive) {
+                                            _togglePatientStatus(
+                                              patient['id'],
+                                              isActive,
+                                            );
+                                          } else {
+                                            _enablePatient(patient['id']);
+                                          }
                                           break;
                                         case 'delete':
                                           _deletePatient(
@@ -585,7 +567,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Détails'),
+                                                Text('Details'),
                                               ],
                                             ),
                                           ),
@@ -597,12 +579,16 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                                   isActive
                                                       ? Icons.block
                                                       : Icons.check_circle,
+                                                  color:
+                                                      isActive
+                                                          ? null
+                                                          : kSuccessGreen,
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   isActive
-                                                      ? 'Désactiver'
-                                                      : 'Activer',
+                                                      ? 'Deactivate'
+                                                      : 'Activate',
                                                 ),
                                               ],
                                             ),
@@ -617,7 +603,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Supprimer',
+                                                  'Delete',
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),
@@ -637,15 +623,6 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigation vers l'écran d'ajout de patient
-          Navigator.pushNamed(context, '/admin/patients/add');
-        },
-        backgroundColor: kSecondaryColor,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }

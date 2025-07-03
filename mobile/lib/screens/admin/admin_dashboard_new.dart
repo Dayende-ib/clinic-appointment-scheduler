@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -249,7 +250,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Dashboard Administrateur',
+          'Admin Dashboard',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kPrimaryColor,
@@ -259,6 +260,42 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _loadDashboardStats,
             tooltip: 'Actualiser',
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Déconnexion',
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder:
+                    (context) => AlertDialog(
+                      title: const Text('Déconnexion'),
+                      content: const Text(
+                        'Voulez-vous vraiment vous déconnecter ?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Annuler'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Déconnexion'),
+                        ),
+                      ],
+                    ),
+              );
+              if (confirmed == true) {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (!context.mounted) return;
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),
@@ -288,7 +325,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Administrateur',
+                          'Administrator',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -297,8 +334,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         ),
                         Text(
                           DateFormat(
-                            'EEEE d MMMM yyyy',
-                            'fr_FR',
+                            'EEEE, MMMM d, yyyy',
+                            'en_US',
                           ).format(DateTime.now()),
                           style: const TextStyle(
                             fontSize: 16,
@@ -314,7 +351,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
               // Statistiques principales
               Text(
-                'Vue d\'ensemble',
+                'Overview',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -326,7 +363,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Docteurs',
+                      title: 'Doctors',
                       value: totalDoctors,
                       icon: Icons.medical_services,
                       color: kPrimaryColor,
@@ -352,7 +389,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Rendez-vous',
+                      title: 'Appointments',
                       value: totalAppointments,
                       icon: Icons.calendar_today,
                       color: kAccentColor,
@@ -366,7 +403,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Aujourd\'hui',
+                      title: 'Today',
                       value: todayAppointments,
                       icon: Icons.today,
                       color: kSuccessGreen,
@@ -383,7 +420,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
               // Actions rapides
               Text(
-                'Gestion des utilisateurs',
+                'User Management',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -392,16 +429,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'Gestion des docteurs',
-                subtitle: 'Voir, modifier et gérer tous les docteurs',
+                title: 'Manage Doctors',
+                subtitle: 'View, edit and manage all doctors',
                 icon: Icons.medical_services,
                 color: kPrimaryColor,
                 onTap: () => Navigator.pushNamed(context, '/admin/doctors'),
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Gestion des patients',
-                subtitle: 'Voir, modifier et gérer tous les patients',
+                title: 'Manage Patients',
+                subtitle: 'View, edit and manage all patients',
                 icon: Icons.people,
                 color: kSecondaryColor,
                 onTap: () => Navigator.pushNamed(context, '/admin/patients'),
@@ -410,7 +447,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
               // Gestion des rendez-vous
               Text(
-                'Gestion des rendez-vous',
+                'Appointments Management',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -419,8 +456,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'Tous les rendez-vous',
-                subtitle: 'Voir et gérer tous les rendez-vous',
+                title: 'All Appointments',
+                subtitle: 'View and manage all appointments',
                 icon: Icons.calendar_month,
                 color: kAccentColor,
                 onTap:
@@ -428,8 +465,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Rendez-vous en attente',
-                subtitle: 'Gérer les rendez-vous non confirmés',
+                title: 'Pending Appointments',
+                subtitle: 'Manage unconfirmed appointments',
                 icon: Icons.pending_actions,
                 color: kWarningYellow,
                 onTap:
@@ -440,8 +477,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Plannings des docteurs',
-                subtitle: 'Voir tous les plannings et disponibilités',
+                title: 'Doctors Schedules',
+                subtitle: 'View all schedules and availabilities',
                 icon: Icons.schedule,
                 color: kPurple,
                 onTap: () async {
@@ -474,7 +511,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Statistiques détaillées',
+                      'Detailed Statistics',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -483,19 +520,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                     const SizedBox(height: 16),
                     _buildStatRow(
-                      'Rendez-vous terminés',
+                      'Completed appointments',
                       completedAppointments,
                       Icons.check_circle,
                       kSuccessGreen,
                     ),
                     _buildStatRow(
-                      'Rendez-vous en attente',
+                      'Pending appointments',
                       pendingAppointments,
                       Icons.schedule,
                       kWarningYellow,
                     ),
                     _buildStatRow(
-                      'Taux de remplissage',
+                      'Occupancy rate',
                       '${((completedAppointments / (totalAppointments > 0 ? totalAppointments : 1)) * 100).toStringAsFixed(1)}%',
                       Icons.trending_up,
                       kPrimaryColor,
