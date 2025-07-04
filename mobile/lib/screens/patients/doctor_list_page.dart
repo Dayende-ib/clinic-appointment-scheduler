@@ -136,6 +136,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
             image: d['image'] ?? 'assets/images/male-doctor-icon.png',
             country: d['country'] ?? '',
             city: d['city'] ?? '',
+            phone: d['phone'] ?? '',
           ),
         )
         .toList();
@@ -514,6 +515,7 @@ class Doctor {
   final String image;
   final String? country;
   final String? city;
+  final String? phone;
 
   Doctor({
     required this.id,
@@ -524,6 +526,7 @@ class Doctor {
     required this.image,
     this.country,
     this.city,
+    this.phone,
   });
 }
 

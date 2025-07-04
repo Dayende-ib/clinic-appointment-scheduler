@@ -277,6 +277,25 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             color: Colors.teal,
                           ),
                         ),
+                        if (widget.doctor.phone != null &&
+                            widget.doctor.phone!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.phone, size: 16, color: Colors.teal),
+                                SizedBox(width: 6),
+                                Text(
+                                  widget.doctor.phone!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
