@@ -7,7 +7,7 @@ exports.setAvailability = async (req, res) => {
     const { date, slots } = req.body;
 
     if (!date || !Array.isArray(slots) || slots.length === 0) {
-      return res.status(400).json({ message: "Date ou créneaux manquants" });
+      return res.status(400).json({ message: "Missing date or slots" });
     }
 
     // Vérifie s'il existe déjà une dispo pour cette date
@@ -20,7 +20,7 @@ exports.setAvailability = async (req, res) => {
       availability = await Availability.create({ doctorId, date, slots });
     }
 
-    res.status(200).json({ message: "Disponibilités mises à jour", availability });
+    res.status(200).json({ message: "Availability updated", availability });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -33,13 +33,13 @@ exports.getAvailability = async (req, res) => {
     const { date } = req.query;
 
     if (!doctorId || !date) {
-      return res.status(400).json({ message: "Paramètres manquants" });
+      return res.status(400).json({ message: "Missing parameters" });
     }
 
     const availability = await Availability.findOne({ doctorId, date });
 
     if (!availability) {
-      return res.status(404).json({ message: "Aucune disponibilité trouvée" });
+      return res.status(404).json({ message: "No availability found" });
     }
 
     res.status(200).json(availability);
@@ -54,10 +54,10 @@ exports.deleteAvailability = async (req, res) => {
     const doctorId = req.user.id;
     const { date } = req.query;
     if (!date) {
-      return res.status(400).json({ message: "Date manquante" });
+      return res.status(400).json({ message: "Missing date" });
     }
     await Availability.deleteOne({ doctorId, date });
-    res.status(200).json({ message: "Disponibilité supprimée" });
+    res.status(200).json({ message: "Availability deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -70,7 +70,7 @@ exports.getDoctorAvailabilities = async (req, res) => {
     console.log('[getDoctorAvailabilities] doctorId:', doctorId, 'date:', date);
     if (!doctorId || !date) {
       console.log('[getDoctorAvailabilities] Paramètres manquants');
-      return res.status(400).json({ message: 'doctorId et date requis' });
+      return res.status(400).json({ message: 'doctorId and date required' });
     }
     const start = new Date(date + 'T00:00:00.000Z');
     const end = new Date(date + 'T23:59:59.999Z');

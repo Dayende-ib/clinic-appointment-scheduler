@@ -173,9 +173,7 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  dayName[0].toUpperCase() +
-                                                      dayName.substring(1) +
-                                                      ' :',
+                                                  '${dayName[0].toUpperCase()}${dayName.substring(1)} :',
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15,

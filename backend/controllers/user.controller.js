@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
     } = req.body;
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "Email déjà utilisé" });
+    if (existingUser) return res.status(400).json({ message: "Email already in use" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
     );
 
     res.status(201).json({
-      message: "Utilisateur enregistré",
+      message: "User registered",
       token,
       user: {
         id: newUser._id,
@@ -68,14 +68,14 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Email non trouvé" });
+    if (!user) return res.status(400).json({ message: "Email not found" });
 
     if (user.isActive === false) {
-      return res.status(403).json({ message: "Votre compte a été désactivé par l'administrateur." });
+      return res.status(403).json({ message: "Your account has been deactivated by the administrator." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Mot de passe incorrect" });
+    if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -104,13 +104,13 @@ exports.login = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     if (user.isActive === false) {
-      return res.status(403).json({ message: "Votre compte a été désactivé par l'administrateur." });
+      return res.status(403).json({ message: "Your account has been deactivated by the administrator." });
     }
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -124,7 +124,7 @@ exports.updateMe = async (req, res) => {
     // Empêcher la modification de l'email en double
     if (updates.email) {
       const emailExists = await User.findOne({ email: updates.email, _id: { $ne: req.user.id } });
-      if (emailExists) return res.status(400).json({ message: 'Email déjà utilisé' });
+      if (emailExists) return res.status(400).json({ message: 'Email already in use' });
     }
 
     const user = await User.findByIdAndUpdate(
@@ -132,7 +132,7 @@ exports.updateMe = async (req, res) => {
       { $set: updates },
       { new: true, runValidators: true, context: 'query' }
     ).select('-password');
-    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     // Retourne un objet filtré
     res.json({
       id: user._id,
@@ -146,7 +146,7 @@ exports.updateMe = async (req, res) => {
       city: user.city
     });
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -166,7 +166,7 @@ exports.getDoctors = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const user = await require('../models/User').findById(req.params.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });

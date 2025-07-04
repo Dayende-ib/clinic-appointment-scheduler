@@ -8,7 +8,7 @@ exports.createAppointment = async (req, res) => {
 
     // Vérifier que la date/heure est dans le futur
     if (new Date(datetime) < new Date()) {
-      return res.status(400).json({ message: "Impossible de réserver un créneau passé." });
+      return res.status(400).json({ message: "Cannot book a past slot." });
     }
 
     // Empêcher la double réservation du même créneau
@@ -18,7 +18,7 @@ exports.createAppointment = async (req, res) => {
       status: { $ne: "canceled" }
     });
     if (existing) {
-      return res.status(400).json({ message: "Ce créneau est déjà réservé." });
+      return res.status(400).json({ message: "This slot is already booked." });
     }
 
     const appointment = new Appointment({
@@ -30,7 +30,7 @@ exports.createAppointment = async (req, res) => {
     });
 
     await appointment.save();
-    res.status(201).json({ message: "Rendez-vous créé", appointment });
+    res.status(201).json({ message: "Appointment created", appointment });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,12 +65,12 @@ exports.updateAppointmentStatus = async (req, res) => {
 
     const allowedStatuses = ["booked", "confirmed", "completed", "canceled"];
     if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({ message: "Statut invalide" });
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const appointment = await Appointment.findById(id);
     if (!appointment) {
-      return res.status(404).json({ message: "Rendez-vous non trouvé" });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
     //  Règles de rôle
@@ -84,20 +84,20 @@ exports.updateAppointmentStatus = async (req, res) => {
         // OK
       }
       else {
-        return res.status(403).json({ message: "Seul le patient ou le médecin concerné peut annuler ce rendez-vous" });
+        return res.status(403).json({ message: "Only the patient or the concerned doctor can cancel this appointment" });
       }
     }
 
     if (["confirmed", "completed"].includes(status)) {
       if (role !== "doctor" || appointment.doctorId.toString() !== userId) {
-        return res.status(403).json({ message: "Seul le médecin concerné peut confirmer ou compléter ce rendez-vous" });
+        return res.status(403).json({ message: "Only the concerned doctor can confirm or complete this appointment" });
       }
     }
 
     appointment.status = status;
     await appointment.save();
 
-    res.status(200).json({ message: "Statut mis à jour", appointment });
+    res.status(200).json({ message: "Status updated", appointment });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -111,12 +111,12 @@ exports.rescheduleAppointment = async (req, res) => {
     const { role, id: userId } = req.user;
 
     if (!datetime) {
-      return res.status(400).json({ message: "Nouvelle date/heure requise" });
+      return res.status(400).json({ message: "New date/time required" });
     }
 
     const appointment = await Appointment.findById(id);
     if (!appointment) {
-      return res.status(404).json({ message: "Rendez-vous non trouvé" });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
     // Seul le patient ou le médecin concerné peut reprogrammer
@@ -124,7 +124,7 @@ exports.rescheduleAppointment = async (req, res) => {
       appointment.patientId.toString() !== userId &&
       appointment.doctorId.toString() !== userId
     ) {
-      return res.status(403).json({ message: "Accès refusé" });
+      return res.status(403).json({ message: "Access denied" });
     }
 
     // Vérifier qu'il n'y a pas déjà un rendez-vous à ce créneau pour ce médecin
@@ -135,14 +135,14 @@ exports.rescheduleAppointment = async (req, res) => {
       _id: { $ne: id }
     });
     if (existing) {
-      return res.status(400).json({ message: "Ce créneau est déjà réservé." });
+      return res.status(400).json({ message: "This slot is already booked." });
     }
 
     appointment.datetime = datetime;
     appointment.status = "booked"; // repasse en attente de validation
     await appointment.save();
 
-    res.status(200).json({ message: "Rendez-vous reprogrammé", appointment });
+    res.status(200).json({ message: "Appointment rescheduled", appointment });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -156,9 +156,9 @@ exports.deleteAppointmentByAdmin = async (req, res) => {
     const deleted = await Appointment.findByIdAndDelete(id);
     console.log('[ADMIN] Résultat suppression :', deleted);
     if (!deleted) {
-      return res.status(404).json({ message: "Rendez-vous non trouvé" });
+      return res.status(404).json({ message: "Appointment not found" });
     }
-    res.status(200).json({ message: "Rendez-vous supprimé" });
+    res.status(200).json({ message: "Appointment deleted" });
   } catch (err) {
     console.error('[ADMIN] Erreur suppression RDV :', err);
     res.status(500).json({ message: err.message });

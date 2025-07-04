@@ -26,10 +26,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   String? _selectedReason;
   final List<String> _motifs = [
     'Consultation',
-    "Renouvellement d'ordonnance",
-    "Résultats d'analyses",
-    'Suivi',
-    'Autre',
+    'Prescription renewal',
+    'Test results',
+    'Follow-up',
+    'Other',
   ];
 
   @override
@@ -205,13 +205,13 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                               children: [
                                 Text(
                                   [
-                                    'Lun',
-                                    'Mar',
-                                    'Mer',
-                                    'Jeu',
-                                    'Ven',
-                                    'Sam',
-                                    'Dim',
+                                    'Mon',
+                                    'Tue',
+                                    'Wed',
+                                    'Thu',
+                                    'Fri',
+                                    'Sat',
+                                    'Sun',
                                   ][date.weekday - 1],
                                   style: TextStyle(
                                     color:
@@ -365,7 +365,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           DropdownButtonFormField<String>(
                             value: _selectedReason,
                             decoration: const InputDecoration(
-                              labelText: 'Motif',
+                              labelText: 'Reason',
                               border: OutlineInputBorder(),
                             ),
                             items:
@@ -382,7 +382,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             validator:
                                 (val) =>
                                     val == null || val.isEmpty
-                                        ? 'Veuillez choisir un motif'
+                                        ? 'Please choose a reason'
                                         : null,
                           ),
                           const SizedBox(height: 12),
@@ -390,10 +390,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             controller: _noteController,
                             maxLines: 2,
                             decoration: const InputDecoration(
-                              labelText: 'Note (optionnel)',
+                              labelText: 'Note (optional)',
                               border: OutlineInputBorder(),
                               hintText:
-                                  'Ex: Je souhaite aborder un problème particulier...',
+                                  'E.g.: I would like to discuss a specific issue...',
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -422,8 +422,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                   });
                                   bool allSuccess = true;
                                   for (int idx in selectedSlotIndices) {
-                                    if (idx < 0 || idx >= slots.length)
+                                    if (idx < 0 || idx >= slots.length) {
                                       continue;
+                                    }
                                     String startTime = slots[idx]['time'];
                                     String hour =
                                         startTime.contains('-')
@@ -496,24 +497,24 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   String _monthName(int month) {
     const months = [
-      'Janvier',
-      'Février',
-      'Mars',
-      'Avril',
-      'Mai',
-      'Juin',
-      'Juillet',
-      'Août',
-      'Septembre',
-      'Octobre',
-      'Novembre',
-      'Décembre',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return months[month - 1];
   }
 
   bool _isSlotInFuture(String slotTime, DateTime date) {
-    if (slotTime == null || slotTime.isEmpty) return false;
+    if (slotTime.isEmpty) return false;
     final now = DateTime.now();
     final startHour = int.tryParse(slotTime.split(':')[0]) ?? 0;
     final startMinute = int.tryParse(slotTime.split(':')[1].split('-')[0]) ?? 0;

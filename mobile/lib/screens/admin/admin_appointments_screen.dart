@@ -239,8 +239,8 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildDetailSection('📅 Rendez-vous', [
-                          '${date != null ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}' : 'Date inconnue'}',
-                          '${date != null ? 'Heure: ${DateFormat('HH:mm').format(date)}' : ''}',
+                          (date != null ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}' : 'Date inconnue'),
+                          (date != null ? 'Heure: ${DateFormat('HH:mm').format(date)}' : ''),
                         ]),
                         const SizedBox(height: 20),
                         _buildDetailSection('👨‍⚕️ Docteur', [
@@ -673,7 +673,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                     'Dr. ${appointment['doctorName'] ?? 'Nom médecin inconnu'}',
                                   ),
                                   Text(
-                                    '${date != null ? '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}' : 'Date inconnue'}',
+                                    date != null ? '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}' : 'Date inconnue',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],

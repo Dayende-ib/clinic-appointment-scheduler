@@ -1,5 +1,5 @@
 name: caretime
-description: "A Flutter application for patients and doc- tors to manage appointments."
+description: "CareTime is a complete medical appointment management application, designed to facilitate appointment booking between patients, doctors."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

@@ -33,13 +33,13 @@ app.use("/api/admin", require("./routes/admin.routes"));
 
 // Gestion des routes inconnues (404)
 app.use((req, res, next) => {
-  res.status(404).json({ message: 'Route non trouvée' });
+  res.status(404).json({ message: 'Route not found' });
 });
 
 // Middleware global de gestion d'erreur
 app.use((err, req, res, next) => {
   console.error('Erreur serveur:', err);
-  res.status(500).json({ message: 'Erreur serveur' });
+  res.status(500).json({ message: 'Server error' });
 });
 
 // Connexion MongoDB
