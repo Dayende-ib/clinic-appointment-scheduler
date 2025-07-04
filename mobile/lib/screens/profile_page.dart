@@ -20,7 +20,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // _redirectByRole(); // Suppression de la redirection automatique ici
     _checkAuth();
     _fetchUserData();
   }

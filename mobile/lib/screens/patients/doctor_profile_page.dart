@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:caretime/app_colors.dart';
 import 'doctor_list_page.dart'; // Import pour accéder à la classe Doctor
 import '../../services/patient_api_service.dart';
 
