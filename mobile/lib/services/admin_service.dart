@@ -111,6 +111,9 @@ class AdminService {
       },
     );
 
+    print('togglePatientStatus status: \\${response.statusCode}');
+    print('togglePatientStatus body: \\${response.body}');
+
     return response.statusCode == 200;
   }
 

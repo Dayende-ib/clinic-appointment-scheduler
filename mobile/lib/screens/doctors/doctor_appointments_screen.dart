@@ -531,6 +531,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                     ),
                                 ],
                               ),
+                              onTap: () => _showAppointmentDetails(rdv),
                             ),
                           );
                         },

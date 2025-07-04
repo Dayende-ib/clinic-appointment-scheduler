@@ -1,26 +1,33 @@
-const mongoose = require('mongoose');
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const Availability = require('../models/Availability');
-require('dotenv').config();
 
-async function seedAppointments() {
-  await mongoose.connect(process.env.MONGO_URI);
+module.exports = async function() {
   await Appointment.deleteMany({});
-
   const doctors = await User.find({ role: 'doctor' });
   const patients = await User.find({ role: 'patient' });
-
   // Pour chaque docteur, prendre le premier créneau de chaque jour et créer un rendez-vous avec un patient
   for (const doctor of doctors) {
     const availabilities = await Availability.find({ doctorId: doctor._id });
     for (let i = 0; i < availabilities.length && i < patients.length; i++) {
       const slot = availabilities[i].slots[0];
       if (!slot) continue;
+      // Correction de la date
+      const dateObj = availabilities[i].date instanceof Date
+        ? availabilities[i].date
+        : new Date(availabilities[i].date);
+      const [hour, minute] = slot.time.split('-')[0].split(':');
+      const datetime = new Date(
+        dateObj.getFullYear(),
+        dateObj.getMonth(),
+        dateObj.getDate(),
+        parseInt(hour, 10),
+        parseInt(minute, 10)
+      );
       await Appointment.create({
         doctorId: doctor._id,
         patientId: patients[i]._id,
-        datetime: new Date(availabilities[i].date + 'T' + slot.time.split('-')[0] + ':00'),
+        datetime,
         status: 'booked',
         reason: 'Consultation de test',
         notes: { patientNotes: 'Je souhaite un contrôle.' },
@@ -28,10 +35,4 @@ async function seedAppointments() {
     }
   }
   console.log('✅ Rendez-vous insérés !');
-  await mongoose.disconnect();
-}
-
-seedAppointments().catch(err => {
-  console.error('Erreur lors du seed des rendez-vous :', err);
-  process.exit(1);
-}); 
+}; 

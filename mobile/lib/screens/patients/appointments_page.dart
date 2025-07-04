@@ -555,29 +555,29 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildDetailSection('👨‍⚕️ Médecin', [
-                    'Nom: $doctorName',
-                    'Spécialité: $specialty',
+                  _buildDetailSection('👨‍⚕️ Doctor', [
+                    'Name: $doctorName',
+                    'Specialty: $specialty',
                     'Email: $doctorEmail',
-                    'Téléphone: $doctorPhone',
+                    'Phone: $doctorPhone',
                   ]),
                   const SizedBox(height: 16),
-                  _buildDetailSection('📅 Rendez-vous', [
+                  _buildDetailSection('📅 Appointment', [
                     'Date: $dateStr',
-                    'Heure: $timeStr',
-                    'Statut: ${_getStatusLabel(status)}',
+                    'Time: $timeStr',
+                    'Status: ${_getStatusLabel(status)}',
                   ]),
                   const SizedBox(height: 16),
-                  _buildDetailSection('💬 Motif', [
-                    reason.isNotEmpty ? reason : 'Aucun motif spécifié',
+                  _buildDetailSection('💬 Reason', [
+                    reason.isNotEmpty ? reason : 'No reason specified',
                   ]),
                   if (patientNotes.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildDetailSection('📝 Notes patient', [patientNotes]),
+                    _buildDetailSection('📝 Patient notes', [patientNotes]),
                   ],
                   if (doctorNotes.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildDetailSection('📋 Notes médecin', [doctorNotes]),
+                    _buildDetailSection('📋 Doctor notes', [doctorNotes]),
                   ],
                 ],
               ),

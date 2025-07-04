@@ -22,6 +22,15 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   DateTime calendarMonth = DateTime(DateTime.now().year, DateTime.now().month);
   List<int> selectedSlotIndices = [];
   List<DateTime> selectedDates = [];
+  final TextEditingController _noteController = TextEditingController();
+  String? _selectedReason;
+  final List<String> _motifs = [
+    'Consultation',
+    "Renouvellement d'ordonnance",
+    "Résultats d'analyses",
+    'Suivi',
+    'Autre',
+  ];
 
   @override
   void initState() {
@@ -347,6 +356,50 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                         ),
                       ),
                     ),
+                  if (selectedSlotIndices.isNotEmpty && slots.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DropdownButtonFormField<String>(
+                            value: _selectedReason,
+                            decoration: const InputDecoration(
+                              labelText: 'Motif',
+                              border: OutlineInputBorder(),
+                            ),
+                            items:
+                                _motifs
+                                    .map(
+                                      (motif) => DropdownMenuItem(
+                                        value: motif,
+                                        child: Text(motif),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged:
+                                (val) => setState(() => _selectedReason = val),
+                            validator:
+                                (val) =>
+                                    val == null || val.isEmpty
+                                        ? 'Veuillez choisir un motif'
+                                        : null,
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _noteController,
+                            maxLines: 2,
+                            decoration: const InputDecoration(
+                              labelText: 'Note (optionnel)',
+                              border: OutlineInputBorder(),
+                              hintText:
+                                  'Ex: Je souhaite aborder un problème particulier...',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
                   Center(
                     child: SizedBox(
                       width: 260,
@@ -384,7 +437,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                         await PatientApiService.bookAppointment(
                                           doctorId: widget.doctor.id,
                                           datetime: datetimeIso,
-                                          reason: 'Consultation',
+                                          reason:
+                                              _selectedReason ?? 'Consultation',
+                                          patientNotes:
+                                              _noteController.text.isNotEmpty
+                                                  ? _noteController.text
+                                                  : null,
                                         );
                                     if (!success) allSuccess = false;
                                   }

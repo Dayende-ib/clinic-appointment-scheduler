@@ -1,16 +1,11 @@
-const mongoose = require('mongoose');
 const Availability = require('../models/Availability');
 const User = require('../models/User');
-require('dotenv').config();
 
-async function seedAvailabilities() {
-  await mongoose.connect(process.env.MONGO_URI);
+module.exports = async function() {
   await Availability.deleteMany({});
-
   // Récupérer les docteurs
   const doctors = await User.find({ role: 'doctor' });
   const today = new Date();
-
   for (const doctor of doctors) {
     for (let i = 0; i < 5; i++) { // 5 jours à partir d'aujourd'hui
       const date = new Date(today);
@@ -30,10 +25,4 @@ async function seedAvailabilities() {
     }
   }
   console.log('✅ Disponibilités insérées !');
-  await mongoose.disconnect();
-}
-
-seedAvailabilities().catch(err => {
-  console.error('Erreur lors du seed des disponibilités :', err);
-  process.exit(1);
-}); 
+}; 
