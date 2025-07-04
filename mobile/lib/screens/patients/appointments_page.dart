@@ -145,6 +145,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 final String status = (apt['status'] ?? '').toString();
                 final String reason = apt['reason'] ?? '';
                 final String doctorName =
+                    'Dr. ' +
                     (doctor['firstname'] ?? '') +
                     ' ' +
                     (doctor['lastname'] ?? '');
@@ -336,6 +337,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                     );
                                   }
                                 },
+                              ),
+                              const SizedBox(width: 8),
+                              TextButton.icon(
+                                icon: const Icon(Icons.cancel, color: kSoftRed),
+                                label: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: kSoftRed),
+                                ),
+                                onPressed: () => _cancelAppointment(aptId),
                               ),
                             ],
                           ),
@@ -532,7 +542,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Détails du rendez-vous',
+                        'Appointment Details',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -585,7 +595,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -621,15 +631,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   String _getStatusLabel(String status) {
     switch (status) {
       case 'confirmed':
-        return 'Confirmé';
+        return 'Confirmed';
       case 'pending':
-        return 'En attente';
+        return 'Pending';
       case 'canceled':
-        return 'Annulé';
+        return 'Cancelled';
       case 'completed':
-        return 'Terminé';
+        return 'Completed';
       case 'booked':
-        return 'Réservé (en attente de validation)';
+        return 'Booked (waiting for confirmation)';
       default:
         return status;
     }

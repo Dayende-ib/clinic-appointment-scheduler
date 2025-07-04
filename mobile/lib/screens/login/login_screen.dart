@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password_screen.dart';
-
-// URL de base de l'API
-const String apiBaseUrl = 'http://localhost:5000';
+import 'package:caretime/api_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,13 +19,13 @@ class _LoginPageState extends State<LoginScreen> {
 
   String? _validateEmail(String value) {
     final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}');
-    if (value.isEmpty) return 'Veuillez entrer votre email';
-    if (!emailRegex.hasMatch(value)) return 'Email invalide';
+    if (value.isEmpty) return 'Please enter your email';
+    if (!emailRegex.hasMatch(value)) return 'Invalid email';
     return null;
   }
 
   String? _validatePassword(String value) {
-    if (value.isEmpty) return 'Veuillez entrer un mot de passe';
+    if (value.isEmpty) return 'Please enter a password';
     return null;
   }
 
@@ -65,7 +63,7 @@ class _LoginPageState extends State<LoginScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Connexion réussie !')));
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
         await Future.delayed(const Duration(milliseconds: 800));
         if (!mounted) return;
         if (role == 'doctor') {
@@ -77,14 +75,14 @@ class _LoginPageState extends State<LoginScreen> {
         }
       } else {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Identifiants invalides.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid credentials.')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur réseau ou serveur.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Network or server error.')));
     }
   }
 
@@ -219,7 +217,7 @@ class _LoginPageState extends State<LoginScreen> {
                     );
                   },
                   child: const Text(
-                    'Mot de passe oublié ?',
+                    'Forgot password?',
                     style: TextStyle(color: Color(0xFF0891B2)),
                   ),
                 ),

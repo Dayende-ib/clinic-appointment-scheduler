@@ -105,16 +105,6 @@ class MyApp extends StatelessWidget {
           final doctors = args?['doctors'] as List<Map<String, dynamic>>? ?? [];
           return AllDoctorSchedulesScreen(doctors: doctors);
         },
-        '/admin/settings':
-            (context) => Scaffold(
-              appBar: AppBar(title: Text('Paramètres')),
-              body: Center(child: Text('Paramètres à venir')),
-            ),
-        '/admin/logs':
-            (context) => Scaffold(
-              appBar: AppBar(title: Text('Logs')),
-              body: Center(child: Text('Logs système à venir')),
-            ),
         '/admin/doctors/appointments': (context) {
           final args =
               ModalRoute.of(context)?.settings.arguments

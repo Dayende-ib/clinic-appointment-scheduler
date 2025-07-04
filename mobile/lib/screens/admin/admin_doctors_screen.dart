@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/admin_service.dart';
+import 'package:intl/intl.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -271,18 +272,12 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                         _buildDetailSection('🏥 Professional Information', [
                           'Specialization: ${doctor['specialization'] ?? 'Not defined'}',
                           'License number: ${doctor['licenseNumber'] ?? 'Not provided'}',
-                          'Years of experience: ${doctor['experienceYears'] ?? 'Not provided'}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('📅 Working hours', [
-                          'Monday - Friday: ${doctor['workingHours']?['weekdays'] ?? 'Not defined'}',
-                          'Saturday: ${doctor['workingHours']?['saturday'] ?? 'Not defined'}',
-                          'Sunday: ${doctor['workingHours']?['sunday'] ?? 'Not defined'}',
-                        ]),
-                        const SizedBox(height: 20),
-                        _buildDetailSection('💰 Pricing', [
-                          'Consultation: ${doctor['pricing']?['consultation'] ?? 'Not defined'}',
-                          'Follow-up: ${doctor['pricing']?['followUp'] ?? 'Not defined'}',
+                        _buildDetailSection('📅 Account Information', [
+                          'ID: ${doctor['id'] ?? doctor['_id'] ?? ''}',
+                          'Address: ${(doctor['country'] ?? '') + (doctor['city'] != null && doctor['city'].toString().isNotEmpty ? ', ' + doctor['city'] : '')}',
+                          'Account creation date: ${doctor['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(doctor['createdAt'])) : 'Not provided'}',
                         ]),
                         const SizedBox(height: 30),
                       ],

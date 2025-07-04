@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/api_config.dart';
 
 class PatientApiService {
-  static const String baseUrl = 'http://localhost:5000/api';
+  static final String baseUrl = '${apiBaseUrl}/api';
 
   static Future<List<Map<String, dynamic>>> getDoctorsList() async {
     final prefs = await SharedPreferences.getInstance();

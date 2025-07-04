@@ -371,22 +371,22 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmé';
+        label = 'Confirmed';
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'En attente';
+        label = 'Pending';
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Annulé';
+        label = 'Cancelled';
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Terminé';
+        label = 'Completed';
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -484,27 +484,27 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Statistiques globales'),
+            title: const Text('Global statistics'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildStatRow(
-                  'Total des rendez-vous',
+                  'Total appointments',
                   allAppointments.length,
                   Icons.calendar_today,
                 ),
                 _buildStatRow(
-                  'Rendez-vous terminés',
+                  'Completed appointments',
                   totalCompleted,
                   Icons.check_circle,
                 ),
                 _buildStatRow(
-                  'Rendez-vous annulés',
+                  'Cancelled appointments',
                   totalCancelled,
                   Icons.cancel,
                 ),
                 _buildStatRow(
-                  'Rendez-vous à venir',
+                  'Upcoming appointments',
                   totalUpcoming,
                   Icons.schedule,
                 ),
@@ -513,7 +513,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Fermer'),
+                child: const Text('Close'),
               ),
             ],
           ),
@@ -818,7 +818,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   IconButton(
                     onPressed: _showQuickStats,
                     icon: const Icon(Icons.analytics_outlined),
-                    tooltip: 'Statistiques globales',
+                    tooltip: 'Global statistics',
                   ),
                 ],
               ),
@@ -850,7 +850,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Terminés',
+                      title: 'Completed',
                       value: completedToday,
                       icon: Icons.check_circle,
                       color: kSuccessGreen,
@@ -862,7 +862,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'En attente',
+                      title: 'Pending',
                       value: pendingToday,
                       icon: Icons.schedule,
                       color: kWarningYellow,
@@ -889,7 +889,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   ),
                   TextButton(
                     onPressed: _showQuickStats,
-                    child: const Text('Voir plus'),
+                    child: const Text('See more'),
                   ),
                 ],
               ),
@@ -908,7 +908,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Terminés',
+                      title: 'Completed',
                       value: totalCompleted,
                       icon: Icons.check_circle,
                       color: kSuccessGreen,
@@ -919,7 +919,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'À venir',
+                      title: 'Upcoming',
                       value: totalUpcoming,
                       icon: Icons.schedule,
                       color: kWarningYellow,
@@ -942,16 +942,16 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'Gérer mes disponibilités',
-                subtitle: 'Ajouter ou modifier vos créneaux',
+                title: 'Manage my availabilities',
+                subtitle: 'Add or modify your slots',
                 icon: Icons.schedule,
                 color: kPrimaryColor,
                 onTap: _navigateToAvailability,
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Tous mes rendez-vous',
-                subtitle: 'Voir et gérer tous vos rendez-vous',
+                title: 'All my appointments',
+                subtitle: 'See and manage all your appointments',
                 icon: Icons.list_alt,
                 color: kSecondaryColor,
                 onTap: () {
@@ -960,8 +960,8 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Mon profil',
-                subtitle: 'Modifier vos informations',
+                title: 'My profile',
+                subtitle: 'Modify your information',
                 icon: Icons.person,
                 color: kAccentColor,
                 onTap: _navigateToProfile,
@@ -985,7 +985,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       onPressed: () {
                         _navigateToAppointmentsWithFilter('today');
                       },
-                      child: const Text('Voir tout'),
+                      child: const Text('See all'),
                     ),
                 ],
               ),
@@ -1002,7 +1002,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       Icon(Icons.event_busy, size: 48, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        'Aucun rendez-vous aujourd\'hui',
+                        'No appointments today',
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ],
@@ -1029,7 +1029,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       onPressed: () {
                         _navigateToAppointmentsWithFilter('upcoming');
                       },
-                      child: const Text('Voir tout'),
+                      child: const Text('See all'),
                     ),
                 ],
               ),
@@ -1046,7 +1046,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       Icon(Icons.event_note, size: 48, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        'Aucun rendez-vous à venir',
+                        'No upcoming appointments',
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ],

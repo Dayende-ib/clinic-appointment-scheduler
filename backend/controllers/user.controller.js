@@ -117,7 +117,7 @@ exports.getMe = async (req, res) => {
 // Modifier le profil de l'utilisateur connecté
 exports.updateMe = async (req, res) => {
   try {
-    const fields = ['firstname', 'lastname', 'specialty', 'email', 'phone', 'city'];
+    const fields = ['firstname', 'lastname', 'specialty', 'email', 'phone', 'city', 'country', 'dateOfBirth'];
     const updates = {};
     fields.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
@@ -143,7 +143,9 @@ exports.updateMe = async (req, res) => {
       specialty: user.specialty,
       licenseNumber: user.licenseNumber,
       phone: user.phone,
-      city: user.city
+      city: user.city,
+      country: user.country,
+      dateOfBirth: user.dateOfBirth
     });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });

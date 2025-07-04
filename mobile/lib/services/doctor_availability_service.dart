@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/api_config.dart';
 
 class DoctorAvailabilityService {
-  static const String baseUrl = 'http://localhost:5000/api/availability';
+  static final String baseUrl = '${apiBaseUrl}/api/availability';
 
   static Future<bool> addAvailability({
     required DateTime date,

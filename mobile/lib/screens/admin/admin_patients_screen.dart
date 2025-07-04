@@ -272,20 +272,13 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                         ]),
                         const SizedBox(height: 20),
                         _buildDetailSection('👤 Personal Information', [
-                          'Date of birth: ${patient['dateOfBirth'] != null ? DateFormat('MM/dd/yyyy').format(DateTime.parse(patient['dateOfBirth'])) : 'Not provided'}',
+                          'Date of birth: ${patient['dateOfBirth'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['dateOfBirth'])) : 'Not provided'}',
                           'Gender: ${patient['gender'] ?? 'Not provided'}',
-                          'Address: ${patient['address'] ?? 'Not provided'}',
-                        ]),
-                        const SizedBox(height: 20),
-                        _buildDetailSection('🏥 Medical Information', [
-                          'Blood group: ${patient['bloodGroup'] ?? 'Not provided'}',
-                          'Allergies: ${patient['allergies']?.join(', ') ?? 'None'}',
-                          'Medical history: ${patient['medicalHistory'] ?? 'None'}',
+                          'Address: ${(patient['country'] ?? '') + (patient['city'] != null && patient['city'].toString().isNotEmpty ? ', ' + patient['city'] : '')}',
                         ]),
                         const SizedBox(height: 20),
                         _buildDetailSection('📅 Account Information', [
-                          'Registration date: ${patient['createdAt'] != null ? DateFormat('MM/dd/yyyy').format(DateTime.parse(patient['createdAt'])) : 'Not provided'}',
-                          'Last login: ${patient['lastLogin'] != null ? DateFormat('MM/dd/yyyy HH:mm').format(DateTime.parse(patient['lastLogin'])) : 'Never'}',
+                          'Registration date: ${patient['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['createdAt'])) : 'Not provided'}',
                         ]),
                         const SizedBox(height: 30),
                       ],

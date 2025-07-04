@@ -4,9 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// URL de base de l'API
-const String apiBaseUrl = 'http://localhost:5000';
+import 'package:caretime/api_config.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -66,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Bénin',
     'Burkina Faso',
     'Cap-Vert',
-    'Côte d’Ivoire',
+    'Côte d\'Ivoire',
     'Gambie',
     'Ghana',
     'Guinée',
