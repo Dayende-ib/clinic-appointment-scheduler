@@ -200,7 +200,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Image.asset(
-                            'images/caretime_2x1.png',
+                            'assets/images/Logo-caretime.png',
                             height: 80,
                           ),
                         ),

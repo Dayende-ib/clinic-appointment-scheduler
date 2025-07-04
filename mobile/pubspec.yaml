@@ -32,10 +32,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/caretime_2x1.png
-    - assets/images/caretime_100x100_nobg.png
-    - assets/images/Logo-caretime.png
-    - assets/images/male-doctor-icon.png
+    - assets/images/
 
   fonts:
     - family: NotoSans
