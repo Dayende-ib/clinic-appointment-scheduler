@@ -1,1 +1,1 @@
-const String apiBaseUrl = 'http://192.168.11.117:5000';
+const String apiBaseUrl = 'https://343d-154-66-162-112.ngrok-free.app';

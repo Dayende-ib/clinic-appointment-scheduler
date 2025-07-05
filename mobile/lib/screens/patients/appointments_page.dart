@@ -98,7 +98,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: Offset(0, 2),
                   ),
@@ -129,7 +129,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   return const SizedBox.shrink();
                 }
                 final doctor = apt['doctorId'] ?? {};
-                final patient = apt['patientId'] ?? {};
                 final DateTime? dt =
                     apt['datetime'] != null
                         ? DateTime.tryParse(apt['datetime'])
@@ -145,10 +144,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 final String status = (apt['status'] ?? '').toString();
                 final String reason = apt['reason'] ?? '';
                 final String doctorName =
-                    'Dr. ' +
-                    (doctor['firstname'] ?? '') +
-                    ' ' +
-                    (doctor['lastname'] ?? '');
+                    '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}';
                 final String specialty = doctor['specialty'] ?? '';
                 final String aptId = apt['_id'] ?? apt['id'] ?? '';
                 final bool isPast = dt != null && dt.isBefore(DateTime.now());
@@ -498,7 +494,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   void _showAppointmentDetails(Map<String, dynamic> appointment) {
     final doctor = appointment['doctorId'] ?? {};
-    final patient = appointment['patientId'] ?? {};
     final DateTime? dt =
         appointment['datetime'] != null
             ? DateTime.tryParse(appointment['datetime'])
@@ -514,7 +509,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     final String status = (appointment['status'] ?? '').toString();
     final String reason = appointment['reason'] ?? '';
     final String doctorName =
-        (doctor['firstname'] ?? '') + ' ' + (doctor['lastname'] ?? '');
+        '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}';
     final String specialty = doctor['specialty'] ?? '';
     final String doctorEmail = doctor['email'] ?? '';
     final String doctorPhone = doctor['phone'] ?? '';

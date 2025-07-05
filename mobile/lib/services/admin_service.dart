@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
 class AdminService {
-  static final String baseUrl = '${apiBaseUrl}/api/admin';
+  static final String baseUrl = '$apiBaseUrl/api/admin';
 
   static Future<Map<String, dynamic>> getDashboardStats() async {
     final prefs = await SharedPreferences.getInstance();
@@ -111,9 +111,6 @@ class AdminService {
         'Content-Type': 'application/json',
       },
     );
-
-    print('togglePatientStatus status: \\${response.statusCode}');
-    print('togglePatientStatus body: \\${response.body}');
 
     return response.statusCode == 200;
   }

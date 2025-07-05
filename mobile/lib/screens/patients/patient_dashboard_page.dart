@@ -72,18 +72,9 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
               .map(
                 (d) => Doctor(
                   id: d['_id'] ?? d['id'] ?? '',
-                  name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
+                  name: '${d['firstname'] ?? ''} ${d['lastname'] ?? ''}',
                   specialty: d['specialty'] ?? '',
-                  rating:
-                      d['rating'] is double
-                          ? d['rating']
-                          : double.tryParse(d['rating']?.toString() ?? '') ??
-                              0.0,
-                  reviews:
-                      d['reviews'] is int
-                          ? d['reviews']
-                          : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
-                  image: d['image'] ?? 'assets/images/male-doctor-icon.png',
+                  image: '',
                 ),
               )
               .toList();
@@ -226,7 +217,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 10,
               offset: Offset(0, -2),
@@ -434,9 +425,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                             );
                             final doctor = nextAppointment['doctorId'] ?? {};
                             final doctorName =
-                                ((doctor['firstname'] ?? '') +
-                                        ' ' +
-                                        (doctor['lastname'] ?? ''))
+                                ('${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}')
                                     .trim();
                             if (dt == null) return SizedBox();
                             final dateStr = DateFormat(

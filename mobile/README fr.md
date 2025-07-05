@@ -20,7 +20,7 @@ Application mobile Flutter pour la gestion de rendez-vous médicaux (Caretime).
 ## Configuration
 
 - L'application est configurée pour pointer par défaut sur `http://localhost:5000` pour l'API backend.
-- Pour tester sur un appareil physique ou un émulateur, adapte les URLs dans les fichiers `lib/services/*.dart` si besoin (ex : remplace `localhost` par l'IP de ta machine).
+- Pour tester sur un appareil physique ou un émulateur, adapte les URLs dans les fichiers `api_config.dart` si besoin (ex : remplace `localhost` par l'IP de ta machine).
 
 ## Lancer l'application
 

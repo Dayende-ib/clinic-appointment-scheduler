@@ -531,21 +531,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return months[month - 1];
   }
 
-  bool _isSlotInFuture(String slotTime, DateTime date) {
-    if (slotTime.isEmpty) return false;
-    final now = DateTime.now();
-    final startHour = int.tryParse(slotTime.split(':')[0]) ?? 0;
-    final startMinute = int.tryParse(slotTime.split(':')[1].split('-')[0]) ?? 0;
-    final slotDateTime = DateTime(
-      date.year,
-      date.month,
-      date.day,
-      startHour,
-      startMinute,
-    );
-    return slotDateTime.isAfter(now);
-  }
-
   Widget _buildSlotChip(int i, String? slotTime, DateTime date) {
     final now = DateTime.now();
     final isPastDay = date.isBefore(DateTime(now.year, now.month, now.day));
@@ -585,7 +570,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isDisabled ? Colors.grey[300]! : Colors.teal.withOpacity(0.2),
+          color:
+              isDisabled
+                  ? Colors.grey[300]!
+                  : Colors.teal.withValues(alpha: 0.2),
         ),
       ),
       onSelected:

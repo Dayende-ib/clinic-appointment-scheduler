@@ -52,6 +52,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   }
 
   Future<void> _loadAllData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       error = null;
@@ -60,6 +61,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     try {
       await Future.wait([_loadProfile(), _loadAppointments()]);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         error = e.toString();
         isLoading = false;
@@ -70,6 +72,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   Future<void> _loadProfile() async {
     try {
       final data = await DoctorService.fetchDoctorProfile();
+      if (!mounted) return;
       setState(() {
         doctorProfile = data;
       });
@@ -97,6 +100,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             return date.isAfter(today);
           }).toList();
 
+      if (!mounted) return;
       setState(() {
         allAppointments = allData;
         todayAppointments = todayData;
@@ -126,6 +130,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });

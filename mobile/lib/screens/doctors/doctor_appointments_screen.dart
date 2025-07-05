@@ -414,27 +414,6 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       (a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime),
     );
 
-    String getTitle() {
-      if (widget.arguments != null && widget.arguments!['filter'] != null) {
-        final filter = widget.arguments!['filter'] as String;
-        switch (filter) {
-          case 'today':
-            return 'Today\'s appointments';
-          case 'completed':
-            return 'Completed appointments';
-          case 'booked':
-            return 'Pending appointments';
-          case 'upcoming':
-            return 'Upcoming appointments';
-          case 'all':
-            return 'All my appointments';
-          default:
-            return 'My appointments';
-        }
-      }
-      return 'My appointments';
-    }
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),

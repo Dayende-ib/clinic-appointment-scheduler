@@ -44,7 +44,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    final today = DateFormat.yMMMMd('en_US').format(DateTime.now());
     String title;
     String? subtitle;
     if (_selectedIndex == 0) {

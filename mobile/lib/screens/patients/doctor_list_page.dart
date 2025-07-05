@@ -13,6 +13,19 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   final Color primaryColor = Color(0xFF03A6A1);
   final Color secondaryColor = Color(0xFF0891B2);
 
+  // Ajout d'une liste de couleurs pastel pour les cartes
+  final List<Color> cardColors = [
+    Color(0xFFE0F7FA), // bleu clair
+    Color(0xFFFFF9C4), // jaune clair
+    Color(0xFFFFF3E0), // orange très clair
+    Color(0xFFE1F5FE), // bleu très pâle
+    Color(0xFFF1F8E9), // vert très clair
+    Color(0xFFF8BBD0), // rose très clair
+    Color(0xFFD1C4E9), // violet très clair
+    Color(0xFFFFECB3), // jaune pâle
+    Color(0xFFC8E6C9), // vert pâle
+  ];
+
   String? selectedSpecialty;
   int? selectedDoctorIndex;
   String? selectedCountry;
@@ -105,7 +118,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
               (d['lastname'] ?? '').toString().toLowerCase().contains(
                 searchLower,
               ) ||
-              ((d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''))
+              ('${d['firstname'] ?? ''} ${d['lastname'] ?? ''}')
                   .toLowerCase()
                   .contains(searchLower) ||
               (d['specialty'] ?? '').toString().toLowerCase().contains(
@@ -123,16 +136,8 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
         .map(
           (d) => Doctor(
             id: d['_id'] ?? d['id'] ?? '',
-            name: (d['firstname'] ?? '') + ' ' + (d['lastname'] ?? ''),
+            name: '${d['firstname'] ?? ''} ${d['lastname'] ?? ''}',
             specialty: d['specialty'] ?? '',
-            rating:
-                d['rating'] is double
-                    ? d['rating']
-                    : double.tryParse(d['rating']?.toString() ?? '') ?? 0.0,
-            reviews:
-                d['reviews'] is int
-                    ? d['reviews']
-                    : int.tryParse(d['reviews']?.toString() ?? '') ?? 0,
             image: d['image'] ?? 'assets/images/male-doctor-icon.png',
             country: d['country'] ?? '',
             city: d['city'] ?? '',
@@ -196,7 +201,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: Offset(0, 2),
                   ),
@@ -340,6 +345,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                 itemBuilder: (context, index) {
                   final doctor = filteredDoctors[index];
                   final isSelected = selectedDoctorIndex == index;
+                  final cardColor = cardColors[index % cardColors.length];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -364,6 +370,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                           ),
                         );
                       },
+                      backgroundColor: cardColor,
                     ),
                   );
                 },
@@ -381,6 +388,7 @@ class DoctorCard extends StatelessWidget {
   final Color primaryColor;
   final bool isSelected;
   final VoidCallback onArrowTap;
+  final Color backgroundColor;
 
   const DoctorCard({
     super.key,
@@ -388,6 +396,7 @@ class DoctorCard extends StatelessWidget {
     required this.primaryColor,
     required this.isSelected,
     required this.onArrowTap,
+    required this.backgroundColor,
   });
 
   @override
@@ -396,11 +405,11 @@ class DoctorCard extends StatelessWidget {
     final city = doctor.city ?? '';
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? primaryColor : Colors.white,
+        color: isSelected ? primaryColor : backgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -510,8 +519,6 @@ class Doctor {
   final String id;
   final String name;
   final String specialty;
-  final double rating;
-  final int reviews;
   final String image;
   final String? country;
   final String? city;
@@ -521,8 +528,6 @@ class Doctor {
     required this.id,
     required this.name,
     required this.specialty,
-    required this.rating,
-    required this.reviews,
     required this.image,
     this.country,
     this.city,
@@ -556,7 +561,7 @@ class FilterBottomSheet extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, -2),
           ),

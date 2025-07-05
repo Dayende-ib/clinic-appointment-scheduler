@@ -101,42 +101,6 @@ class _DoctorQuickAvailabilityPageState
     );
   }
 
-  Future<void> _addFullWeekSlots() async {
-    setState(() => isLoading = true);
-    final weekDates = getWeekDates();
-    for (final date in weekDates) {
-      final slots = [
-        {'start': '08:00', 'end': '09:00'},
-        {'start': '09:00', 'end': '10:00'},
-        {'start': '10:00', 'end': '11:00'},
-        {'start': '11:00', 'end': '12:00'},
-        {'start': '14:00', 'end': '15:00'},
-        {'start': '15:00', 'end': '16:00'},
-        {'start': '16:00', 'end': '17:00'},
-        {'start': '17:00', 'end': '18:00'},
-      ];
-      final formattedSlots =
-          slots
-              .map(
-                (slot) => {
-                  'time': '${slot['start']}-${slot['end']}',
-                  'available': true,
-                },
-              )
-              .toList();
-      await DoctorAvailabilityService.addAvailabilityV2(
-        date: date,
-        slots: formattedSlots,
-      );
-    }
-    await _loadWeekAvailabilities();
-    setState(() => isLoading = false);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Full week availabilities added!')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final weekDates = getWeekDates();
@@ -230,49 +194,6 @@ class _DoctorQuickAvailabilityPageState
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xFF0891B2),
                                           fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    InkWell(
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: () async {
-                                        final success =
-                                            await DoctorAvailabilityService.deleteAvailabilityForDate(
-                                              date,
-                                            );
-                                        await _loadWeekAvailabilities();
-                                        if (!mounted) return;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: const [
-                                                Icon(
-                                                  Icons.delete_forever,
-                                                  color: Colors.white,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  'All slots deleted for this day.',
-                                                ),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.redAccent,
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.withOpacity(0.12),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.delete_forever,
-                                          color: Colors.red,
-                                          size: 24,
                                         ),
                                       ),
                                     ),
@@ -373,7 +294,6 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
   DateTime displayedMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
   List<DateTime> getMonthDates() {
-    final firstDay = DateTime(displayedMonth.year, displayedMonth.month, 1);
     final lastDay =
         DateTime(displayedMonth.year, displayedMonth.month + 1, 0).day;
     return List.generate(

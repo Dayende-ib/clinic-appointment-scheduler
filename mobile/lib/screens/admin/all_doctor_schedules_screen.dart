@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../services/doctor_availability_service.dart';
-import '../../app_theme.dart';
 import 'package:intl/intl.dart';
 
 class AllDoctorSchedulesScreen extends StatefulWidget {
@@ -34,11 +33,6 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
   @override
   void initState() {
     super.initState();
-    print('[AllDoctorSchedulesScreen] Liste des docteurs reçue :');
-    print(widget.doctors);
-    if (widget.doctors.isEmpty) {
-      print('[AllDoctorSchedulesScreen] Aucun médecin sélectionné !');
-    }
     _loadAllWeekPlannings();
   }
 
@@ -52,9 +46,6 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
     final weekDates = getWeekDates();
     for (final doctor in widget.doctors) {
       final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
-      print(
-        '[AllDoctorSchedulesScreen] Chargement du planning pour doctorId=$doctorId, doctor=$doctor',
-      );
       if (doctorId.isEmpty) continue;
       setState(() => loadingDoctors.add(doctorId));
       Map<String, List<Map<String, String>>> planning = {};
@@ -115,9 +106,7 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                           final cardColor =
                               doctorCardColors[idx % doctorCardColors.length];
                           final String name =
-                              ((doctor['firstname'] ?? '') +
-                                      ' ' +
-                                      (doctor['lastname'] ?? ''))
+                              '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}'
                                   .trim();
                           final String displayName =
                               name.isNotEmpty ? name : 'Nom inconnu';
@@ -127,7 +116,6 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                           final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
                           final planning = weekPlannings[doctorId] ?? {};
                           final isLoading = loadingDoctors.contains(doctorId);
-                          final isSingle = doctors.length == 1;
                           return Card(
                             color: cardColor,
                             margin: const EdgeInsets.symmetric(
