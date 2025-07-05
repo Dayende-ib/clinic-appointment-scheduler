@@ -1,0 +1,1492 @@
+{
+	"info": {
+		"_postman_id": "61c9131a-e92d-4db9-a999-1bf3a0cc2893",
+		"name": "Caretime – API REST (Node.js / Express / MongoDB)",
+		"description": "🎯 Objective\n\nThis collection contains all the queries needed to test and demonstrate the Clinic Appointment Scheduler (Caretime) project API.\n\nElle couvre :\n\n| Folder | Fonction | Main role |\n| --- | --- | --- |\n| Authentification | Registration & login (JWT) | Public |\n| **Users** | Profile, list of doctors. | Patient / Admin |\n| **Appointments** | Booking, listing, cancelling appointments | Patient / Doctor / Admin |\n| **Availability** | Manage & consult doctors' slots | Doctor / Patient |\n| **Admin** | Account supervision and management | Admin |\n\n---\n\n## 🔐 Authentification & roles\n\n- **JWT** : every protected request requires the  \n    `Authorization: Bearer {{token}}`\n    \n- Managed roles : `patient`, `doctor`, `admin` (middleware)\n    \n\n---\n\n## ⚙️ Postman Variables\n\n| Nom | Example | Description |\n| --- | --- | --- |\n| `base_url` | `http://localhost:5000` | API URL |\n| `token` | (injected after /auth/login) | JWT of the logged-in user |\n\n---\n\n## 🚀 Quick start\n\n1.  Clone the repo, launch the backend\n    \n    (`npm run dev`)\n    \n2. **In Postman** :\n    \n    - Import collection (JSON)\n        \n    - Enter `{{base_url}}` in _Environments_\n        \n3. Run `/auth/register` then `/auth/login` to retrieve `{{token}}`\n    \n4. Freely test other folders according to your role\n    \n\n---\n\n## 📝 Notes\n\n- Sample request bodies are pre-filled with dummy data (modifiable).\n    \n- **Automatic tests** in Postman check the main HTTP codes\n    \n    (200, 201, 400, 401, 403).\n    \n- **Pre-request scripts** inject the ISO date/time and IDs needed to chain calls.\n    \n\n---\n\n**Tip :** activate the “Visualize” tab on certain queries to display the formatted response (list of appointments, slots, etc.).\n\nHappy exploring!",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42791731",
+		"_collection_link": "https://guali-3927753.postman.co/workspace/72cb639c-bd54-4dd7-85be-ba009f21f972/collection/45627315-61c9131a-e92d-4db9-a999-1bf3a0cc2893?action=share&source=collection_link&creator=42791731"
+	},
+	"item": [
+		{
+			"name": "AUTHENTIFICATION",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"marie.martin@mail.com\",\n  \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": [
+						{
+							"name": "Success Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"marie.martin@mail.com\",\n  \"password\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "335"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"14f-6SWBZR1u4wcS+rJwmqgVxOXb/Uk\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 17:45:33 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjgwYTRkMzExNjUzMTViMDYwY2MyNyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxNjUxMTMzLCJleHAiOjE3NTIyNTU5MzN9.OfqBfwsWXvtft1sWx6ndNKx_py7JJ8Y_lInTnDRNPag\",\n    \"user\": {\n        \"id\": \"68680a4d31165315b060cc27\",\n        \"lastname\": \"Martin\",\n        \"firstname\": \"Marie\",\n        \"email\": \"marie.martin@mail.com\",\n        \"role\": \"patient\"\n    }\n}"
+						},
+						{
+							"name": "Incorrect Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"marie.martin@mail.com\",\n  \"password\": \"12346\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "32"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"20-La30IV3IxG4lUSPZkoBsB25RUbw\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 17:46:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Incorrect password\"\n}"
+						}
+					]
+				},
+				{
+					"name": "register patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"firstname\": \"Marie\",\r\n    \"lastname\": \"Martin\",\r\n    \"email\": \"marie.martin@mail.com\",\r\n    \"password\": \"123456\",\r\n    \"dateOfBirth\": \"1990-01-01\",\r\n    \"gender\": \"female\",\r\n    \"role\": \"patient\",\r\n    \"country\": \"Bénin\",\r\n    \"city\": \"Cotonou\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "register patient echec",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"firstname\": \"Marie\",\r\n    \"lastname\": \"Martin\",\r\n    \"email\": \"marie.martin@mail.com\",\r\n    \"password\": \"123456\",\r\n    \"dateOfBirth\": \"1990-01-01\",\r\n    \"gender\": \"female\",\r\n    \"role\": \"patient\",\r\n    \"country\": \"Bénin\",\r\n    \"city\": \"Cotonou\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"register"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "34"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"22-7E/nw4NTj1wudq/7GNEsO0zIZHQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 17:46:51 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Email already in use\"\n}"
+						},
+						{
+							"name": "Success register patient",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"firstname\": \"Marie\",\r\n    \"lastname\": \"Martin\",\r\n    \"email\": \"marie.martinm@mail.com\",\r\n    \"password\": \"123456\",\r\n    \"dateOfBirth\": \"1990-01-01\",\r\n    \"gender\": \"female\",\r\n    \"role\": \"patient\",\r\n    \"country\": \"Bénin\",\r\n    \"city\": \"Cotonou\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "400"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"190-FiQ45cbSV3HrGTDPIiLNEIZKN7g\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 17:47:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User registered\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjgxM2IyMzExNjUzMTViMDYwY2M4OSIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxNjUxMjUwLCJleHAiOjE3NTIyNTYwNTB9.OcdJH_8Mx8JvsHIxvyeJluNBBUKBBLtdlihCO6Gf8x4\",\n    \"user\": {\n        \"id\": \"686813b231165315b060cc89\",\n        \"lastname\": \"Martin\",\n        \"firstname\": \"Marie\",\n        \"email\": \"marie.martinm@mail.com\",\n        \"role\": \"patient\",\n        \"country\": \"Bénin\",\n        \"city\": \"Cotonou\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "register doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"lastname\": \"Doe\",\r\n  \"firstname\": \"John\",\r\n  \"email\": \"john.doe@clinic.com\",\r\n  \"phone\": \"12345678\",\r\n  \"password\": \"123456\",\r\n  \"dateOfBirth\": \"1990-01-01\",\r\n  \"gender\": \"male\",\r\n  \"role\": \"doctor\",\r\n  \"country\": \"Burkina Faso\",\r\n  \"city\": \"Ouagadougou\",\r\n  \"specialty\": \"Cardiology\",\r\n  \"licenseNumber\": \"12356K\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"marie.martin@mail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@caretime.com\",\r\n  \"password\": \"admin123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"john.doe@clinic.com\",\r\n  \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "This folder contains all routes related to user authentication (patients, doctors, administrators).\n\nIt includes account creation (`register`) and connection (`login`). These endpoints generate a JWT token, used to secure access to the application's protected routes."
+		},
+		{
+			"name": "USERS",
+			"item": [
+				{
+					"name": "See his profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjgwYTRkMzExNjUzMTViMDYwY2MyNyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxNjQ5NDc0LCJleHAiOjE3NTIyNTQyNzR9.rYVQQF7ic9_JftNVoyqo_IzQKznBp7mEEYvCU7jWw0s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit his profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjgwYTRkMzExNjUzMTViMDYwY2MyNyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxNjQ5NDc0LCJleHAiOjE3NTIyNTQyNzR9.rYVQQF7ic9_JftNVoyqo_IzQKznBp7mEEYvCU7jWw0s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"city\": \"Nouvelle-ville\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Stocke le premier doctorId dans une variable d’environnement\r",
+									"let data = pm.response.json();\r",
+									"if (Array.isArray(data) && data.length > 0) {\r",
+									"    pm.environment.set(\"doctorId\", data[0]._id || data[0].id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/users/doctors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"doctors"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "This folder contains user management routes.\n\nIt enables:\n\n- users to consult their own data (profile),\n    \n- patients to consult the list of doctors,\n    \n- and administrators to manage accounts.\n    \n\nRoles are managed via Auth middleware."
+		},
+		{
+			"name": "APPOINTMENTS",
+			"item": [
+				{
+					"name": "Create Appointment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Génère la date/heure actuelle au format ISO (UTC +1)\r",
+									"const now = new Date();\r",
+									"now.setHours(now.getHours() + 1);\r",
+									"pm.environment.set(\"isoDateTime\", now.toISOString().slice(0, 19) + \".000Z\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Stocke l'ID du rendez-vous créé\r",
+									"let data = pm.response.json();\r",
+									"if (data.appointment && (data.appointment._id || data.appointment.id)) {\r",
+									"    pm.environment.set(\"appointmentId\", data.appointment._id || data.appointment.id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4N2JiYmJjYTA4NzdjMjMxZDMzMyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxMTU2ODcxLCJleHAiOjE3NTE3NjE2NzF9.FBO6jjcA8Wwpz_CeYydKs5VFpK03GyJiUgwEsEvK6zc",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\r\n    \"doctorId\": \"{{doctorId}}\",\r\n    \"datetime\": \"{{isoDateTime}}\",\r\n    \"reason\": \"Consultation\"\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/appointments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Appointments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4N2JiYmJjYTA4NzdjMjMxZDMzMyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxMjQ4NjM3LCJleHAiOjE3NTE4NTM0Mzd9.ZU2X-Gy0v_zRHD0dIJHGwcCC5t-pZdzVC7s810_pb_0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/appointments/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"appointments",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4NWFiYmJjYTA4NzdjMjMxZDMyZiIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3NTExNTg2MjMsImV4cCI6MTc1MTc2MzQyM30.jA5fkJ0HSytVE1GChoBuIqier8Hhv4yd6awnMl65OA4",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"confirmed\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments/{{appointmentId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"{{appointmentId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4N2JiYmJjYTA4NzdjMjMxZDMzMyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxMTU2ODcxLCJleHAiOjE3NTE3NjE2NzF9.FBO6jjcA8Wwpz_CeYydKs5VFpK03GyJiUgwEsEvK6zc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  { \"status\": \"canceled\" }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments/68680dd131165315b060cc39/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"68680dd131165315b060cc39",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reschedule an appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4N2JiYmJjYTA4NzdjMjMxZDMzMyIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzUxMTU2ODcxLCJleHAiOjE3NTE3NjE2NzF9.FBO6jjcA8Wwpz_CeYydKs5VFpK03GyJiUgwEsEvK6zc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  { \"datetime\": \"2024-07-02T11:00:00.000Z\" }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments/68680dd131165315b060cc39/reschedule",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"68680dd131165315b060cc39",
+								"reschedule"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Regroupe les routes liées à la gestion des **rendez-vous médicaux**.\n\nFonctionnalités disponibles :\n\n- Réservation d’un rendez-vous par un patient\n    \n- Liste des rendez-vous (selon le rôle connecté)\n    \n- Annulation d’un rendez-vous\n    \n\nLa logique métier applique des vérifications sur les dates, les créneaux, et les autorisations selon le rôle de l'utilisateur connecté."
+		},
+		{
+			"name": "AVAILABILITY",
+			"item": [
+				{
+					"name": "See a doctor's availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/availability/686085abbbca0877c231d32f?date=2025-07-02",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"availability",
+								"686085abbbca0877c231d32f"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-07-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Availability",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjA4NWFiYmJjYTA4NzdjMjMxZDMyZiIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3NTExNTg2MjMsImV4cCI6MTc1MTc2MzQyM30.jA5fkJ0HSytVE1GChoBuIqier8Hhv4yd6awnMl65OA4",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"2025-07-02\",\r\n  \"slots\": [\r\n    { \"time\": \"09:00\", \"available\": true },\r\n    { \"time\": \"10:00\", \"available\": true },\r\n    { \"time\": \"11:00\", \"available\": false },\r\n    { \"time\": \"14:00\", \"available\": true }\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/availability",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"availability"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ce dossier permet aux **docteurs** de gérer leurs créneaux disponibles.\n\nIls peuvent :\n\n- définir leurs horaires (par jour)\n    \n- consulter les créneaux disponibles d’un jour donné\n    \n\nLes patients peuvent utiliser ces données pour choisir un créneau libre lors de la prise de rendez-vous."
+		},
+		{
+			"name": "ADMIN",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/users/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enable User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/users/:id/enable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id",
+								"enable"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Appointments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/appointments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Create an admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstname\": \"Admin\",\r\n  \"lastname\": \"Superuser\",\r\n  \"email\": \"admi@clinic.com\",\r\n  \"password\": \"admin123\",\r\n  \"role\": \"admin\",\r\n  \"gender\": \"other\",\r\n  \"dateOfBirth\": \"1990-01-01\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disable User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/users/:id/disable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								":id",
+								"disable"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "enable user",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjFlMGVlOTIwZjY3YmVhOWRiZjQ2NiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTI0NTA1MCwiZXhwIjoxNzUxODQ5ODUwfQ.zf4p4HYF9pfWxla3R8Cq4k0jWpz7RvR0mzRJ4p4t-r4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/admin/users/6861e0ee920f67bea9dbf466/enable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"6861e0ee920f67bea9dbf466",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Contient les routes réservées aux **administrateurs**.\n\nFonctionnalités typiques :\n\n- Voir tous les utilisateurs du système\n    \n- Désactiver ou supprimer des comptes\n    \n- (Optionnel) Modifier des paramètres globaux\n    \n\nCes routes nécessitent un rôle `admin` validé via le token JWT"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		}
+	]
+}
