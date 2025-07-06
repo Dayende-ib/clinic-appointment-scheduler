@@ -46,7 +46,7 @@ class DoctorAvailabilityService {
     final token = prefs.getString('token') ?? '';
     final id = doctorId ?? prefs.getString('userId') ?? '';
     final url = Uri.parse(
-      '$baseUrl/$id?date=${date.toIso8601String().split('T')[0]}',
+      '$baseUrl/all/$id?date=${date.toIso8601String().split('T')[0]}',
     );
     final response = await http.get(
       url,

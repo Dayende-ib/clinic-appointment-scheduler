@@ -63,29 +63,16 @@ exports.deleteAvailability = async (req, res) => {
   }
 };
 
-exports.getDoctorAvailabilities = async (req, res) => {
+// Récupère toutes les disponibilités d'un médecin (toutes les dates)
+exports.getAllAvailabilitiesForDoctor = async (req, res) => {
   try {
     const { doctorId } = req.params;
-    const { date } = req.query;
-    console.log('[getDoctorAvailabilities] doctorId:', doctorId, 'date:', date);
-    if (!doctorId || !date) {
-      console.log('[getDoctorAvailabilities] Paramètres manquants');
-      return res.status(400).json({ message: 'doctorId and date required' });
+    if (!doctorId) {
+      return res.status(400).json({ message: 'doctorId required' });
     }
-    const start = new Date(date + 'T00:00:00.000Z');
-    const end = new Date(date + 'T23:59:59.999Z');
-    console.log('[getDoctorAvailabilities] Recherche entre', start, 'et', end);
-    const availability = await Availability.findOne({
-      doctorId,
-      date: { $gte: start, $lte: end }
-    });
-    console.log('[getDoctorAvailabilities] Résultat MongoDB:', availability);
-    if (!availability) {
-      return res.status(200).json({ doctorId, date, slots: [] });
-    }
-    res.status(200).json({ doctorId, date, slots: availability.slots });
+    const availabilities = await Availability.find({ doctorId });
+    res.status(200).json(availabilities);
   } catch (err) {
-    console.error('[getDoctorAvailabilities] Erreur:', err);
     res.status(500).json({ message: err.message });
   }
 };
