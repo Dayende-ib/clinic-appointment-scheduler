@@ -206,7 +206,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     const Text(
-                      'Chargement du dashboard admin...',
+                      'Loading admin dashboard...',
                       style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
                     ),
                   ],
@@ -231,7 +231,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadDashboardStats,
-                child: const Text('Réessayer'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -259,28 +259,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadDashboardStats,
-            tooltip: 'Actualiser',
+            tooltip: 'refresh',
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Déconnexion',
+            tooltip: 'Logout',
             onPressed: () async {
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder:
                     (context) => AlertDialog(
-                      title: const Text('Déconnexion'),
-                      content: const Text(
-                        'Voulez-vous vraiment vous déconnecter ?',
-                      ),
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to log out?'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Annuler'),
+                          child: const Text('Cancel'),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Déconnexion'),
+                          child: const Text('Logout'),
                         ),
                       ],
                     ),

@@ -173,7 +173,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Erreur: $error'));
+      return Center(child: Text('Error: $error'));
     }
     return Scaffold(
       backgroundColor: Color(0xFFF5F7FA),

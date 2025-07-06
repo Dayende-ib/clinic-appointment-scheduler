@@ -162,28 +162,28 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Rendez-vous', [
+                        _buildDetailSection('📅 Appointment', [
                           'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
-                          'Heure: ${DateFormat('HH:mm').format(date)}',
+                          'Hour: ${DateFormat('HH:mm').format(date)}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Informations patient', [
+                        _buildDetailSection('👤 Patient informations', [
                           'Email: $patientEmail',
-                          'Téléphone: $patientPhone',
+                          'Phone: $patientPhone',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Motif de consultation', [
-                          reason.isNotEmpty ? reason : 'Aucun motif spécifié',
+                        _buildDetailSection('💬 Reason for consultation', [
+                          reason.isNotEmpty ? reason : 'No reason specified',
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Notes du patient', [
+                          _buildDetailSection('📝 Patient note', [
                             patientNotes,
                           ]),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 Mes notes', [doctorNotes]),
+                          _buildDetailSection('📋 My notes', [doctorNotes]),
                         ],
                         const SizedBox(height: 30),
                       ],
@@ -219,7 +219,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Rendez-vous rejeté'),
+                                    content: Text('Appointment rejected'),
                                     backgroundColor: kSoftRed,
                                   ),
                                 );
@@ -227,7 +227,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Erreur lors du rejet'),
+                                    content: Text(
+                                      'Error rejecting appointment',
+                                    ),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -263,7 +265,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text('Rendez-vous confirmé'),
+                                    content: const Text(
+                                      'Appointment confirmed',
+                                    ),
                                     backgroundColor: kPrimaryColor,
                                   ),
                                 );
@@ -271,9 +275,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                      'Erreur lors de la confirmation',
-                                    ),
+                                    content: Text('Error'),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -287,7 +289,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Confirmer',
+                              'Confirm',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -337,22 +339,22 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmé';
+        label = 'Confirmed';
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'En attente';
+        label = 'Booked';
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Annulé';
+        label = 'Cancelled';
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Terminé';
+        label = 'Completed';
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -381,7 +383,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     if (error != null) {
       return Center(
         child: Text(
-          'Erreur: '
+          'Error: '
           '$error',
         ),
       );
@@ -449,7 +451,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             Expanded(
               child:
                   filtered.isEmpty
-                      ? const Center(child: Text('Aucun rendez-vous trouvé.'))
+                      ? const Center(child: Text('No appointments found.'))
                       : ListView.separated(
                         itemCount: filtered.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -490,25 +492,39 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               subtitle: Text(
-                                '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}',
+                                '${DateFormat('EEEE d MMMM', 'en_US').format(date)} à ${DateFormat('HH:mm').format(date)}',
                               ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    status,
-                                    style: TextStyle(
-                                      color: statusColor,
-                                      fontWeight: FontWeight.bold,
+                              trailing: SizedBox(
+                                width: 80,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      status,
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
-                                  if (originalStatus == 'booked')
-                                    TextButton(
-                                      onPressed:
-                                          () => _showAppointmentDetails(rdv),
-                                      child: const Text('Details'),
-                                    ),
-                                ],
+                                    if (originalStatus == 'booked')
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 4.0,
+                                        ),
+                                        child: TextButton(
+                                          onPressed:
+                                              () =>
+                                                  _showAppointmentDetails(rdv),
+                                          child: const Text(
+                                            'Details',
+                                            style: TextStyle(fontSize: 13),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
                               onTap: () => _showAppointmentDetails(rdv),
                             ),

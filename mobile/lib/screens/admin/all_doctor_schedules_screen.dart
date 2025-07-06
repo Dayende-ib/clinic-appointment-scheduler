@@ -109,10 +109,10 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                               '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}'
                                   .trim();
                           final String displayName =
-                              name.isNotEmpty ? name : 'Nom inconnu';
+                              name.isNotEmpty ? name : 'No name provided';
                           final String email = doctor['email'] ?? '';
                           final String specialty =
-                              doctor['specialty'] ?? 'Spécialité inconnue';
+                              doctor['specialty'] ?? 'No specialty provided';
                           final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
                           final planning = weekPlannings[doctorId] ?? {};
                           final isLoading = loadingDoctors.contains(doctorId);
@@ -154,7 +154,7 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                                                 planning[dateStr] ?? [];
                                             final dayName = DateFormat(
                                               'EEEE',
-                                              'fr_FR',
+                                              'en_US',
                                             ).format(date);
                                             return Column(
                                               crossAxisAlignment:

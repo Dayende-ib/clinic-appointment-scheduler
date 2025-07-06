@@ -384,7 +384,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadPatients,
-                child: const Text('Réessayer'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -433,7 +433,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Filtre: ',
+                      'Filter: ',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 8),
@@ -504,7 +504,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 ),
                               ),
                               title: Text(
-                                patient['name'] ?? 'Nom inconnu',
+                                patient['name'] ?? 'No name provided',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -514,11 +514,10 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    patient['email'] ?? 'Email non renseigné',
+                                    patient['email'] ?? 'Email not provided',
                                   ),
                                   Text(
-                                    patient['phone'] ??
-                                        'Téléphone non renseigné',
+                                    patient['phone'] ?? 'Phone not provided',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],

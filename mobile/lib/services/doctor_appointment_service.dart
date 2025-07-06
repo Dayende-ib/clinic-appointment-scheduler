@@ -35,7 +35,7 @@ class DoctorAppointmentService {
         };
       }).toList();
     } else {
-      throw Exception('Erreur lors du chargement des rendez-vous');
+      throw Exception('Failed to load appointments');
     }
   }
 

@@ -21,7 +21,7 @@ class AdminService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur lors du chargement des statistiques');
+      throw Exception('Failed to load dashboard stats');
     }
   }
 
@@ -41,7 +41,7 @@ class AdminService {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) => item).toList();
     } else {
-      throw Exception('Erreur lors du chargement des docteurs');
+      throw Exception('Failed to load doctors');
     }
   }
 
@@ -61,7 +61,7 @@ class AdminService {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) => item).toList();
     } else {
-      throw Exception('Erreur lors du chargement des patients');
+      throw Exception('Failed to load patients');
     }
   }
 
@@ -81,7 +81,7 @@ class AdminService {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) => item).toList();
     } else {
-      throw Exception('Erreur lors du chargement des rendez-vous');
+      throw Exception('Failed to load appointments');
     }
   }
 
@@ -175,7 +175,7 @@ class AdminService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur lors du chargement des détails du docteur');
+      throw Exception('Failed to load doctor details');
     }
   }
 
@@ -196,7 +196,7 @@ class AdminService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur lors du chargement des détails du patient');
+      throw Exception('Failed to load patient details');
     }
   }
 
@@ -218,7 +218,7 @@ class AdminService {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) => item).toList();
     } else {
-      throw Exception('Erreur lors du chargement des rendez-vous du docteur');
+      throw Exception('Failed to load doctor appointments');
     }
   }
 
@@ -240,7 +240,7 @@ class AdminService {
       final List data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) => item).toList();
     } else {
-      throw Exception('Erreur lors du chargement des rendez-vous du patient');
+      throw Exception('Failed to load patient appointments');
     }
   }
 
@@ -259,7 +259,7 @@ class AdminService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur lors du chargement des paramètres système');
+      throw Exception('Failed to load system settings');
     }
   }
 

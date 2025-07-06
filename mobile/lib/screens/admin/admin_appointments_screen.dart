@@ -236,41 +236,39 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Rendez-vous', [
+                        _buildDetailSection('📅 Appointment', [
                           (date != null
-                              ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}'
-                              : 'Date inconnue'),
+                              ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'en_US').format(date)}'
+                              : 'Unknown date'),
                           (date != null
-                              ? 'Heure: ${DateFormat('HH:mm').format(date)}'
+                              ? 'Time: ${DateFormat('HH:mm').format(date)}'
                               : ''),
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👨‍⚕️ Docteur', [
-                          'Nom: $doctorName',
+                        _buildDetailSection('👨‍⚕️ Doctor', [
+                          'Name: $doctorName',
                           'Email: $doctorEmail',
-                          'Téléphone: $doctorPhone',
+                          'Phone: $doctorPhone',
                         ]),
                         const SizedBox(height: 20),
                         _buildDetailSection('👤 Patient', [
-                          'Nom: $patientName',
+                          'Name: $patientName',
                           'Email: $patientEmail',
-                          'Téléphone: $patientPhone',
+                          'Phone: $patientPhone',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Motif de consultation', [
-                          reason.isNotEmpty ? reason : 'Aucun motif spécifié',
+                        _buildDetailSection('💬 Reason of consultation', [
+                          reason.isNotEmpty ? reason : 'No reason specified',
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Notes du patient', [
+                          _buildDetailSection('📝 Patient notes', [
                             patientNotes,
                           ]),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 Notes du docteur', [
-                            doctorNotes,
-                          ]),
+                          _buildDetailSection('📋 Doctor notes', [doctorNotes]),
                         ],
                         const SizedBox(height: 30),
                       ],
@@ -475,7 +473,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadAppointments,
-                child: const Text('Réessayer'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -672,12 +670,12 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Dr. ${appointment['doctorName'] ?? 'Nom médecin inconnu'}',
+                                    'Dr. ${appointment['doctorName'] ?? 'Doctor name unknown'}',
                                   ),
                                   Text(
                                     date != null
                                         ? '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}'
-                                        : 'Date inconnue',
+                                        : 'Unknown date',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],

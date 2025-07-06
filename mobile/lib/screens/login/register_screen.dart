@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Affiche le snackbar puis redirige après un court délai
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Inscription réussie !')));
+        ).showSnackBar(SnackBar(content: Text('Registration successful!')));
         await Future.delayed(const Duration(milliseconds: 800));
         if (!mounted) return;
         if (role == 'doctor') {
@@ -154,11 +154,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.pushReplacementNamed(context, '/patient');
         }
       } else {
-        final msg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
+        final msg = jsonDecode(response.body)['message'] ?? 'Unknown error';
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Erreur : $msg')));
+          ).showSnackBar(SnackBar(content: Text('Error : $msg')));
         }
       }
     }
@@ -447,18 +447,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Accueil')),
-      body: const Center(child: Text('Bienvenue sur la page d\'accueil !')),
     );
   }
 }

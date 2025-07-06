@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'doctor_dashboard_screen.dart';
 import 'doctor_appointments_screen.dart';
 import 'doctor_quick_availability_page.dart';

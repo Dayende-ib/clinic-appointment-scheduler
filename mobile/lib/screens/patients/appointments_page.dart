@@ -78,7 +78,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Erreur: $error'));
+      return Center(child: Text('Error: $error'));
     }
     return Scaffold(
       appBar: AppBar(
@@ -203,7 +203,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                   Text(
                                     doctorName.isNotEmpty
                                         ? doctorName
-                                        : 'Docteur inconnu',
+                                        : 'Unknown Doctor',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,

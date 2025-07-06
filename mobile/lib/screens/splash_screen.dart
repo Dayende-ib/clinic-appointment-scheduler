@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen>
     final role = prefs.getString('role');
     await Future.delayed(const Duration(milliseconds: 1200));
     if (token == null || token.isEmpty) {
-      if (mounted) Navigator.pushReplacementNamed(context, '/login');
+      if (mounted) Navigator.pushReplacementNamed(context, '/welcome');
       return;
     }
     if (role == 'doctor') {

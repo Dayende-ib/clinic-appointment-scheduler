@@ -18,6 +18,7 @@ import 'screens/admin/admin_doctors_screen.dart';
 import 'screens/admin/admin_patients_screen.dart';
 import 'screens/admin/admin_appointments_screen.dart';
 import 'screens/admin/all_doctor_schedules_screen.dart';
+import 'screens/welcome_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
       // Define routes for navigation
       routes: {
+        '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/doctor': (context) => DoctorHomeScreen(),
