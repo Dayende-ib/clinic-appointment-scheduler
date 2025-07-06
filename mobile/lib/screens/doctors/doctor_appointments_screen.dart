@@ -499,27 +499,43 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      status,
-                                      style: TextStyle(
-                                        color: statusColor,
-                                        fontWeight: FontWeight.bold,
+                                    Flexible(
+                                      child: Text(
+                                        status,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
                                     if (originalStatus == 'booked')
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                          top: 4.0,
+                                          top: 2.0,
                                         ),
-                                        child: TextButton(
-                                          onPressed:
-                                              () =>
-                                                  _showAppointmentDetails(rdv),
-                                          child: const Text(
-                                            'Details',
-                                            style: TextStyle(fontSize: 13),
+                                        child: SizedBox(
+                                          height: 24,
+                                          child: TextButton(
+                                            onPressed:
+                                                () => _showAppointmentDetails(
+                                                  rdv,
+                                                ),
+                                            style: TextButton.styleFrom(
+                                              padding: EdgeInsets.zero,
+                                              minimumSize: Size.zero,
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                            child: const Text(
+                                              'Details',
+                                              style: TextStyle(fontSize: 11),
+                                            ),
                                           ),
                                         ),
                                       ),

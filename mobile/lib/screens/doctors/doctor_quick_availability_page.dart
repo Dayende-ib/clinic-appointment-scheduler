@@ -80,21 +80,19 @@ class _DoctorQuickAvailabilityPageState
                       date: date,
                       slots: formattedSlots,
                     );
+                if (!mounted) return;
                 if (success) {
-                  if (!mounted) return;
-                  Navigator.pop(context);
-                  await _loadWeekAvailabilities();
-                  if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Availability saved!')),
                   );
+                  Navigator.pop(context);
+                  await _loadWeekAvailabilities();
                 } else {
-                  if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Error while saving.')),
                   );
                 }
-                setState(() => isLoading = false);
+                if (mounted) setState(() => isLoading = false);
               },
             ),
           ),
