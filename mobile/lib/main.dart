@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:caretime/app_colors.dart';
+import 'package:caretime/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:caretime/screens/doctors/home_page.dart';
 import 'package:caretime/screens/doctors/doctor_dashboard_screen.dart';
 import 'package:caretime/screens/doctors/doctor_appointments_screen.dart';
@@ -19,6 +18,7 @@ import 'screens/admin/admin_patients_screen.dart';
 import 'screens/admin/admin_appointments_screen.dart';
 import 'screens/admin/all_doctor_schedules_screen.dart';
 import 'screens/welcome_page.dart';
+import 'screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,45 +31,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Caretime - Your Clinic Appointment Scheduler',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        textTheme: GoogleFonts.nunitoTextTheme(textTheme).copyWith(
-          headlineLarge: GoogleFonts.nunito(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF1F2937),
-          ),
-          headlineMedium: GoogleFonts.nunito(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF1F2937),
-          ),
-          titleLarge: GoogleFonts.nunito(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF0891B2),
-          ),
-          bodyLarge: GoogleFonts.nunito(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF374151),
-          ),
-          bodyMedium: GoogleFonts.nunito(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: const Color(0xFF374151),
-          ),
-          labelLarge: GoogleFonts.nunito(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0891B2),
-          ),
-        ),
-      ),
+      theme: appTheme,
       home: const SplashScreen(),
       // Define routes for navigation
       routes: {
@@ -127,6 +92,7 @@ class MyApp extends StatelessWidget {
           );
         },
         '/profile': (context) => const ProfileScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }

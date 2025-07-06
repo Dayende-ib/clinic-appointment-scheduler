@@ -122,36 +122,37 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           Expanded(
             child:
                 appointments.isEmpty
-                    ? Center(
+                    ? const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.calendar_today_outlined,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: Color(0xFF9CA3AF),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           Text(
                             'No appointments yet',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
+                              color: Color(0xFF6B7280),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             'Your appointments will appear here',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[500],
+                              color: Color(0xFF9CA3AF),
                             ),
                           ),
                         ],
                       ),
                     )
                     : ListView.builder(
+                      key: const ValueKey('appointments_list'),
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
                       itemCount: appointments.length,
                       itemBuilder: (context, index) {

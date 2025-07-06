@@ -1,1 +1,14 @@
-const String apiBaseUrl = 'http://192.168.11.114:5000';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// URL de base de l'API
+const String apiBaseUrl = 'http://localhost:5000';
+
+// Fonction pour obtenir l'URL personnalisée
+Future<String> getCustomApiUrl() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('custom_api_url') ?? apiBaseUrl;
+  } catch (e) {
+    return apiBaseUrl;
+  }
+}

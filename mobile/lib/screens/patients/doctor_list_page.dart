@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // Ajout pour Timer
 import 'doctor_profile_page.dart';
 import '../../services/patient_api_service.dart';
 import 'all_availability_page.dart';
@@ -13,6 +14,7 @@ class DoctorsListScreen extends StatefulWidget {
 class DoctorsListScreenState extends State<DoctorsListScreen> {
   final Color primaryColor = Color(0xFF03A6A1);
   final Color secondaryColor = Color(0xFF0891B2);
+  Timer? _searchDebounce; // Timer pour debouncer la recherche
 
   // Ajout d'une liste de couleurs pastel pour les cartes
   final List<Color> cardColors = [
@@ -41,6 +43,12 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   void initState() {
     super.initState();
     _loadDoctors();
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel(); // Annuler le timer lors de la destruction
+    super.dispose();
   }
 
   Future<void> _loadDoctors() async {
@@ -230,7 +238,17 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                     vertical: 12,
                   ),
                 ),
-                onChanged: (v) => setState(() => search = v),
+                onChanged: (v) {
+                  _searchDebounce?.cancel(); // Annuler le timer précédent
+                  _searchDebounce = Timer(
+                    const Duration(milliseconds: 300),
+                    () {
+                      if (mounted) {
+                        setState(() => search = v);
+                      }
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -380,6 +398,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                           final cardColor =
                               cardColors[index % cardColors.length];
                           return GestureDetector(
+                            key: ValueKey(doctor.id),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -391,6 +410,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                               );
                             },
                             child: DoctorCard(
+                              key: ValueKey('doctor-card-${doctor.id}'),
                               doctor: doctor,
                               primaryColor: primaryColor,
                               isSelected: isSelected,

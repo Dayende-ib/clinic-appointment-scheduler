@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:caretime/app_colors.dart';
+import 'package:caretime/app_theme.dart';
 import 'package:caretime/strings.dart';
 import 'package:caretime/screens/login/login_screen.dart';
 import 'package:caretime/screens/login/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/screens/settings_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -14,6 +14,9 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  int _logoTapCount = 0;
+  static const int _requiredTaps = 5;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +40,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
+  void _onLogoTap() {
+    setState(() {
+      _logoTapCount++;
+    });
+
+    if (_logoTapCount >= _requiredTaps) {
+      _logoTapCount = 0;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const SettingsScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,17 +63,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/Logo-caretime.png',
-                height: 90,
-                fit: BoxFit.contain,
+              GestureDetector(
+                onTap: _onLogoTap,
+                child: Image.asset(
+                  'assets/images/Logo-caretime.png',
+                  height: 90,
+                  fit: BoxFit.contain,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
                 AppStrings.enSubtitle,
-                style: GoogleFonts.poppins(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: const Color(0xFF03A6A1),
                   letterSpacing: 0.5,
                 ),

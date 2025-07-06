@@ -4,18 +4,58 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
 class PatientApiService {
-  static final String baseUrl = '${apiBaseUrl}/api';
+  static final String baseUrl = '$apiBaseUrl/api/patients';
+
+  // Cache simple pour les données
+  static final Map<String, dynamic> _cache = {};
+  static const Duration _cacheDuration = Duration(minutes: 5);
+  static final Map<String, DateTime> _cacheTimestamps = {};
+
+  // Méthode pour ajouter au cache
+  static void _addToCache(String key, dynamic value) {
+    _cache[key] = value;
+    _cacheTimestamps[key] = DateTime.now();
+  }
+
+  // Méthode pour vérifier si le cache est valide
+  static bool _isCacheValid(String key) {
+    final timestamp = _cacheTimestamps[key];
+    if (timestamp == null) return false;
+    return DateTime.now().difference(timestamp) < _cacheDuration;
+  }
+
+  // Méthode pour nettoyer le cache expiré
+  static void _cleanExpiredCache() {
+    final now = DateTime.now();
+    _cacheTimestamps.removeWhere((key, timestamp) {
+      return now.difference(timestamp) >= _cacheDuration;
+    });
+    _cache.removeWhere((key, value) => !_cacheTimestamps.containsKey(key));
+  }
 
   static Future<List<Map<String, dynamic>>> getDoctorsList() async {
+    const cacheKey = 'doctors_list';
+
+    // Vérifier le cache d'abord
+    if (_isCacheValid(cacheKey)) {
+      return _cache[cacheKey] as List<Map<String, dynamic>>;
+    }
+
+    _cleanExpiredCache();
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.get(
-      Uri.parse('$baseUrl/users/doctors'),
+      Uri.parse('$baseUrl/doctors'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      return data.cast<Map<String, dynamic>>();
+      final data = List<Map<String, dynamic>>.from(json.decode(response.body));
+
+      // Mettre en cache
+      _addToCache(cacheKey, data);
+
+      return data;
     } else {
       throw Exception('Failed to load doctors');
     }
