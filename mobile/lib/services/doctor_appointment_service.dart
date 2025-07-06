@@ -85,24 +85,4 @@ class DoctorAppointmentService {
 
     return response.statusCode == 200;
   }
-
-  static Future<List<Map<String, dynamic>>> fetchTodayAppointments() async {
-    final all = await fetchDoctorAppointments();
-    final today = DateTime.now();
-    return all.where((rdv) {
-      final date = rdv['date'] as DateTime;
-      return date.year == today.year &&
-          date.month == today.month &&
-          date.day == today.day;
-    }).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> fetchUpcomingAppointments() async {
-    final all = await fetchDoctorAppointments();
-    final now = DateTime.now();
-    return all.where((rdv) {
-      final date = rdv['date'] as DateTime;
-      return date.isAfter(now);
-    }).toList();
-  }
 }

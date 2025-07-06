@@ -112,19 +112,6 @@ class DoctorAvailabilityService {
     return response.statusCode == 200;
   }
 
-  static Future<bool> deleteAvailabilityForDate(DateTime date) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    final response = await http.delete(
-      Uri.parse('$baseUrl?date=${date.toIso8601String().split('T')[0]}'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    return response.statusCode == 200;
-  }
-
   static Future<List<Map<String, dynamic>>> getAllAvailabilities() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';

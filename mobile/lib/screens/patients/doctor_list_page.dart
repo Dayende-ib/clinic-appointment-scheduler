@@ -335,47 +335,80 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                 right: 16,
                 bottom: 80,
               ), // Add bottom padding for nav bar
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: filteredDoctors.length,
-                itemBuilder: (context, index) {
-                  final doctor = filteredDoctors[index];
-                  final isSelected = selectedDoctorIndex == index;
-                  final cardColor = cardColors[index % cardColors.length];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => DoctorProfileScreen(doctor: doctor),
+              child:
+                  filteredDoctors.isEmpty
+                      ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.medical_services_outlined,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No doctors available',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Try adjusting your filters',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                    child: DoctorCard(
-                      doctor: doctor,
-                      primaryColor: primaryColor,
-                      isSelected: isSelected,
-                      onArrowTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    DoctorProfileScreen(doctor: doctor),
-                          ),
-                        );
-                      },
-                      backgroundColor: cardColor,
-                    ),
-                  );
-                },
-              ),
+                      )
+                      : GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.85,
+                        ),
+                        itemCount: filteredDoctors.length,
+                        itemBuilder: (context, index) {
+                          final doctor = filteredDoctors[index];
+                          final isSelected = selectedDoctorIndex == index;
+                          final cardColor =
+                              cardColors[index % cardColors.length];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          DoctorProfileScreen(doctor: doctor),
+                                ),
+                              );
+                            },
+                            child: DoctorCard(
+                              doctor: doctor,
+                              primaryColor: primaryColor,
+                              isSelected: isSelected,
+                              onArrowTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            DoctorProfileScreen(doctor: doctor),
+                                  ),
+                                );
+                              },
+                              backgroundColor: cardColor,
+                            ),
+                          );
+                        },
+                      ),
             ),
           ),
         ],

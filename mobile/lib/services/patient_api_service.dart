@@ -21,20 +21,6 @@ class PatientApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> getDoctorProfile(String doctorId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    final response = await http.get(
-      Uri.parse('$baseUrl/users/$doctorId'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load doctor profile');
-    }
-  }
-
   static Future<List<Map<String, dynamic>>> getDoctorAvailabilities(
     String doctorId,
     String date,

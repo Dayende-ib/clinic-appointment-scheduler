@@ -120,301 +120,368 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-              itemCount: appointments.length,
-              itemBuilder: (context, index) {
-                final apt = appointments[index];
-                if (deletedAppointments.contains(apt['_id'] ?? apt['id'])) {
-                  return const SizedBox.shrink();
-                }
-                final doctor = apt['doctorId'] ?? {};
-                final DateTime? dt =
-                    apt['datetime'] != null
-                        ? DateTime.tryParse(apt['datetime'])
-                        : null;
-                final String dateStr =
-                    dt != null
-                        ? '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}'
-                        : '';
-                final String timeStr =
-                    dt != null
-                        ? '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
-                        : '';
-                final String status = (apt['status'] ?? '').toString();
-                final String reason = apt['reason'] ?? '';
-                final String doctorName =
-                    '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}';
-                final String specialty = doctor['specialty'] ?? '';
-                final String aptId = apt['_id'] ?? apt['id'] ?? '';
-                final bool isPast = dt != null && dt.isBefore(DateTime.now());
-                final bool canCancel =
-                    (status == 'booked' || status == 'confirmed') && !isPast;
-                final bool canReschedule = status == 'canceled';
-                final searchLower = search.toLowerCase();
-                if (searchLower.isNotEmpty &&
-                    !doctorName.toLowerCase().contains(searchLower) &&
-                    !specialty.toLowerCase().contains(searchLower) &&
-                    !reason.toLowerCase().contains(searchLower)) {
-                  return const SizedBox.shrink();
-                }
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border(
-                      left: BorderSide(
-                        color: _getStatusColor(status),
-                        width: 4,
+            child:
+                appointments.isEmpty
+                    ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No appointments yet',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Your appointments will appear here',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 22,
-                              backgroundColor: kAccentColor,
-                              child: Text(
-                                doctorName.isNotEmpty ? doctorName[0] : '?',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                      itemCount: appointments.length,
+                      itemBuilder: (context, index) {
+                        final apt = appointments[index];
+                        if (deletedAppointments.contains(
+                          apt['_id'] ?? apt['id'],
+                        )) {
+                          return const SizedBox.shrink();
+                        }
+                        final doctor = apt['doctorId'] ?? {};
+                        final DateTime? dt =
+                            apt['datetime'] != null
+                                ? DateTime.tryParse(apt['datetime'])
+                                : null;
+                        final String dateStr =
+                            dt != null
+                                ? '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}'
+                                : '';
+                        final String timeStr =
+                            dt != null
+                                ? '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
+                                : '';
+                        final String status = (apt['status'] ?? '').toString();
+                        final String reason = apt['reason'] ?? '';
+                        final String doctorName =
+                            '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}';
+                        final String specialty = doctor['specialty'] ?? '';
+                        final String aptId = apt['_id'] ?? apt['id'] ?? '';
+                        final bool isPast =
+                            dt != null && dt.isBefore(DateTime.now());
+                        final bool canCancel =
+                            (status == 'booked' || status == 'confirmed') &&
+                            !isPast;
+                        final bool canReschedule = status == 'canceled';
+                        final searchLower = search.toLowerCase();
+                        if (searchLower.isNotEmpty &&
+                            !doctorName.toLowerCase().contains(searchLower) &&
+                            !specialty.toLowerCase().contains(searchLower) &&
+                            !reason.toLowerCase().contains(searchLower)) {
+                          return const SizedBox.shrink();
+                        }
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border(
+                              left: BorderSide(
+                                color: _getStatusColor(status),
+                                width: 4,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    doctorName.isNotEmpty
-                                        ? doctorName
-                                        : 'Unknown Doctor',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1F2937),
-                                    ),
-                                  ),
-                                  Text(
-                                    specialty,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF6B7280),
-                                    ),
-                                  ),
-                                ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildMetaRow('📅', dateStr),
-                                _buildMetaRow('🕙', timeStr),
-                                _buildMetaRow('💬', reason),
-                              ],
-                            ),
-                            _buildStatusBadge(status),
-                          ],
-                        ),
-                        if (status == 'booked')
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Row(
-                              children: const [
-                                Icon(
-                                  Icons.info_outline,
-                                  color: Colors.orange,
-                                  size: 18,
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 22,
+                                      backgroundColor: kAccentColor,
+                                      child: Text(
+                                        doctorName.isNotEmpty
+                                            ? doctorName[0]
+                                            : '?',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            doctorName.isNotEmpty
+                                                ? doctorName
+                                                : 'Unknown Doctor',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF1F2937),
+                                            ),
+                                          ),
+                                          Text(
+                                            specialty,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Color(0xFF6B7280),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 6),
-                                Text(
-                                  'Waiting for doctor confirmation',
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 13,
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildMetaRow('📅', dateStr),
+                                        _buildMetaRow('🕙', timeStr),
+                                        _buildMetaRow('💬', reason),
+                                      ],
+                                    ),
+                                    _buildStatusBadge(status),
+                                  ],
+                                ),
+                                if (status == 'booked')
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Row(
+                                      children: const [
+                                        Icon(
+                                          Icons.info_outline,
+                                          color: Colors.orange,
+                                          size: 18,
+                                        ),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          'Waiting for doctor confirmation',
+                                          style: TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                if (canCancel)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton.icon(
+                                        icon: const Icon(
+                                          Icons.info_outline,
+                                          color: kSecondaryColor,
+                                        ),
+                                        label: const Text(
+                                          'Details',
+                                          style: TextStyle(
+                                            color: kSecondaryColor,
+                                          ),
+                                        ),
+                                        onPressed:
+                                            () => _showAppointmentDetails(apt),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      TextButton.icon(
+                                        icon: const Icon(
+                                          Icons.calendar_today,
+                                          color: kSecondaryColor,
+                                        ),
+                                        label: const Text(
+                                          'Reschedule',
+                                          style: TextStyle(
+                                            color: kSecondaryColor,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          final pickedDate =
+                                              await showDatePicker(
+                                                context: context,
+                                                initialDate:
+                                                    dt ?? DateTime.now(),
+                                                firstDate: DateTime.now(),
+                                                lastDate: DateTime.now().add(
+                                                  const Duration(days: 365),
+                                                ),
+                                              );
+                                          if (pickedDate == null) return;
+                                          final pickedTime =
+                                              await showTimePicker(
+                                                context: context,
+                                                initialTime:
+                                                    TimeOfDay.fromDateTime(
+                                                      dt ?? DateTime.now(),
+                                                    ),
+                                              );
+                                          if (pickedTime == null) return;
+                                          final newDateTime = DateTime(
+                                            pickedDate.year,
+                                            pickedDate.month,
+                                            pickedDate.day,
+                                            pickedTime.hour,
+                                            pickedTime.minute,
+                                          );
+                                          final iso =
+                                              newDateTime.toIso8601String();
+                                          final success =
+                                              await PatientApiService.rescheduleAppointment(
+                                                aptId,
+                                                iso,
+                                              );
+                                          if (!mounted) return;
+                                          if (success) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Appointment rescheduled!',
+                                                ),
+                                              ),
+                                            );
+                                            _loadAppointments();
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Error while rescheduling.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      TextButton.icon(
+                                        icon: const Icon(
+                                          Icons.cancel,
+                                          color: kSoftRed,
+                                        ),
+                                        label: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: kSoftRed),
+                                        ),
+                                        onPressed:
+                                            () => _cancelAppointment(aptId),
+                                      ),
+                                    ],
+                                  ),
+                                if (canReschedule)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton.icon(
+                                        icon: const Icon(
+                                          Icons.calendar_today,
+                                          color: kSecondaryColor,
+                                        ),
+                                        label: const Text(
+                                          'Reschedule',
+                                          style: TextStyle(
+                                            color: kSecondaryColor,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          final pickedDate =
+                                              await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime.now(),
+                                                lastDate: DateTime.now().add(
+                                                  const Duration(days: 365),
+                                                ),
+                                              );
+                                          if (pickedDate == null) return;
+                                          final pickedTime =
+                                              await showTimePicker(
+                                                context: context,
+                                                initialTime: TimeOfDay.now(),
+                                              );
+                                          if (pickedTime == null) return;
+                                          final newDateTime = DateTime(
+                                            pickedDate.year,
+                                            pickedDate.month,
+                                            pickedDate.day,
+                                            pickedTime.hour,
+                                            pickedTime.minute,
+                                          );
+                                          final iso =
+                                              newDateTime.toIso8601String();
+                                          final success =
+                                              await PatientApiService.rescheduleAppointment(
+                                                aptId,
+                                                iso,
+                                              );
+                                          if (!mounted) return;
+                                          if (success) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Appointment rescheduled!',
+                                                ),
+                                              ),
+                                            );
+                                            _loadAppointments();
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Error while rescheduling.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
-                        if (canCancel)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton.icon(
-                                icon: const Icon(
-                                  Icons.info_outline,
-                                  color: kSecondaryColor,
-                                ),
-                                label: const Text(
-                                  'Details',
-                                  style: TextStyle(color: kSecondaryColor),
-                                ),
-                                onPressed: () => _showAppointmentDetails(apt),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton.icon(
-                                icon: const Icon(
-                                  Icons.calendar_today,
-                                  color: kSecondaryColor,
-                                ),
-                                label: const Text(
-                                  'Reschedule',
-                                  style: TextStyle(color: kSecondaryColor),
-                                ),
-                                onPressed: () async {
-                                  final pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: dt ?? DateTime.now(),
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(
-                                      const Duration(days: 365),
-                                    ),
-                                  );
-                                  if (pickedDate == null) return;
-                                  final pickedTime = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.fromDateTime(
-                                      dt ?? DateTime.now(),
-                                    ),
-                                  );
-                                  if (pickedTime == null) return;
-                                  final newDateTime = DateTime(
-                                    pickedDate.year,
-                                    pickedDate.month,
-                                    pickedDate.day,
-                                    pickedTime.hour,
-                                    pickedTime.minute,
-                                  );
-                                  final iso = newDateTime.toIso8601String();
-                                  final success =
-                                      await PatientApiService.rescheduleAppointment(
-                                        aptId,
-                                        iso,
-                                      );
-                                  if (!mounted) return;
-                                  if (success) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Appointment rescheduled!',
-                                        ),
-                                      ),
-                                    );
-                                    _loadAppointments();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Error while rescheduling.',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton.icon(
-                                icon: const Icon(Icons.cancel, color: kSoftRed),
-                                label: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: kSoftRed),
-                                ),
-                                onPressed: () => _cancelAppointment(aptId),
-                              ),
-                            ],
-                          ),
-                        if (canReschedule)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton.icon(
-                                icon: const Icon(
-                                  Icons.calendar_today,
-                                  color: kSecondaryColor,
-                                ),
-                                label: const Text(
-                                  'Reschedule',
-                                  style: TextStyle(color: kSecondaryColor),
-                                ),
-                                onPressed: () async {
-                                  final pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(
-                                      const Duration(days: 365),
-                                    ),
-                                  );
-                                  if (pickedDate == null) return;
-                                  final pickedTime = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                  );
-                                  if (pickedTime == null) return;
-                                  final newDateTime = DateTime(
-                                    pickedDate.year,
-                                    pickedDate.month,
-                                    pickedDate.day,
-                                    pickedTime.hour,
-                                    pickedTime.minute,
-                                  );
-                                  final iso = newDateTime.toIso8601String();
-                                  final success =
-                                      await PatientApiService.rescheduleAppointment(
-                                        aptId,
-                                        iso,
-                                      );
-                                  if (!mounted) return;
-                                  if (success) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Appointment rescheduled!',
-                                        ),
-                                      ),
-                                    );
-                                    _loadAppointments();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Error while rescheduling.',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
-                );
-              },
-            ),
           ),
         ],
       ),
