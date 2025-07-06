@@ -220,28 +220,28 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Rendez-vous', [
-                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
+                        _buildDetailSection('📅 Appoitment', [
+                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'en_US').format(date)}',
                           'Heure: ${DateFormat('HH:mm').format(date)}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Informations patient', [
+                        _buildDetailSection('👤 Patient information', [
                           'Email: $patientEmail',
-                          'Téléphone: $patientPhone',
+                          'Phone: $patientPhone',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Motif de consultation', [
-                          reason.isNotEmpty ? reason : 'Aucun motif spécifié',
+                        _buildDetailSection('💬 Reason of consultation', [
+                          reason.isNotEmpty ? reason : 'No reason specified',
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Notes du patient', [
+                          _buildDetailSection('📝 Patient notes', [
                             patientNotes,
                           ]),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 Mes notes', [doctorNotes]),
+                          _buildDetailSection('📋 My notes', [doctorNotes]),
                         ],
                         const SizedBox(height: 30),
                       ],
@@ -276,7 +276,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Rendez-vous rejeté'),
+                                    content: Text('Appointment canceled'),
                                     backgroundColor: kSoftRed,
                                   ),
                                 );
@@ -290,7 +290,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Rejeter',
+                              'Cancel',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -312,7 +312,9 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text('Rendez-vous confirmé'),
+                                    content: const Text(
+                                      'Appointment confirmed',
+                                    ),
                                     backgroundColor: kPrimaryColor,
                                   ),
                                 );
@@ -326,7 +328,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Confirmer',
+                              'Confirme',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -732,7 +734,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     const Text(
-                      'Chargement du dashboard...',
+                      'Loading doctor dashboard...',
                       style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
                     ),
                   ],
@@ -752,11 +754,11 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: $error'),
+              Text('Error: $error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadAllData,
-                child: const Text('Réessayer'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -767,7 +769,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     final String doctorName =
         doctorProfile != null
             ? '${doctorProfile!['firstname']} ${doctorProfile!['lastname']}'
-            : 'Docteur';
+            : 'Doctor';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -800,7 +802,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, $doctorName',
+                          'Hello, Dr $doctorName',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -810,7 +812,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                         Text(
                           DateFormat(
                             'EEEE d MMMM yyyy',
-                            'fr_FR',
+                            'en_US',
                           ).format(DateTime.now()),
                           style: const TextStyle(
                             fontSize: 16,
@@ -1067,5 +1069,3 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     );
   }
 }
-
-// ...autres classes de cartes (si nécessaire)...
