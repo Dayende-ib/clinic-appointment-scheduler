@@ -50,9 +50,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                     ...apt,
                     'id': apt['id'] ?? apt['_id'],
                     'patientName':
-                        ((apt['patientId']?['firstname'] ?? '') +
-                                ' ' +
-                                (apt['patientId']?['lastname'] ?? ''))
+                        '${apt['patientId']?['firstname'] ?? ''} ${apt['patientId']?['lastname'] ?? ''}'
                             .trim(),
                     'doctorName':
                         ((apt['doctorId']?['firstname'] ?? '') +

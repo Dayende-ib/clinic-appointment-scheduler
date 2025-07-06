@@ -506,7 +506,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                     TextButton(
                                       onPressed:
                                           () => _showAppointmentDetails(rdv),
-                                      child: const Text('Détails'),
+                                      child: const Text('Details'),
                                     ),
                                 ],
                               ),
