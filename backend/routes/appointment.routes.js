@@ -5,7 +5,8 @@ const auth = require("../middlewares/auth.middleware");
 const {
   createAppointment,
   getMyAppointments,
-  updateAppointmentStatus
+  updateAppointmentStatus,
+  rescheduleAppointment
 } = require("../controllers/appointment.controller");
 
 // ✅ Route pour créer un rendez-vous (seulement patient)
@@ -16,5 +17,8 @@ router.get("/me", auth(["patient", "doctor"]), getMyAppointments);
 
 // ✅ Route pour mettre à jour le statut d’un rendez-vous
 router.patch("/:id/status", auth(["patient", "doctor"]), updateAppointmentStatus);
+
+// ✅ Route pour reprogrammer un rendez-vous (patient ou médecin)
+router.patch("/:id/reschedule", auth(["patient", "doctor"]), rescheduleAppointment);
 
 module.exports = router;

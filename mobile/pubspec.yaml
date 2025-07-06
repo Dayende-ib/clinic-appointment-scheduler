@@ -1,5 +1,5 @@
 name: caretime
-description: "A new Flutter project."
+description: "CareTime is a complete medical appointment management application, designed to facilitate appointment booking between patients, doctors."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -8,32 +8,52 @@ version: 1.0.0+1
 environment:
   sdk: ^3.7.2
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
-  flutter_hooks: ^0.20.4
-  hooks_riverpod: ^2.5.1
-  google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
+  http: ^1.4.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^5.0.0
-
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
 
   uses-material-design: true
 
   assets:
-    - images/caretime_2x1.png
-    - images/caretime_100x100_nobg.png
+    - assets/images/
+
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-Regular.ttf
+        - asset: assets/fonts/NotoSans-Italic.ttf
+        - asset: assets/fonts/NotoSans-Medium.ttf
+        - asset: assets/fonts/NotoSans-Bold.ttf
+        - asset: assets/fonts/NotoSans-SemiBold.ttf
+
+# Optimisations de performance
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Icone-logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/Icone-logo.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/Logo-caretime.png
+  android: true
+  ios: true
+  web: false
+  fullscreen: true
+  android_12:
+    image: assets/images/Logo-caretime.png
+    icon_background_color: "#FFFFFF"

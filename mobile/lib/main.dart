@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:caretime/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:caretime/screens/welcome_screen.dart';
+import 'package:caretime/app_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:caretime/screens/doctors/home_page.dart';
+import 'package:caretime/screens/doctors/doctor_dashboard_screen.dart';
+import 'package:caretime/screens/doctors/doctor_appointments_screen.dart';
+import 'package:caretime/screens/doctors/doctor_quick_availability_page.dart';
+import 'package:caretime/screens/patients/patient_dashboard_page.dart';
+import 'package:caretime/screens/patients/doctor_list_page.dart';
+import 'package:caretime/screens/patients/appointments_page.dart';
+import 'package:caretime/screens/login/login_screen.dart';
+import 'package:caretime/screens/login/register_screen.dart';
+import 'package:caretime/screens/splash_screen.dart';
+import 'package:caretime/screens/profile_page.dart';
+import 'screens/admin/admin_dashboard_new.dart' as admin_new;
+import 'screens/admin/admin_doctors_screen.dart';
+import 'screens/admin/admin_patients_screen.dart';
+import 'screens/admin/admin_appointments_screen.dart';
+import 'screens/admin/all_doctor_schedules_screen.dart';
+import 'screens/welcome_page.dart';
+import 'screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,112 +34,66 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Caretime - Your Clinic Appointment Scheduler',
-      theme: ThemeData(
-        // Define the color scheme for the app
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          background: const Color(0xFFF8F9FA),
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          tertiary: AppColors.tertiary,
-          error: Colors.red,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onBackground: Colors.black87,
-          onSurface: Colors.black87,
-        ),
-        // Define the text theme using GoogleFonts.poppins
-        textTheme: TextTheme(
-          displayLarge: GoogleFonts.poppins(
-            fontSize: 57,
-            fontWeight: FontWeight.normal,
-          ),
-          displayMedium: GoogleFonts.poppins(
-            fontSize: 45,
-            fontWeight: FontWeight.normal,
-          ),
-          displaySmall: GoogleFonts.poppins(
-            fontSize: 36,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineLarge: GoogleFonts.poppins(
-            fontSize: 32,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineMedium: GoogleFonts.poppins(
-            fontSize: 28,
-            fontWeight: FontWeight.normal,
-          ),
-          headlineSmall: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ), // Used for "Bonjour Docteur"
-          titleLarge: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF0891B2),
-          ), // Used for AppBar title
-          titleMedium: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ), // Used for section titles like "Rendez-vous d’aujourd’hui"
-          titleSmall: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          bodyLarge: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-          bodyMedium: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-          ), // Default body text
-          bodySmall: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-          ),
-          labelLarge: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ), // Used for button text
-          labelMedium: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-          ),
-          labelSmall: GoogleFonts.poppins(
-            fontSize: 11,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        // Define global ElevatedButton theme
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-            elevation: 2,
-            foregroundColor: Colors.white, // Text color for ElevatedButton
-          ),
-        ),
-        // Define global OutlinedButton theme
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary, width: 2),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        ),
-        useMaterial3: true,
-      ),
-      home: const WelcomeScreen(),
+      theme: appTheme,
+      home: const SplashScreen(),
+      // Define routes for navigation
+      routes: {
+        '/welcome': (context) => const WelcomeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/doctor': (context) => DoctorHomeScreen(),
+        '/doctor/dashboard': (context) => const DoctorDashboardScreen(),
+        '/doctor/appointments': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          return DoctorAppointmentsScreen(arguments: args);
+        },
+        '/doctor/availability':
+            (context) => const DoctorQuickAvailabilityPage(),
+        '/patient': (context) => PatientDashboardScreen(),
+        '/patient/doctors': (context) => const DoctorsListScreen(),
+        '/patient/appointments': (context) => const AppointmentsScreen(),
+        '/admin': (context) => admin_new.AdminDashboardScreen(),
+        '/admin/dashboard': (context) => admin_new.AdminDashboardScreen(),
+        '/admin/doctors': (context) => AdminDoctorsScreen(),
+        '/admin/patients': (context) => AdminPatientsScreen(),
+        '/admin/appointments': (context) => AdminAppointmentsScreen(),
+        '/admin/appointments/today':
+            (context) =>
+                AdminAppointmentsScreen(arguments: {'filter': 'today'}),
+        '/admin/appointments/pending':
+            (context) =>
+                AdminAppointmentsScreen(arguments: {'filter': 'pending'}),
+        '/admin/schedules': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          final doctors = args?['doctors'] as List<Map<String, dynamic>>? ?? [];
+          return AllDoctorSchedulesScreen(doctors: doctors);
+        },
+        '/admin/doctors/appointments': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          final doctorId = args?['doctorId'];
+          return AdminAppointmentsScreen(arguments: {'doctorId': doctorId});
+        },
+        '/admin/doctors/schedule': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          final doctorId = args?['doctorId'];
+          // On passe la liste des docteurs avec uniquement ce docteur
+          return AllDoctorSchedulesScreen(
+            doctors: [
+              if (doctorId != null) {'id': doctorId},
+            ],
+          );
+        },
+        '/profile': (context) => const ProfileScreen(),
+        '/settings': (context) => const SettingsScreen(),
+      },
     );
   }
 }
