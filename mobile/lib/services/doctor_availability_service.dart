@@ -71,6 +71,27 @@ class DoctorAvailabilityService {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getAvailabilityForDoctor(
+    String doctorId,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final url = Uri.parse('$baseUrl/all/$doctorId');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      return [];
+    }
+  }
+
   static Future<bool> addAvailabilityV2({
     required DateTime date,
     required List<Map<String, dynamic>> slots,
@@ -102,5 +123,24 @@ class DoctorAvailabilityService {
       },
     );
     return response.statusCode == 200;
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllAvailabilities() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final url = Uri.parse('$baseUrl/all');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      return [];
+    }
   }
 }

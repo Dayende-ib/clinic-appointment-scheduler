@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/doctor_availability_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../patients/all_availability_page.dart';
 
 class DoctorQuickAvailabilityPage extends StatefulWidget {
   const DoctorQuickAvailabilityPage({super.key});
@@ -14,36 +16,49 @@ class _DoctorQuickAvailabilityPageState
     extends State<DoctorQuickAvailabilityPage> {
   bool isLoading = false;
   Map<String, List<Map<String, String>>> weekAvailabilities = {};
+  String search = '';
+  String filter = 'All';
+  final List<String> filterOptions = ['All', 'Upcoming', 'Passed'];
 
   final List<String> morningSlots = ['08:00', '09:00', '10:00', '11:00'];
   final List<String> afternoonSlots = ['14:00', '15:00', '16:00', '17:00'];
   final List<String> eveningSlots = ['18:00', '19:00', '20:00'];
 
-  List<DateTime> getWeekDates() {
-    final today = DateTime.now();
-    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-    return List.generate(7, (i) => startOfWeek.add(Duration(days: i)))
-        .where((d) => !d.isBefore(DateTime(today.year, today.month, today.day)))
-        .toList();
+  List<DateTime> getAllDates() {
+    if (weekAvailabilities.isEmpty) return [];
+    return weekAvailabilities.keys.map((k) => DateTime.parse(k)).toList()
+      ..sort((a, b) => a.compareTo(b));
   }
 
   @override
   void initState() {
     super.initState();
-    _loadWeekAvailabilities();
+    _loadAllAvailabilities();
   }
 
-  Future<void> _loadWeekAvailabilities() async {
+  Future<void> _loadAllAvailabilities() async {
     setState(() => isLoading = true);
-    final dates = getWeekDates();
+    final prefs = await SharedPreferences.getInstance();
+    final doctorId = prefs.getString('userId') ?? '';
+    final allAvailabilities =
+        await DoctorAvailabilityService.getAvailabilityForDoctor(doctorId);
     Map<String, List<Map<String, String>>> result = {};
-    for (final date in dates) {
-      final slots = await DoctorAvailabilityService.getAvailabilityForDate(
-        date,
-      );
-      if (slots.isNotEmpty) {
-        result[DateFormat('yyyy-MM-dd').format(date)] = slots;
-      }
+    for (final avail in allAvailabilities) {
+      final date = DateTime.parse(avail['date']);
+      final key = DateFormat('yyyy-MM-dd').format(date);
+      final slotsRaw = avail['slots'];
+      final slotsList =
+          slotsRaw is List ? slotsRaw : (slotsRaw as Map).values.toList();
+      final slots =
+          slotsList.map<Map<String, String>>((slot) {
+            final time = slot['time'] as String;
+            final parts = time.split('-');
+            return {
+              'start': parts[0],
+              'end': parts.length > 1 ? parts[1] : parts[0],
+            };
+          }).toList();
+      result[key] = slots;
     }
     setState(() {
       weekAvailabilities = result;
@@ -86,7 +101,7 @@ class _DoctorQuickAvailabilityPageState
                     const SnackBar(content: Text('Availability saved!')),
                   );
                   Navigator.pop(context);
-                  await _loadWeekAvailabilities();
+                  await _loadAllAvailabilities();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Error while saving.')),
@@ -101,9 +116,50 @@ class _DoctorQuickAvailabilityPageState
 
   @override
   Widget build(BuildContext context) {
-    final weekDates = getWeekDates();
+    final allDates = getAllDates();
     final Color mainColor = const Color(0xFF03A6A1);
     final Color accentColor = const Color(0xFF0891B2);
+
+    // Filtrage par recherche et filtre
+    final now = DateTime.now();
+    final filteredDates =
+        allDates.where((date) {
+          final key = DateFormat('yyyy-MM-dd').format(date);
+          final slots = weekAvailabilities[key] ?? [];
+          // Recherche améliorée
+          final searchLower = search.toLowerCase();
+          final keyDisplay =
+              DateFormat('dd/MM/yyyy').format(date).toLowerCase();
+          final keyMonth =
+              DateFormat('MMM', 'en_US').format(date).toLowerCase();
+          final searchMatch =
+              search.isEmpty ||
+              key.contains(searchLower) ||
+              keyDisplay.contains(searchLower) ||
+              keyMonth.contains(searchLower) ||
+              slots.any(
+                (slot) =>
+                    slot['start']!.toLowerCase().contains(searchLower) ||
+                    slot['end']!.toLowerCase().contains(searchLower),
+              );
+          // Filtre par période
+          bool filterMatch = true;
+          final today = DateTime.now();
+          if (filter == 'Upcoming') {
+            filterMatch =
+                !date.isBefore(DateTime(today.year, today.month, today.day));
+          } else if (filter == 'Passed') {
+            filterMatch = date.isBefore(
+              DateTime(today.year, today.month, today.day),
+            );
+          } else if (filter == 'All') {
+            // On masque les passées sauf si recherche explicite
+            filterMatch =
+                !date.isBefore(DateTime(today.year, today.month, today.day));
+          }
+          return searchMatch && filterMatch;
+        }).toList();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainColor,
@@ -118,6 +174,18 @@ class _DoctorQuickAvailabilityPageState
         ),
         centerTitle: false,
         automaticallyImplyLeading: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list_alt, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AllAvailabilityPage()),
+              );
+            },
+            tooltip: 'View all availability',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: accentColor,
@@ -150,121 +218,214 @@ class _DoctorQuickAvailabilityPageState
                   ],
                 ),
               )
-              : ListView(
-                padding: const EdgeInsets.all(20),
-                children:
-                    weekDates.map((date) {
-                      final key = DateFormat('yyyy-MM-dd').format(date);
-                      final slots = weekAvailabilities[key] ?? [];
-                      if (slots.isEmpty) return const SizedBox.shrink();
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        margin: const EdgeInsets.only(bottom: 22),
-                        child: Card(
-                          elevation: 6,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          color: const Color(0xFFE6F7FA),
-                          child: Padding(
-                            padding: const EdgeInsets.all(22),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: mainColor.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Text(
-                                        DateFormat(
-                                          'EEE, dd MMM',
-                                          'en_US',
-                                        ).format(date),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0891B2),
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Wrap(
-                                  spacing: 12,
-                                  runSpacing: 10,
-                                  children: [
-                                    for (int i = 0; i < slots.length; i++)
-                                      AnimatedContainer(
-                                        duration: const Duration(
-                                          milliseconds: 250,
-                                        ),
-                                        curve: Curves.easeInOut,
-                                        child: Chip(
-                                          label: Text(
-                                            '${slots[i]['start']} - ${slots[i]['end']}',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF0891B2),
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                          backgroundColor: Colors.white,
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                          ),
-                                          deleteIcon: const Icon(
-                                            Icons.close,
-                                            size: 18,
-                                            color: Colors.redAccent,
-                                          ),
-                                          onDeleted: () async {
-                                            slots.removeAt(i);
-                                            await DoctorAvailabilityService.addAvailability(
-                                              date: date,
-                                              slots: slots,
-                                            );
-                                            await _loadWeekAvailabilities();
-                                            if (!mounted) return;
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Row(
-                                                  children: const [
-                                                    Icon(
-                                                      Icons.check_circle,
-                                                      color: Colors.white,
-                                                    ),
-                                                    SizedBox(width: 8),
-                                                    Text('Slot deleted.'),
-                                                  ],
-                                                ),
-                                                backgroundColor: mainColor,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ],
+              : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration: const InputDecoration(
+                              hintText: 'Search date or month...',
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder(),
+                              isDense: true,
                             ),
+                            onChanged: (v) => setState(() => search = v),
                           ),
                         ),
-                      );
-                    }).toList(),
+                        const SizedBox(width: 12),
+                        DropdownButton<String>(
+                          value: filter,
+                          items:
+                              filterOptions
+                                  .map(
+                                    (s) => DropdownMenuItem(
+                                      value: s,
+                                      child: Text(s),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (v) => setState(() => filter = v ?? 'All'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child:
+                        filteredDates.isEmpty
+                            ? const Center(
+                              child: Text('Availability not found'),
+                            )
+                            : ListView(
+                              padding: const EdgeInsets.all(20),
+                              children:
+                                  filteredDates.map((date) {
+                                    final key = DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(date);
+                                    final slots = weekAvailabilities[key] ?? [];
+                                    if (slots.isEmpty)
+                                      return const SizedBox.shrink();
+                                    return AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      margin: const EdgeInsets.only(bottom: 22),
+                                      child: Card(
+                                        elevation: 6,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                        ),
+                                        color: const Color(0xFFE6F7FA),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(22),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 14,
+                                                          vertical: 6,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: mainColor
+                                                          .withOpacity(0.15),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            16,
+                                                          ),
+                                                    ),
+                                                    child: Text(
+                                                      DateFormat(
+                                                        'EEE, dd MMM',
+                                                        'en_US',
+                                                      ).format(date),
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Color(
+                                                          0xFF0891B2,
+                                                        ),
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Wrap(
+                                                spacing: 12,
+                                                runSpacing: 10,
+                                                children: [
+                                                  for (
+                                                    int i = 0;
+                                                    i < slots.length;
+                                                    i++
+                                                  )
+                                                    AnimatedContainer(
+                                                      duration: const Duration(
+                                                        milliseconds: 250,
+                                                      ),
+                                                      curve: Curves.easeInOut,
+                                                      child: ConstrainedBox(
+                                                        constraints:
+                                                            const BoxConstraints(
+                                                              maxWidth: 200,
+                                                            ),
+                                                        child: Chip(
+                                                          label: Text(
+                                                            '${slots[i]['start']} - ${slots[i]['end']}',
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Color(
+                                                                    0xFF0891B2,
+                                                                  ),
+                                                                  fontSize: 15,
+                                                                ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          elevation: 2,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  16,
+                                                                ),
+                                                          ),
+                                                          deleteIcon: const Icon(
+                                                            Icons.close,
+                                                            size: 18,
+                                                            color:
+                                                                Colors
+                                                                    .redAccent,
+                                                          ),
+                                                          onDeleted: () async {
+                                                            slots.removeAt(i);
+                                                            await DoctorAvailabilityService.addAvailability(
+                                                              date: date,
+                                                              slots: slots,
+                                                            );
+                                                            await _loadAllAvailabilities();
+                                                            if (!mounted)
+                                                              return;
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            ).showSnackBar(
+                                                              SnackBar(
+                                                                content: Row(
+                                                                  children: const [
+                                                                    Icon(
+                                                                      Icons
+                                                                          .check_circle,
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width: 8,
+                                                                    ),
+                                                                    Text(
+                                                                      'Slot deleted.',
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                backgroundColor:
+                                                                    mainColor,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                  ),
+                ],
               ),
     );
   }

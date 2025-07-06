@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'doctor_profile_page.dart';
 import '../../services/patient_api_service.dart';
+import 'all_availability_page.dart';
 
 class DoctorsListScreen extends StatefulWidget {
   const DoctorsListScreen({super.key});
@@ -379,6 +380,20 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.list_alt),
+        label: const Text('View all availability'),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AllAvailabilityPage()),
+          );
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+      ),
     );
   }
 }
@@ -422,26 +437,17 @@ class DoctorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                doctor.image.isNotEmpty
-                    ? CircleAvatar(
-                      radius: 16,
-                      backgroundImage: AssetImage(doctor.image),
-                      backgroundColor:
-                          isSelected
-                              ? Colors.white.withAlpha((0.2 * 255).toInt())
-                              : Colors.grey[200],
-                    )
-                    : CircleAvatar(
-                      radius: 16,
-                      backgroundColor:
-                          isSelected
-                              ? Colors.white.withAlpha((0.2 * 255).toInt())
-                              : Colors.grey[200],
-                      child: Icon(
-                        Icons.person,
-                        color: isSelected ? Colors.white : Colors.grey[600],
-                      ),
-                    ),
+                Hero(
+                  tag: 'doctor-avatar-${doctor.id}',
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundImage: AssetImage(doctor.image),
+                    backgroundColor:
+                        isSelected
+                            ? Colors.white.withAlpha((0.2 * 255).toInt())
+                            : Colors.grey[200],
+                  ),
+                ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(

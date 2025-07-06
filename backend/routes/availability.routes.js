@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middlewares/auth.middleware");
-const { setAvailability, getAvailability, deleteAvailability, getAllAvailabilitiesForDoctor } = require("../controllers/availability.controller");
+const { setAvailability, deleteAvailability, getDoctorAvailabilitiesbyDate, getDoctorAllAvailabilities, getAllAvailabilities } = require("../controllers/availability.controller");
 
 router.post("/", auth(["doctor"]), setAvailability);
-router.get("/:doctorId", getAvailability);
-router.get('/all/:doctorId', getAllAvailabilitiesForDoctor);
 router.delete("/", auth(["doctor"]), deleteAvailability);
+router.get("/all", getAllAvailabilities);
+router.get("/all/:doctorId", getDoctorAllAvailabilities);
+router.get("/:doctorId", getDoctorAvailabilitiesbyDate);
 
 module.exports = router;

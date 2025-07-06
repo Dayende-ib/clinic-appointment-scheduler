@@ -255,10 +255,13 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundImage: AssetImage(widget.doctor.image),
-                          backgroundColor: Colors.grey[200],
+                        Hero(
+                          tag: 'doctor-avatar-${widget.doctor.id}',
+                          child: CircleAvatar(
+                            radius: 36,
+                            backgroundImage: AssetImage(widget.doctor.image),
+                            backgroundColor: Colors.grey[200],
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Text(

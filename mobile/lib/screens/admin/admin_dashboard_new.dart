@@ -255,6 +255,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
         backgroundColor: kPrimaryColor,
         foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
