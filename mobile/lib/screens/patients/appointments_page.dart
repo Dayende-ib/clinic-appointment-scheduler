@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/patient_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -32,7 +33,20 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       isLoading = true;
       error = null;
     });
+
     try {
+      // Vérifier si l'utilisateur est connecté
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null || token.isEmpty) {
+        setState(() {
+          isLoading = false;
+          error = 'Please login to view your appointments';
+        });
+        return;
+      }
+
       final data = await PatientApiService.getMyAppointments();
       setState(() {
         appointments = data;
@@ -43,6 +57,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         error = e.toString();
         isLoading = false;
       });
+
+      // Si l'erreur est liée à l'authentification, rediriger vers la connexion
+      if (e.toString().contains('Token not found') ||
+          e.toString().contains('Unauthorized') ||
+          e.toString().contains('AUTH_ERROR')) {
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     }
   }
 
@@ -78,7 +101,39 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Error: $error'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            const Text(
+              'Failed to load appointments',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error ?? 'Unknown error occurred',
+              style: const TextStyle(fontSize: 14, color: Color(0xFF9CA3AF)),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loadAppointments,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
     }
     return Scaffold(
       appBar: AppBar(

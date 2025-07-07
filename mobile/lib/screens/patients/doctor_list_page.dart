@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async'; // Ajout pour Timer
 import 'doctor_profile_page.dart';
 import '../../services/patient_api_service.dart';
 import 'all_availability_page.dart';
+import '../../providers/doctors_provider.dart';
 
-class DoctorsListScreen extends StatefulWidget {
+class DoctorsListScreen extends ConsumerStatefulWidget {
   const DoctorsListScreen({super.key});
 
   @override
-  DoctorsListScreenState createState() => DoctorsListScreenState();
+  ConsumerState<DoctorsListScreen> createState() => _DoctorsListScreenState();
 }
 
-class DoctorsListScreenState extends State<DoctorsListScreen> {
+class _DoctorsListScreenState extends ConsumerState<DoctorsListScreen> {
   final Color primaryColor = Color(0xFF03A6A1);
   final Color secondaryColor = Color(0xFF0891B2);
   Timer? _searchDebounce; // Timer pour debouncer la recherche
@@ -35,39 +37,16 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   String? selectedCity;
   String search = '';
 
-  List<Map<String, dynamic>> doctors = [];
-  bool isLoading = true;
-  String? error;
-
   @override
   void initState() {
     super.initState();
-    _loadDoctors();
+    // Plus besoin d'appel manuel - le provider s'auto-initialise
   }
 
   @override
   void dispose() {
     _searchDebounce?.cancel(); // Annuler le timer lors de la destruction
     super.dispose();
-  }
-
-  Future<void> _loadDoctors() async {
-    setState(() {
-      isLoading = true;
-      error = null;
-    });
-    try {
-      final data = await PatientApiService.getDoctorsList();
-      setState(() {
-        doctors = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
-    }
   }
 
   final List<String> specialties = [
@@ -83,6 +62,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   ];
 
   List<String> get countries {
+    final doctors = ref.watch(doctorsProvider).doctors;
     final set = <String>{};
     for (final d in doctors) {
       final c = (d['country'] ?? '').toString().trim();
@@ -92,10 +72,13 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   }
 
   List<String> get cities {
+    final doctors = ref.watch(doctorsProvider).doctors;
+    final state = ref.watch(doctorsProvider);
     final set = <String>{};
     for (final d in doctors) {
-      if (selectedCountry != null && selectedCountry != 'All countries') {
-        if ((d['country'] ?? '') != selectedCountry) continue;
+      if (state.selectedCountry != null &&
+          state.selectedCountry != 'All countries') {
+        if ((d['country'] ?? '') != state.selectedCountry) continue;
       }
       final c = (d['city'] ?? '').toString().trim();
       if (c.isNotEmpty) set.add(c);
@@ -104,7 +87,9 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   }
 
   List<Doctor> get filteredDoctors {
+    final doctors = ref.watch(doctorsProvider).doctors;
     final searchLower = search.toLowerCase();
+
     return doctors
         .where((d) {
           final matchesSpecialty =
@@ -145,7 +130,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
         .map(
           (d) => Doctor(
             id: d['_id'] ?? d['id'] ?? '',
-            name: '${d['firstname'] ?? ''} ${d['lastname'] ?? ''}',
+            name: '${d['firstname'] ?? ''} ${d['lastname'] ?? ''}'.trim(),
             specialty: d['specialty'] ?? '',
             image: d['image'] ?? 'assets/images/male-doctor-icon.png',
             country: d['country'] ?? '',
@@ -164,12 +149,12 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
       builder:
           (context) => FilterBottomSheet(
             specialties: specialties,
-            selectedSpecialty: selectedSpecialty,
+            selectedSpecialty: ref.watch(doctorsProvider).selectedSpecialty,
             primaryColor: primaryColor,
             onSpecialtySelected: (specialty) {
-              setState(() {
-                selectedSpecialty = specialty;
-              });
+              ref
+                  .read(doctorsProvider.notifier)
+                  .setSelectedSpecialty(specialty);
               Navigator.pop(context);
             },
           ),
@@ -178,12 +163,113 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final doctorsState = ref.watch(doctorsProvider);
+    final filteredDoctors = ref.watch(filteredDoctorsProvider);
+    final isLoading = ref.watch(doctorsLoadingProvider);
+    final error = ref.watch(doctorsErrorProvider);
+
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'Loading doctors...',
+                style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
+              ),
+            ],
+          ),
+        ),
+      );
     }
+
     if (error != null) {
-      return Center(child: Text('Error: $error'));
+      return Scaffold(
+        backgroundColor: Color(0xFFF5F7FA),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            "Doctors List",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () {
+                ref.read(doctorsProvider.notifier).refreshDoctors();
+              },
+              icon: const Icon(Icons.refresh, color: Color(0xFF6B7280)),
+              tooltip: 'Refresh doctors list',
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height - 100, // Hauteur ajustée
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Failed to load doctors',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.length > 200
+                          ? '${error.substring(0, 200)}...'
+                          : error,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF9CA3AF),
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        ref.read(doctorsProvider.notifier).clearError();
+                        ref.read(doctorsProvider.notifier).loadDoctors();
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
     }
+
     return Scaffold(
       backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -199,6 +285,15 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              ref.read(doctorsProvider.notifier).refreshDoctors();
+            },
+            icon: const Icon(Icons.refresh, color: Color(0xFF6B7280)),
+            tooltip: 'Refresh doctors list',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -225,8 +320,9 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                     icon: Icon(
                       Icons.tune,
                       color:
-                          selectedSpecialty != null &&
-                                  selectedSpecialty != 'All specialties'
+                          doctorsState.selectedSpecialty != null &&
+                                  doctorsState.selectedSpecialty !=
+                                      'All specialties'
                               ? primaryColor
                               : Colors.grey[400],
                     ),
@@ -239,12 +335,12 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                   ),
                 ),
                 onChanged: (v) {
-                  _searchDebounce?.cancel(); // Annuler le timer précédent
+                  _searchDebounce?.cancel();
                   _searchDebounce = Timer(
                     const Duration(milliseconds: 300),
                     () {
                       if (mounted) {
-                        setState(() => search = v);
+                        ref.read(doctorsProvider.notifier).setSearchQuery(v);
                       }
                     },
                   );
@@ -252,8 +348,8 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
               ),
             ),
           ),
-          if (selectedSpecialty != null &&
-              selectedSpecialty != 'All specialties')
+          if (doctorsState.selectedSpecialty != null &&
+              doctorsState.selectedSpecialty != 'All specialties')
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -271,7 +367,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          selectedSpecialty!,
+                          doctorsState.selectedSpecialty!,
                           style: TextStyle(
                             color: primaryColor,
                             fontSize: 12,
@@ -281,9 +377,9 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                         SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              selectedSpecialty = null;
-                            });
+                            ref
+                                .read(doctorsProvider.notifier)
+                                .setSelectedSpecialty(null);
                           },
                           child: Icon(
                             Icons.close,
@@ -308,7 +404,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
               children: [
                 Expanded(
                   child: DropdownButton<String>(
-                    value: selectedCountry ?? 'All countries',
+                    value: doctorsState.selectedCountry ?? 'All countries',
                     isExpanded: true,
                     items:
                         countries
@@ -317,17 +413,16 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                             )
                             .toList(),
                     onChanged: (val) {
-                      setState(() {
-                        selectedCountry = val;
-                        selectedCity = null; // reset city when country changes
-                      });
+                      ref
+                          .read(doctorsProvider.notifier)
+                          .setSelectedCountry(val);
                     },
                   ),
                 ),
                 SizedBox(width: 8),
                 Expanded(
                   child: DropdownButton<String>(
-                    value: selectedCity ?? 'All cities',
+                    value: doctorsState.selectedCity ?? 'All cities',
                     isExpanded: true,
                     items:
                         cities
@@ -336,9 +431,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                             )
                             .toList(),
                     onChanged: (val) {
-                      setState(() {
-                        selectedCity = val;
-                      });
+                      ref.read(doctorsProvider.notifier).setSelectedCity(val);
                     },
                   ),
                 ),
@@ -393,7 +486,19 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                         ),
                         itemCount: filteredDoctors.length,
                         itemBuilder: (context, index) {
-                          final doctor = filteredDoctors[index];
+                          final doctorData = filteredDoctors[index];
+                          final doctor = Doctor(
+                            id: doctorData['_id'] ?? doctorData['id'] ?? '',
+                            name:
+                                '${doctorData['firstname'] ?? ''} ${doctorData['lastname'] ?? ''}',
+                            specialty: doctorData['specialty'] ?? '',
+                            image:
+                                doctorData['image'] ??
+                                'assets/images/male-doctor-icon.png',
+                            country: doctorData['country'] ?? '',
+                            city: doctorData['city'] ?? '',
+                            phone: doctorData['phone'] ?? '',
+                          );
                           final isSelected = selectedDoctorIndex == index;
                           final cardColor =
                               cardColors[index % cardColors.length];

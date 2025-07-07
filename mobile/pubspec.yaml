@@ -15,6 +15,14 @@ dependencies:
   intl: ^0.20.2
   http: ^1.4.0
   shared_preferences: ^2.5.3
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  firebase_messaging: ^14.7.20
+  firebase_core: ^2.27.1
+  flutter_local_notifications: ^17.2.2
+  web_socket_channel: ^2.4.0
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -22,6 +30,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.0
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.8
+  mockito: ^5.4.4
 
 flutter:
 
