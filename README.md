@@ -61,9 +61,9 @@ clinic-appointment-scheduler/
 
 ## Auteurs (Groupe 04)
 
-- [GUISSOU Ali]
-- [MADIEGA Aida]
-- [OUGDA Ibrahim]
+- **GUISSOU Ali**
+- **MADIEGA Aida**
+- **OUGDA Ibrahim** (o.ibrahimdayende@gmail.com)
 
 ## Licence
 
