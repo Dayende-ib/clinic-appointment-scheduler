@@ -1,7 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 // URL de base de l'API
-const String apiBaseUrl = 'http://localhost:5000';
+const String apiBaseUrl =
+    'https://clinic-appointment-scheduler-backend.onrender.com';
 
 // Fonction pour obtenir l'URL personnalisée
 Future<String> getCustomApiUrl() async {

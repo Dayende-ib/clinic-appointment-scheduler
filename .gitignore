@@ -1,1 +1,84 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+*~
+*.swp
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.suo
+nbproject/
+
+# --- Backend (Node.js) ---
+# Dependencies
+backend/node_modules/
+
+# Environment variables
 backend/.env
+backend/.env.local
+backend/.env.development.local
+backend/.env.test.local
+backend/.env.production.local
+
+# Build outputs
+backend/dist/
+backend/build/
+
+# Logs
+backend/logs/
+backend/*.log
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+
+# Coverage
+backend/coverage/
+
+
+# --- Mobile (Flutter) ---
+# Flutter/Dart/Pub related
+mobile/.dart_tool/
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# IDE specific files
+mobile/*.iml
+mobile/.idea/
+
+# iOS build artifacts
+mobile/ios/Pods/
+mobile/ios/Flutter/App.framework
+mobile/ios/Flutter/Flutter.framework
+mobile/ios/Flutter/ephemeral/
+mobile/ios/.symlinks/
+mobile/ios/Runner/GeneratedPluginRegistrant.h
+mobile/ios/Runner/GeneratedPluginRegistrant.m
+mobile/ios/Flutter/Debug.xcconfig
+mobile/ios/Flutter/Release.xcconfig
+
+# Android build artifacts
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/app/build/
+mobile/android/app/debug/
+mobile/android/app/profile/
+mobile/android/app/release/
+
+# Obfuscation artifacts
+mobile/*.symbols
+mobile/*.map.json
+
+# --- Documentation ---
+# Ignore built documentation if any, e.g. from Sphinx or other tools
+documentation/_build/
+documentation/build/
+
+# --- Other ---
+# Ignore temporary directory if used by any tool
+/tmp/

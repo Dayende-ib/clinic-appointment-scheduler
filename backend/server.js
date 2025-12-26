@@ -27,6 +27,16 @@ if (!process.env.JWT_SECRET || !process.env.MONGO_URI) {
   process.exit(1);
 }
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+// Route racine simple pour vérification du serveur
+app.get('/', (req, res) => {
+  res.status(200).send('serveur actif');
+});
+
+
 // Routes
 app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/appointments", require("./routes/appointment.routes"));
@@ -71,7 +81,7 @@ setInterval(async () => {
 // Démarrer serveur
 const PORT = process.env.PORT || 5000;
 
-
-app.listen(PORT, () => console.log(`🚀 Serveur en écoute sur le port ${PORT}`));
+// Listen sur l'interface 0.0.0.0 pour les environnements cloud (Render)
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Serveur en écoute sur le port ${PORT}`));
 
 
