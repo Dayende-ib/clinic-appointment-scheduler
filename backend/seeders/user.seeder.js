@@ -27,7 +27,7 @@ module.exports = async function() {
       role: 'doctor',
       specialty: 'Cardiology',
       licenseNumber: 'DOC001',
-      country: 'Bénin',
+      country: 'Burkina Faso',
       city: 'Ouagadougou',
       phone: '+22670000002',
       dateOfBirth: new Date('1980-05-10'),

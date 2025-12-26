@@ -42,29 +42,37 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   }
 
   Future<void> _loadAppointments() async {
-    setState(() {
-      isLoading = true;
-      error = null;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+    }
     try {
       final data = await PatientApiService.getMyAppointments();
-      setState(() {
-        appointments = data;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          appointments = data;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          error = e.toString();
+          isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _loadDoctors() async {
-    setState(() {
-      _isLoadingDoctors = true;
-      _doctorError = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoadingDoctors = true;
+        _doctorError = null;
+      });
+    }
     try {
       final data = await PatientApiService.getDoctorsList();
       final doctors =
@@ -78,16 +86,20 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                 ),
               )
               .toList();
-      setState(() {
-        _doctors = doctors;
-        _selectedDoctor = doctors.isNotEmpty ? doctors[0] : null;
-        _isLoadingDoctors = false;
-      });
+      if (mounted) {
+        setState(() {
+          _doctors = doctors;
+          _selectedDoctor = doctors.isNotEmpty ? doctors[0] : null;
+          _isLoadingDoctors = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _doctorError = e.toString();
-        _isLoadingDoctors = false;
-      });
+      if (mounted) {
+        setState(() {
+          _doctorError = e.toString();
+          _isLoadingDoctors = false;
+        });
+      }
     }
   }
 

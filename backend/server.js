@@ -8,8 +8,6 @@ const Appointment = require("./models/Appointment");
 
 const app = express();
 
-
-
 // Middlewares
 app.use(express.json());
 app.use(helmet());
@@ -39,6 +37,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/patients", require("./routes/patient.routes.js"));
 app.use("/api/appointments", require("./routes/appointment.routes"));
 app.use("/api/availability", require("./routes/availability.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
