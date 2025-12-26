@@ -189,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           'Profile',
           style: TextStyle(
@@ -560,7 +560,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           'Edit profile',
           style: TextStyle(

@@ -75,6 +75,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body:
           isLoading
