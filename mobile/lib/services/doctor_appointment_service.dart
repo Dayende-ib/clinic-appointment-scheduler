@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
 class DoctorAppointmentService {
-  static final String baseUrl = '${apiBaseUrl}/api/appointments/me';
+  static final String baseUrl = '$apiBaseUrl/api/appointments/me';
 
   static Future<List<Map<String, dynamic>>> fetchDoctorAppointments() async {
     final prefs = await SharedPreferences.getInstance();
@@ -59,7 +59,7 @@ class DoctorAppointmentService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.patch(
-      Uri.parse('${apiBaseUrl}/api/appointments/$appointmentId/status'),
+      Uri.parse('$apiBaseUrl/api/appointments/$appointmentId/status'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ class DoctorAppointmentService {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.patch(
-      Uri.parse('${apiBaseUrl}/api/appointments/$appointmentId/status'),
+      Uri.parse('$apiBaseUrl/api/appointments/$appointmentId/status'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

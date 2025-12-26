@@ -190,7 +190,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                         const SizedBox(height: 16),
                         // Reason dropdown
                         DropdownButtonFormField<String>(
-                          value: _selectedReason,
+                          initialValue: _selectedReason,
                           decoration: const InputDecoration(
                             labelText: 'Reason *',
                             border: OutlineInputBorder(),

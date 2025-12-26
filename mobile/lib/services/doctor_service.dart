@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
 class DoctorService {
-  static final String baseUrl = '${apiBaseUrl}/api/users/me';
+  static final String baseUrl = '$apiBaseUrl/api/users/me';
 
   static Future<Map<String, dynamic>?> fetchDoctorProfile() async {
     final prefs = await SharedPreferences.getInstance();

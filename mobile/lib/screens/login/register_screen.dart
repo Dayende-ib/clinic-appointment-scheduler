@@ -285,7 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _selectedGender,
+                                initialValue: _selectedGender,
                                 decoration: const InputDecoration(
                                   labelText: 'Gender',
                                   prefixIcon: Icon(Icons.wc_outlined),
@@ -322,7 +322,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         // Champ pays remplacé par un dropdown
                         DropdownButtonFormField<String>(
-                          value: _selectedCountry,
+                          initialValue: _selectedCountry,
                           decoration: const InputDecoration(
                             labelText: 'Country',
                             prefixIcon: Icon(Icons.flag_outlined),
@@ -363,7 +363,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         if (_isDoctor) ...[
                           DropdownButtonFormField<String>(
-                            value: _selectedSpecialty,
+                            initialValue: _selectedSpecialty,
                             decoration: const InputDecoration(
                               labelText: 'Specialty',
                               prefixIcon: Icon(Icons.medical_services_outlined),

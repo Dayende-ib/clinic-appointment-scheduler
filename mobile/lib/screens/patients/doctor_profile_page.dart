@@ -384,7 +384,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownButtonFormField<String>(
-                            value: _selectedReason,
+                            initialValue: _selectedReason,
                             decoration: const InputDecoration(
                               labelText: 'Reason',
                               border: OutlineInputBorder(),

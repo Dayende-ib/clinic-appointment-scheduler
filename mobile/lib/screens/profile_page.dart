@@ -647,7 +647,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: selectedCountry,
+                  initialValue: selectedCountry,
                   decoration: const InputDecoration(labelText: 'Country'),
                   items:
                       countryList
@@ -667,7 +667,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: selectedCity,
+                  initialValue: selectedCity,
                   decoration: const InputDecoration(labelText: 'City'),
                   items:
                       cities

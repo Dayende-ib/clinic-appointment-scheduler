@@ -269,8 +269,9 @@ class _DoctorQuickAvailabilityPageState
                                       'yyyy-MM-dd',
                                     ).format(date);
                                     final slots = weekAvailabilities[key] ?? [];
-                                    if (slots.isEmpty)
+                                    if (slots.isEmpty) {
                                       return const SizedBox.shrink();
+                                    }
                                     return AnimatedContainer(
                                       duration: const Duration(
                                         milliseconds: 300,
@@ -384,8 +385,9 @@ class _DoctorQuickAvailabilityPageState
                                                               slots: slots,
                                                             );
                                                             await _loadAllAvailabilities();
-                                                            if (!mounted)
+                                                            if (!mounted) {
                                                               return;
+                                                            }
                                                             ScaffoldMessenger.of(
                                                               context,
                                                             ).showSnackBar(
