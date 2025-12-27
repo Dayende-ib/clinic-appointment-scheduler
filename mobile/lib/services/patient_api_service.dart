@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
 class PatientApiService {
-  static final String baseUrl = '$apiBaseUrl/api/patients';
+  // Routes backend: /api/appointments, /api/availability, etc (pas de /patients)
+  static final String appointmentsUrl = '$apiBaseUrl/api/appointments';
+  static final String availabilityUrl = '$apiBaseUrl/api/availability';
 
   // Cache simple pour les données
   static final Map<String, dynamic> _cache = {};
@@ -46,7 +48,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.get(
-      Uri.parse('$baseUrl/doctors'),
+      Uri.parse('$apiBaseUrl/api/users/doctors'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -69,7 +71,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.get(
-      Uri.parse('$baseUrl/availability/$doctorId?date=$date'),
+      Uri.parse('$availabilityUrl/$doctorId?date=$date'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -85,7 +87,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.get(
-      Uri.parse('$baseUrl/appointments/me'),
+      Uri.parse('$appointmentsUrl/me'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -105,7 +107,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.post(
-      Uri.parse('$baseUrl/appointments'),
+      Uri.parse('$appointmentsUrl'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -124,7 +126,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.patch(
-      Uri.parse('$baseUrl/appointments/$appointmentId/status'),
+      Uri.parse('$appointmentsUrl/$appointmentId/status'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -141,7 +143,7 @@ class PatientApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final response = await http.patch(
-      Uri.parse('$baseUrl/appointments/$appointmentId/reschedule'),
+      Uri.parse('$appointmentsUrl/$appointmentId/reschedule'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
