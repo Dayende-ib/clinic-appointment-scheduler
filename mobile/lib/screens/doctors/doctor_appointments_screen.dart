@@ -509,7 +509,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               subtitle: Text(
-                                '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}',
+                                '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} Ã  ${DateFormat('HH:mm').format(date)}',
                               ),
                               trailing: SizedBox(
                                 width: 80,
