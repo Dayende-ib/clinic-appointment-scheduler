@@ -5,6 +5,7 @@ import '../../services/patient_api_service.dart';
 import 'doctor_profile_page.dart';
 import 'doctor_list_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/strings.dart';
 
 class AllAvailabilityPage extends StatefulWidget {
   const AllAvailabilityPage({super.key});
@@ -18,18 +19,12 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
   List<Map<String, dynamic>> allAvailabilities = [];
   String? error;
   String search = '';
-  String selectedSpecialty = 'All specialties';
+  String selectedSpecialty = AppStrings.patientAllSpecialties;
   final TextEditingController _reasonController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   String? _selectedReason;
 
-  final List<String> _motifs = [
-    'Consultation',
-    'Prescription renewal',
-    'Test results',
-    'Follow-up',
-    'Other',
-  ];
+  final List<String> _motifs = AppStrings.patientMotifs;
 
   List<String> get specialties {
     final set = <String>{};
@@ -37,7 +32,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
       final s = (avail['specialty'] ?? '').toString().trim();
       if (s.isNotEmpty) set.add(s);
     }
-    return ['All specialties', ...set.toList()..sort()];
+    return [AppStrings.patientAllSpecialties, ...set.toList()..sort()];
   }
 
   @override
@@ -54,12 +49,10 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
     try {
       final response = await DoctorAvailabilityService.getAllAvailabilities();
 
-      // Vérifier si l'utilisateur connecté est un docteur
       final prefs = await SharedPreferences.getInstance();
       final userRole = prefs.getString('role');
       final currentUserId = prefs.getString('userId');
 
-      // Filtrer les disponibilités si l'utilisateur est un docteur
       List<Map<String, dynamic>> filteredResponse = response;
       if (userRole == 'doctor' && currentUserId != null) {
         filteredResponse =
@@ -105,7 +98,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
           dateStr.contains(searchLower) ||
           slotMatch;
       final matchesSpecialty =
-          selectedSpecialty == 'All specialties' ||
+          selectedSpecialty == AppStrings.patientAllSpecialties ||
           specialty == selectedSpecialty.toLowerCase();
       return matchesSearch && matchesSpecialty;
     }).toList();
@@ -121,7 +114,6 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
     final doctorId = avail['doctorId'] ?? '';
     final slotTime = slot['time'] ?? '';
 
-    // Reset form
     _reasonController.clear();
     _notesController.clear();
     _selectedReason = null;
@@ -135,9 +127,12 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                 (context, setDialogState) => AlertDialog(
                   title: Row(
                     children: [
-                      Icon(Icons.calendar_today, color: Colors.deepPurple),
+                      const Icon(
+                        Icons.calendar_today,
+                        color: Colors.deepPurple,
+                      ),
                       const SizedBox(width: 8),
-                      const Text('Book Appointment'),
+                      const Text(AppStrings.patientBookAppointmentTitle),
                     ],
                   ),
                   content: SingleChildScrollView(
@@ -175,24 +170,24 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                         ),
                         const SizedBox(height: 16),
                         // Appointment details
-                        Text(
-                          'Appointment Details',
-                          style: const TextStyle(
+                        const Text(
+                          AppStrings.patientAppointmentDetails,
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'en_US').format(date)}',
+                          '${AppStrings.patientDateLabel}: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
                         ),
-                        Text('Time: $slotTime'),
+                        Text('${AppStrings.patientTimeLabel}: $slotTime'),
                         const SizedBox(height: 16),
                         // Reason dropdown
                         DropdownButtonFormField<String>(
                           initialValue: _selectedReason,
                           decoration: const InputDecoration(
-                            labelText: 'Reason *',
+                            labelText: AppStrings.patientReasonRequired,
                             border: OutlineInputBorder(),
                           ),
                           items:
@@ -210,7 +205,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                           validator:
                               (val) =>
                                   val == null || val.isEmpty
-                                      ? 'Please choose a reason'
+                                      ? AppStrings.patientPleaseChooseReason
                                       : null,
                         ),
                         const SizedBox(height: 12),
@@ -219,9 +214,9 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                           controller: _notesController,
                           maxLines: 3,
                           decoration: const InputDecoration(
-                            labelText: 'Notes (optional)',
+                            labelText: AppStrings.patientNotesOptional,
                             border: OutlineInputBorder(),
-                            hintText: 'Any additional information...',
+                            hintText: AppStrings.patientAdditionalInfoHint,
                           ),
                         ),
                       ],
@@ -230,7 +225,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(dialogContext).pop(),
-                      child: const Text('Cancel'),
+                      child: const Text(AppStrings.patientCancel),
                     ),
                     ElevatedButton(
                       onPressed: () async {
@@ -238,7 +233,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                             _selectedReason!.isEmpty) {
                           ScaffoldMessenger.of(dialogContext).showSnackBar(
                             const SnackBar(
-                              content: Text('Please select a reason'),
+                              content: Text(AppStrings.patientSelectReason),
                             ),
                           );
                           return;
@@ -246,7 +241,6 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
 
                         Navigator.of(dialogContext).pop();
 
-                        // Book the appointment
                         final success = await _bookAppointment(
                           doctorId: doctorId,
                           date: date,
@@ -258,19 +252,17 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                                   : null,
                         );
 
-                        // Use the original context for SnackBar
                         if (mounted) {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
-                                  'Appointment booked successfully!',
+                                  AppStrings.patientAppointmentBookedSuccess,
                                 ),
                                 backgroundColor: Colors.green,
                                 duration: Duration(seconds: 2),
                               ),
                             );
-                            // Fermer la page après un délai
                             Future.delayed(const Duration(seconds: 2), () {
                               if (mounted) {
                                 Navigator.of(context).pop();
@@ -279,7 +271,9 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Error booking appointment'),
+                                content: Text(
+                                  AppStrings.patientAppointmentBookedError,
+                                ),
                                 backgroundColor: Colors.red,
                                 duration: Duration(seconds: 3),
                               ),
@@ -291,7 +285,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Book Appointment'),
+                      child: const Text(AppStrings.patientBookAppointmentTitle),
                     ),
                   ],
                 ),
@@ -307,7 +301,6 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
     String? notes,
   }) async {
     try {
-      // Parse slot time to get hour
       final hour = slotTime.split(':')[0];
       final dateStr =
           '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -330,7 +323,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Availabilities'),
+        title: const Text(AppStrings.patientAllAvailabilitiesTitle),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),
@@ -339,7 +332,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : error != null
-              ? Center(child: Text('Erreur: $error'))
+              ? Center(child: Text('${AppStrings.errorPrefix}$error'))
               : Column(
                 children: [
                   Padding(
@@ -349,8 +342,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                         Expanded(
                           child: TextField(
                             decoration: const InputDecoration(
-                              hintText:
-                                  'Search doctor, specialty, date or hour...',
+                              hintText: AppStrings.patientSearchAvailabilityHint,
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(),
                               isDense: true,
@@ -373,7 +365,8 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                           onChanged:
                               (v) => setState(
                                 () =>
-                                    selectedSpecialty = v ?? 'All specialties',
+                                    selectedSpecialty =
+                                        v ?? AppStrings.patientAllSpecialties,
                               ),
                         ),
                       ],
@@ -384,7 +377,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                     child:
                         filteredAvailabilities.isEmpty
                             ? const Center(
-                              child: Text('No availability found.'),
+                              child: Text(AppStrings.patientNoAvailabilityFound),
                             )
                             : ListView.builder(
                               padding: const EdgeInsets.all(16),
@@ -419,7 +412,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                                       children: [
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.calendar_today,
                                               color: Colors.deepPurple,
                                             ),
@@ -427,7 +420,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                                             Text(
                                               DateFormat(
                                                 'EEEE d MMMM yyyy',
-                                                'en_US',
+                                                'fr_FR',
                                               ).format(date),
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
@@ -439,7 +432,7 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                                         const SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.person,
                                               color: Colors.teal,
                                             ),
@@ -488,30 +481,29 @@ class _AllAvailabilityPageState extends State<AllAvailabilityPage> {
                                                     context,
                                                     MaterialPageRoute(
                                                       builder:
-                                                          (
-                                                            context,
-                                                          ) => DoctorProfileScreen(
-                                                            doctor: Doctor(
-                                                              id: doctorId,
-                                                              name: doctorName,
-                                                              specialty:
-                                                                  specialty,
-                                                              image:
-                                                                  doctorImage,
-                                                              country:
-                                                                  doctorCountry,
-                                                              city: doctorCity,
-                                                              phone:
-                                                                  doctorPhone,
-                                                            ),
-                                                          ),
+                                                          (context) =>
+                                                              DoctorProfileScreen(
+                                                                doctor: Doctor(
+                                                                  id: doctorId,
+                                                                  name:
+                                                                      doctorName,
+                                                                  specialty:
+                                                                      specialty,
+                                                                  image:
+                                                                      doctorImage,
+                                                                  country:
+                                                                      doctorCountry,
+                                                                  city:
+                                                                      doctorCity,
+                                                                  phone:
+                                                                      doctorPhone,
+                                                                ),
+                                                              ),
                                                     ),
                                                   );
                                                 },
                                                 child: Chip(
-                                                  label: Text(
-                                                    slot['time'] ?? '',
-                                                  ),
+                                                  label: Text(slot['time'] ?? ''),
                                                   backgroundColor: Colors
                                                       .deepPurple
                                                       .withOpacity(0.08),

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password_screen.dart';
 import 'package:caretime/api_config.dart';
+import 'package:caretime/strings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,13 +20,13 @@ class _LoginPageState extends State<LoginScreen> {
 
   String? _validateEmail(String value) {
     final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}');
-    if (value.isEmpty) return 'Please enter your email';
-    if (!emailRegex.hasMatch(value)) return 'Invalid email';
+    if (value.isEmpty) return AppStrings.enterEmail;
+    if (!emailRegex.hasMatch(value)) return AppStrings.invalidEmail;
     return null;
   }
 
   String? _validatePassword(String value) {
-    if (value.isEmpty) return 'Please enter a password';
+    if (value.isEmpty) return AppStrings.enterPassword;
     return null;
   }
 
@@ -63,7 +64,9 @@ class _LoginPageState extends State<LoginScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        ).showSnackBar(
+          const SnackBar(content: Text(AppStrings.loginSuccess)),
+        );
         await Future.delayed(const Duration(milliseconds: 800));
         if (!mounted) return;
         if (role == 'doctor') {
@@ -77,12 +80,16 @@ class _LoginPageState extends State<LoginScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Invalid credentials.')));
+        ).showSnackBar(
+          const SnackBar(content: Text(AppStrings.invalidCredentials)),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Network or server error.')));
+      ).showSnackBar(
+        const SnackBar(content: Text(AppStrings.networkError)),
+      );
     }
   }
 
@@ -109,7 +116,7 @@ class _LoginPageState extends State<LoginScreen> {
 
               const SizedBox(height: 4),
               const Text(
-                'Your health, our priority',
+                AppStrings.subtitle,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w500,
@@ -121,7 +128,7 @@ class _LoginPageState extends State<LoginScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Email",
+                  AppStrings.emailLabel,
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 20,
@@ -134,7 +141,7 @@ class _LoginPageState extends State<LoginScreen> {
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
-                  hintText: 'Enter your email',
+                  hintText: AppStrings.emailHint,
                   fillColor: Color(0xFFF8FAFC),
                   filled: true,
                   border: OutlineInputBorder(
@@ -158,7 +165,7 @@ class _LoginPageState extends State<LoginScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Password",
+                  AppStrings.passwordLabel,
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 20,
@@ -172,7 +179,7 @@ class _LoginPageState extends State<LoginScreen> {
                 controller: passwordController,
                 obscureText: !isPasswordVisible,
                 decoration: InputDecoration(
-                  hintText: 'Enter your password',
+                  hintText: AppStrings.passwordHint,
                   fillColor: Color(0xFFF8FAFC),
                   filled: true,
                   border: OutlineInputBorder(
@@ -217,7 +224,7 @@ class _LoginPageState extends State<LoginScreen> {
                     );
                   },
                   child: const Text(
-                    'Forgot password?',
+                    AppStrings.forgotPassword,
                     style: TextStyle(color: Color(0xFF0891B2)),
                   ),
                 ),
@@ -245,7 +252,7 @@ class _LoginPageState extends State<LoginScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Log in',
+                    AppStrings.loginButton,
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -255,7 +262,7 @@ class _LoginPageState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't have an account? ",
+                    AppStrings.noAccount,
                     style: TextStyle(color: Color(0xFF374151)),
                   ),
                   GestureDetector(
@@ -263,7 +270,7 @@ class _LoginPageState extends State<LoginScreen> {
                       Navigator.pushNamed(context, '/register');
                     },
                     child: const Text(
-                      "Sign up",
+                      AppStrings.signUp,
                       style: TextStyle(
                         color: Color(0xFF0891B2),
                         fontWeight: FontWeight.bold,

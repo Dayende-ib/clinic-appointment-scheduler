@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/patient_api_service.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -51,13 +52,13 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     if (success) {
       await _loadAppointments();
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Appointment canceled.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.patientAppointmentCanceled)),
+      );
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error while canceling appointment.')),
+        const SnackBar(content: Text(AppStrings.patientCancelError)),
       );
     }
   }
@@ -78,11 +79,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Error: $error'));
+      return Center(child: Text('${AppStrings.errorPrefix}$error'));
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Appointments'),
+        title: const Text(AppStrings.patientAppointmentsTitle),
         backgroundColor: kPrimaryColor,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -91,7 +92,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -100,17 +101,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: "Search for appointment...",
+                  hintText: AppStrings.patientSearchAppointmentHint,
                   hintStyle: TextStyle(color: Colors.grey[400]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -133,7 +134,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'No appointments yet',
+                            AppStrings.patientNoAppointmentsTitle,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
@@ -142,7 +143,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Your appointments will appear here',
+                            AppStrings.patientNoAppointmentsSubtitle,
                             style: TextStyle(
                               fontSize: 14,
                               color: Color(0xFF9CA3AF),
@@ -205,11 +206,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                 width: 4,
                               ),
                             ),
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                 color: Colors.black12,
                                 blurRadius: 10,
-                                offset: const Offset(0, 2),
+                                offset: Offset(0, 2),
                               ),
                             ],
                           ),
@@ -242,7 +243,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                           Text(
                                             doctorName.isNotEmpty
                                                 ? doctorName
-                                                : 'Unknown Doctor',
+                                                : AppStrings.patientUnknownDoctor,
                                             style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
@@ -270,9 +271,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _buildMetaRow('📅', dateStr),
-                                        _buildMetaRow('🕙', timeStr),
-                                        _buildMetaRow('💬', reason),
+                                        _buildMetaRow(
+                                          AppStrings.patientDateLabel,
+                                          dateStr,
+                                        ),
+                                        _buildMetaRow(
+                                          AppStrings.patientTimeLabel,
+                                          timeStr,
+                                        ),
+                                        _buildMetaRow(
+                                          AppStrings.patientReasonLabel,
+                                          reason,
+                                        ),
                                       ],
                                     ),
                                     _buildStatusBadge(status),
@@ -290,7 +300,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                         ),
                                         SizedBox(width: 6),
                                         Text(
-                                          'Waiting for doctor confirmation',
+                                          AppStrings.patientWaitingConfirmation,
                                           style: TextStyle(
                                             color: Colors.orange,
                                             fontSize: 13,
@@ -309,7 +319,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                           color: kSecondaryColor,
                                         ),
                                         label: const Text(
-                                          'Details',
+                                          AppStrings.patientDetails,
                                           style: TextStyle(
                                             color: kSecondaryColor,
                                           ),
@@ -324,7 +334,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                           color: kSecondaryColor,
                                         ),
                                         label: const Text(
-                                          'Reschedule',
+                                          AppStrings.patientReschedule,
                                           style: TextStyle(
                                             color: kSecondaryColor,
                                           ),
@@ -371,7 +381,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  'Appointment rescheduled!',
+                                                  AppStrings
+                                                      .patientRescheduleSuccess,
                                                 ),
                                               ),
                                             );
@@ -382,7 +393,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  'Error while rescheduling.',
+                                                  AppStrings
+                                                      .patientRescheduleError,
                                                 ),
                                               ),
                                             );
@@ -396,7 +408,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                           color: kSoftRed,
                                         ),
                                         label: const Text(
-                                          'Cancel',
+                                          AppStrings.patientCancel,
                                           style: TextStyle(color: kSoftRed),
                                         ),
                                         onPressed:
@@ -414,7 +426,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                           color: kSecondaryColor,
                                         ),
                                         label: const Text(
-                                          'Reschedule',
+                                          AppStrings.patientReschedule,
                                           style: TextStyle(
                                             color: kSecondaryColor,
                                           ),
@@ -457,7 +469,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  'Appointment rescheduled!',
+                                                  AppStrings
+                                                      .patientRescheduleSuccess,
                                                 ),
                                               ),
                                             );
@@ -468,7 +481,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  'Error while rescheduling.',
+                                                  AppStrings
+                                                      .patientRescheduleError,
                                                 ),
                                               ),
                                             );
@@ -489,10 +503,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     );
   }
 
-  Widget _buildMetaRow(String icon, String text) {
+  Widget _buildMetaRow(String label, String text) {
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 12)),
+        Text(label, style: const TextStyle(fontSize: 12)),
         const SizedBox(width: 4),
         Text(
           text,
@@ -509,22 +523,27 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmed';
+        label = AppStrings.patientStatusConfirmed;
         break;
       case 'pending':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'Pending';
+        label = AppStrings.patientStatusPending;
+        break;
+      case 'booked':
+        bg = const Color(0xFFFEF3C7);
+        fg = const Color(0xFF92400E);
+        label = AppStrings.patientStatusPending;
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Cancelled';
+        label = AppStrings.patientStatusCancelled;
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Completed';
+        label = AppStrings.patientStatusCompleted;
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -550,6 +569,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       case 'confirmed':
         return const Color(0xFF10B981);
       case 'pending':
+        return kSecondaryColor;
+      case 'booked':
         return kSecondaryColor;
       case 'canceled':
         return kSoftRed;
@@ -604,9 +625,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Appointment Details',
-                        style: const TextStyle(
+                      const Text(
+                        AppStrings.patientAppointmentDetailsTitle,
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -628,29 +649,35 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildDetailSection('👨‍⚕️ Doctor', [
-                    'Name: $doctorName',
-                    'Specialty: $specialty',
-                    'Email: $doctorEmail',
-                    'Phone: $doctorPhone',
+                  _buildDetailSection(AppStrings.patientDoctorSection, [
+                    '${AppStrings.adminName}: $doctorName',
+                    '${AppStrings.adminSpecialization}: $specialty',
+                    '${AppStrings.emailLabel}: $doctorEmail',
+                    '${AppStrings.phone}: $doctorPhone',
                   ]),
                   const SizedBox(height: 16),
-                  _buildDetailSection('📅 Appointment', [
-                    'Date: $dateStr',
-                    'Time: $timeStr',
-                    'Status: ${_getStatusLabel(status)}',
+                  _buildDetailSection(AppStrings.patientAppointmentSection, [
+                    '${AppStrings.patientDateLabel}: $dateStr',
+                    '${AppStrings.patientTimeLabel}: $timeStr',
+                    '${AppStrings.patientStatusLabel}: ${_getStatusLabel(status)}',
                   ]),
                   const SizedBox(height: 16),
-                  _buildDetailSection('💬 Reason', [
-                    reason.isNotEmpty ? reason : 'No reason specified',
+                  _buildDetailSection(AppStrings.patientReasonSection, [
+                    reason.isNotEmpty
+                        ? reason
+                        : AppStrings.patientNoReasonSpecified,
                   ]),
                   if (patientNotes.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildDetailSection('📝 Patient notes', [patientNotes]),
+                    _buildDetailSection(AppStrings.patientPatientNotes, [
+                      patientNotes,
+                    ]),
                   ],
                   if (doctorNotes.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildDetailSection('📋 Doctor notes', [doctorNotes]),
+                    _buildDetailSection(AppStrings.patientDoctorNotes, [
+                      doctorNotes,
+                    ]),
                   ],
                 ],
               ),
@@ -658,7 +685,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: const Text(AppStrings.patientClose),
               ),
             ],
           ),
@@ -694,15 +721,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   String _getStatusLabel(String status) {
     switch (status) {
       case 'confirmed':
-        return 'Confirmed';
+        return AppStrings.patientStatusConfirmed;
       case 'pending':
-        return 'Pending';
+        return AppStrings.patientStatusPending;
       case 'canceled':
-        return 'Cancelled';
+        return AppStrings.patientStatusCancelled;
       case 'completed':
-        return 'Completed';
+        return AppStrings.patientStatusCompleted;
       case 'booked':
-        return 'Booked (waiting for confirmation)';
+        return AppStrings.patientStatusBooked;
       default:
         return status;
     }

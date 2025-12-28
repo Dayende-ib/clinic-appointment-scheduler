@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -78,7 +79,9 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              currentStatus ? 'Patient deactivated' : 'Patient activated',
+              currentStatus
+                  ? AppStrings.adminPatientDeactivated
+                  : AppStrings.adminPatientActivated,
             ),
             backgroundColor: currentStatus ? kSoftRed : kSuccessGreen,
           ),
@@ -87,7 +90,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to deactivate patient.'),
+            content: Text(AppStrings.adminFailedDeactivatePatient),
             backgroundColor: Colors.red,
           ),
         );
@@ -96,7 +99,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text('${AppStrings.errorPrefix}${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -111,7 +114,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Patient reactivated'),
+            content: Text(AppStrings.adminPatientReactivated),
             backgroundColor: kSuccessGreen,
           ),
         );
@@ -119,7 +122,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to reactivate patient.'),
+            content: Text(AppStrings.adminFailedReactivatePatient),
             backgroundColor: Colors.red,
           ),
         );
@@ -128,7 +131,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text('${AppStrings.errorPrefix}${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -140,19 +143,19 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirm deletion'),
+            title: const Text(AppStrings.adminConfirmDeletion),
             content: Text(
-              'Are you sure you want to delete patient "$patientName"?',
+              '${AppStrings.adminConfirmDeletePatient} "$patientName" ?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: const Text(AppStrings.adminCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Delete'),
+                child: const Text(AppStrings.adminDelete),
               ),
             ],
           ),
@@ -166,7 +169,9 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Patient "$patientName" deleted'),
+              content: Text(
+                '${AppStrings.adminPatientDeleted} "$patientName"',
+              ),
               backgroundColor: kSuccessGreen,
             ),
           );
@@ -174,7 +179,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to delete patient.'),
+              content: Text(AppStrings.adminFailedDeletePatient),
               backgroundColor: Colors.red,
             ),
           );
@@ -183,7 +188,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppStrings.errorPrefix}${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -224,7 +229,9 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                         radius: 30,
                         backgroundColor: kSecondaryColor,
                         child: Text(
-                          (patient['name'] ?? '')[0],
+                          (patient['name'] ?? '').isNotEmpty
+                              ? (patient['name'] as String)[0]
+                              : '?',
                           style: const TextStyle(
                             fontSize: 24,
                             color: Colors.white,
@@ -238,16 +245,16 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              patient['name'] ?? 'Unknown name',
+                              patient['name'] ?? AppStrings.adminUnknownName,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1F2937),
                               ),
                             ),
-                            Text(
-                              'Patient',
-                              style: const TextStyle(
+                            const Text(
+                              AppStrings.adminPatients,
+                              style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF6B7280),
                               ),
@@ -266,19 +273,22 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📧 Contact', [
-                          'Email: ${patient['email'] ?? 'Not provided'}',
-                          'Phone: ${patient['phone'] ?? 'Not provided'}',
+                        _buildDetailSection(AppStrings.adminContactSection, [
+                          '${AppStrings.emailLabel}: ${patient['email'] ?? AppStrings.adminNotProvided}',
+                          '${AppStrings.phone}: ${patient['phone'] ?? AppStrings.adminNotProvided}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Personal Information', [
-                          'Date of birth: ${patient['dateOfBirth'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['dateOfBirth'])) : 'Not provided'}',
-                          'Gender: ${patient['gender'] ?? 'Not provided'}',
-                          'Address: ${(patient['country'] ?? '') + (patient['city'] != null && patient['city'].toString().isNotEmpty ? ', ' + patient['city'] : '')}',
-                        ]),
+                        _buildDetailSection(
+                          AppStrings.adminPersonalInfoSection,
+                          [
+                            '${AppStrings.dateOfBirth}: ${patient['dateOfBirth'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['dateOfBirth'])) : AppStrings.adminNotProvided}',
+                            '${AppStrings.gender}: ${patient['gender'] ?? AppStrings.adminNotProvided}',
+                            '${AppStrings.country}: ${(patient['country'] ?? '') + (patient['city'] != null && patient['city'].toString().isNotEmpty ? ', ' + patient['city'] : '')}',
+                          ],
+                        ),
                         const SizedBox(height: 20),
-                        _buildDetailSection('📅 Account Information', [
-                          'Registration date: ${patient['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['createdAt'])) : 'Not provided'}',
+                        _buildDetailSection(AppStrings.adminAccountInfoSection, [
+                          '${AppStrings.adminRegistrationDate}: ${patient['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(patient['createdAt'])) : AppStrings.adminNotProvided}',
                         ]),
                         const SizedBox(height: 30),
                       ],
@@ -329,7 +339,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
         border: Border.all(color: isActive ? kSuccessGreen : kSoftRed),
       ),
       child: Text(
-        isActive ? 'Active' : 'Inactive',
+        isActive ? AppStrings.adminStatusActive : AppStrings.adminStatusInactive,
         style: TextStyle(
           color: isActive ? kSuccessGreen : kSoftRed,
           fontSize: 12,
@@ -380,11 +390,11 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text('${AppStrings.errorPrefix}$error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadPatients,
-                child: const Text('Retry'),
+                child: const Text(AppStrings.adminRetry),
               ),
             ],
           ),
@@ -396,7 +406,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Patients Management',
+          AppStrings.adminPatientsManagement,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kSecondaryColor,
@@ -405,7 +415,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadPatients,
-            tooltip: 'Refresh',
+            tooltip: AppStrings.adminRefresh,
           ),
         ],
       ),
@@ -419,7 +429,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search for a patient...',
+                    hintText: AppStrings.adminSearchPatient,
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -433,7 +443,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Filter: ',
+                      AppStrings.adminFilter,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 8),
@@ -441,9 +451,20 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                       value: filterStatus,
                       items:
                           ['All', 'Active', 'Inactive'].map((status) {
+                            String label;
+                            switch (status) {
+                              case 'Active':
+                                label = AppStrings.adminFilterActive;
+                                break;
+                              case 'Inactive':
+                                label = AppStrings.adminFilterInactive;
+                                break;
+                              default:
+                                label = AppStrings.adminFilterAll;
+                            }
                             return DropdownMenuItem(
                               value: status,
-                              child: Text(status),
+                              child: Text(label),
                             );
                           }).toList(),
                       onChanged:
@@ -468,7 +489,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                             Icon(Icons.people, size: 64, color: Colors.grey),
                             SizedBox(height: 16),
                             Text(
-                              'No patients found',
+                              AppStrings.adminNoPatients,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -495,7 +516,9 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 radius: 25,
                                 backgroundColor: kSecondaryColor,
                                 child: Text(
-                                  (patient['name'] ?? '')[0],
+                                  (patient['name'] ?? '').isNotEmpty
+                                      ? (patient['name'] as String)[0]
+                                      : '?',
                                   style: const TextStyle(
                                     fontSize: 18,
                                     color: Colors.white,
@@ -504,7 +527,8 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 ),
                               ),
                               title: Text(
-                                patient['name'] ?? 'No name provided',
+                                patient['name'] ??
+                                    AppStrings.adminNoNameProvided,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -514,10 +538,12 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    patient['email'] ?? 'Email not provided',
+                                    patient['email'] ??
+                                        AppStrings.adminEmailNotProvided,
                                   ),
                                   Text(
-                                    patient['phone'] ?? 'Phone not provided',
+                                    patient['phone'] ??
+                                        AppStrings.adminPhoneNotProvided,
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -559,7 +585,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Details'),
+                                                Text(AppStrings.adminDetails),
                                               ],
                                             ),
                                           ),
@@ -579,8 +605,8 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   isActive
-                                                      ? 'Deactivate'
-                                                      : 'Activate',
+                                                      ? AppStrings.adminDeactivate
+                                                      : AppStrings.adminActivate,
                                                 ),
                                               ],
                                             ),
@@ -595,7 +621,7 @@ class _AdminPatientsScreenState extends State<AdminPatientsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Delete',
+                                                  AppStrings.adminDelete,
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),

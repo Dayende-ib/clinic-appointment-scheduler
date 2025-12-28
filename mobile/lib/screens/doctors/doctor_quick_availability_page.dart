@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../services/doctor_availability_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../patients/all_availability_page.dart';
+import 'package:caretime/strings.dart';
 
 class DoctorQuickAvailabilityPage extends StatefulWidget {
   const DoctorQuickAvailabilityPage({super.key});
@@ -19,6 +20,11 @@ class _DoctorQuickAvailabilityPageState
   String search = '';
   String filter = 'All';
   final List<String> filterOptions = ['All', 'Upcoming', 'Passed'];
+  final Map<String, String> filterLabels = {
+    'All': AppStrings.doctorFilterAll,
+    'Upcoming': AppStrings.doctorFilterUpcoming,
+    'Passed': AppStrings.doctorFilterPast,
+  };
 
   final List<String> morningSlots = ['08:00', '09:00', '10:00', '11:00'];
   final List<String> afternoonSlots = ['14:00', '15:00', '16:00', '17:00'];
@@ -98,13 +104,17 @@ class _DoctorQuickAvailabilityPageState
                 if (!mounted) return;
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Availability saved!')),
+                    const SnackBar(
+                      content: Text(AppStrings.doctorAvailabilitySaved),
+                    ),
                   );
                   Navigator.pop(context);
                   await _loadAllAvailabilities();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Error while saving.')),
+                    const SnackBar(
+                      content: Text(AppStrings.doctorAvailabilitySaveError),
+                    ),
                   );
                 }
                 if (mounted) setState(() => isLoading = false);
@@ -120,18 +130,15 @@ class _DoctorQuickAvailabilityPageState
     final Color mainColor = const Color(0xFF03A6A1);
     final Color accentColor = const Color(0xFF0891B2);
 
-    // Filtrage par recherche et filtre
-    final now = DateTime.now();
     final filteredDates =
         allDates.where((date) {
           final key = DateFormat('yyyy-MM-dd').format(date);
           final slots = weekAvailabilities[key] ?? [];
-          // Recherche améliorée
           final searchLower = search.toLowerCase();
           final keyDisplay =
               DateFormat('dd/MM/yyyy').format(date).toLowerCase();
           final keyMonth =
-              DateFormat('MMM', 'en_US').format(date).toLowerCase();
+              DateFormat('MMM', 'fr_FR').format(date).toLowerCase();
           final searchMatch =
               search.isEmpty ||
               key.contains(searchLower) ||
@@ -142,7 +149,6 @@ class _DoctorQuickAvailabilityPageState
                     slot['start']!.toLowerCase().contains(searchLower) ||
                     slot['end']!.toLowerCase().contains(searchLower),
               );
-          // Filtre par période
           bool filterMatch = true;
           final today = DateTime.now();
           if (filter == 'Upcoming') {
@@ -153,7 +159,6 @@ class _DoctorQuickAvailabilityPageState
               DateTime(today.year, today.month, today.day),
             );
           } else if (filter == 'All') {
-            // On masque les passées sauf si recherche explicite
             filterMatch =
                 !date.isBefore(DateTime(today.year, today.month, today.day));
           }
@@ -165,7 +170,7 @@ class _DoctorQuickAvailabilityPageState
         backgroundColor: mainColor,
         elevation: 0,
         title: const Text(
-          'My Availabilities',
+          AppStrings.doctorMyAvailabilities,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -183,7 +188,7 @@ class _DoctorQuickAvailabilityPageState
                 MaterialPageRoute(builder: (context) => AllAvailabilityPage()),
               );
             },
-            tooltip: 'View all availability',
+            tooltip: AppStrings.doctorViewAllAvailability,
           ),
         ],
       ),
@@ -191,7 +196,7 @@ class _DoctorQuickAvailabilityPageState
         backgroundColor: accentColor,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Add'),
+        label: const Text(AppStrings.doctorAdd),
         onPressed: _showAddSlotSheet,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 4,
@@ -208,7 +213,7 @@ class _DoctorQuickAvailabilityPageState
                     Icon(Icons.event_busy, size: 64, color: Colors.grey[300]),
                     const SizedBox(height: 18),
                     const Text(
-                      'No availabilities yet.',
+                      AppStrings.doctorNoAvailabilitiesYet,
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.grey,
@@ -230,7 +235,7 @@ class _DoctorQuickAvailabilityPageState
                         Expanded(
                           child: TextField(
                             decoration: const InputDecoration(
-                              hintText: 'Search date or month...',
+                              hintText: AppStrings.doctorSearchDateOrMonth,
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(),
                               isDense: true,
@@ -246,7 +251,7 @@ class _DoctorQuickAvailabilityPageState
                                   .map(
                                     (s) => DropdownMenuItem(
                                       value: s,
-                                      child: Text(s),
+                                      child: Text(filterLabels[s] ?? s),
                                     ),
                                   )
                                   .toList(),
@@ -259,7 +264,9 @@ class _DoctorQuickAvailabilityPageState
                     child:
                         filteredDates.isEmpty
                             ? const Center(
-                              child: Text('Availability not found'),
+                              child: Text(
+                                AppStrings.doctorAvailabilityNotFound,
+                              ),
                             )
                             : ListView(
                               padding: const EdgeInsets.all(20),
@@ -311,7 +318,7 @@ class _DoctorQuickAvailabilityPageState
                                                     child: Text(
                                                       DateFormat(
                                                         'EEE, dd MMM',
-                                                        'en_US',
+                                                        'fr_FR',
                                                       ).format(date),
                                                       style: const TextStyle(
                                                         fontWeight:
@@ -405,7 +412,8 @@ class _DoctorQuickAvailabilityPageState
                                                                       width: 8,
                                                                     ),
                                                                     Text(
-                                                                      'Slot deleted.',
+                                                                      AppStrings
+                                                                          .doctorSlotDeleted,
                                                                     ),
                                                                   ],
                                                                 ),
@@ -461,7 +469,6 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
       lastDay,
       (i) => DateTime(displayedMonth.year, displayedMonth.month, i + 1),
     ).where((d) {
-      // Si mois courant, on ne montre que les jours >= aujourd'hui
       if (displayedMonth.year == DateTime.now().year &&
           displayedMonth.month == DateTime.now().month) {
         return !d.isBefore(DateTime.now());
@@ -473,7 +480,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
   @override
   Widget build(BuildContext context) {
     final monthDates = getMonthDates();
-    final monthLabel = DateFormat('MMMM yyyy').format(displayedMonth);
+    final monthLabel = DateFormat('MMMM yyyy', 'fr_FR').format(displayedMonth);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -481,11 +488,10 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Add Availability',
+            AppStrings.doctorAddAvailabilityTitle,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          // Sélecteur de mois
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -497,7 +503,6 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                       displayedMonth.year,
                       displayedMonth.month - 1,
                     );
-                    // Si on revient sur le mois courant et la date sélectionnée est passée, on la remet à aujourd'hui
                     if (displayedMonth.year == DateTime.now().year &&
                         displayedMonth.month == DateTime.now().month &&
                         selectedDate.isBefore(DateTime.now())) {
@@ -521,7 +526,6 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                       displayedMonth.year,
                       displayedMonth.month + 1,
                     );
-                    // Si on avance, on sélectionne le 1er du mois si la date sélectionnée n'est pas dans ce mois
                     if (displayedMonth.month != selectedDate.month ||
                         displayedMonth.year != selectedDate.year) {
                       selectedDate = DateTime(
@@ -558,7 +562,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          DateFormat('E').format(date),
+                          DateFormat('E', 'fr_FR').format(date),
                           style: TextStyle(
                             color: isSelected ? Colors.white : Colors.blue,
                           ),
@@ -597,7 +601,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                     ]);
                   });
                 },
-                child: const Text('Full Day'),
+                child: const Text(AppStrings.doctorFullDay),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -634,27 +638,30 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                     context: context,
                     builder:
                         (context) => AlertDialog(
-                          title: const Text('Success'),
+                          title: const Text(AppStrings.doctorSuccess),
                           content: const Text(
-                            'Full month availabilities added!',
+                            AppStrings.doctorFullMonthAdded,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('OK'),
+                              child: const Text(AppStrings.doctorClose),
                             ),
                           ],
                         ),
                   );
                 },
-                child: const Text('Full Month'),
+                child: const Text(AppStrings.doctorFullMonth),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildSlotSection('Morning Slots', widget.morningSlots),
-          _buildSlotSection('Afternoon Slots', widget.afternoonSlots),
-          _buildSlotSection('Evening Slots', widget.eveningSlots),
+          _buildSlotSection(AppStrings.doctorMorningSlots, widget.morningSlots),
+          _buildSlotSection(
+            AppStrings.doctorAfternoonSlots,
+            widget.afternoonSlots,
+          ),
+          _buildSlotSection(AppStrings.doctorEveningSlots, widget.eveningSlots),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -679,20 +686,22 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                           context: context,
                           builder:
                               (context) => AlertDialog(
-                                title: const Text('Confirmation'),
+                                title: const Text(
+                                  AppStrings.doctorConfirmationTitle,
+                                ),
                                 content: const Text(
-                                  'Are you sure you want to save these availabilities?',
+                                  AppStrings.doctorConfirmSaveAvailability,
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed:
                                         () => Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
+                                    child: const Text(AppStrings.doctorCancel),
                                   ),
                                   ElevatedButton(
                                     onPressed:
                                         () => Navigator.of(context).pop(true),
-                                    child: const Text('Confirm'),
+                                    child: const Text(AppStrings.doctorConfirm),
                                   ),
                                 ],
                               ),
@@ -702,7 +711,7 @@ class _AddSlotSheetState extends State<_AddSlotSheet> {
                         }
                       }
                       : null,
-              child: const Text('Save'),
+              child: const Text(AppStrings.doctorSave),
             ),
           ),
         ],

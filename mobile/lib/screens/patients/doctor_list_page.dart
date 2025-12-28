@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; // Ajout pour Timer
+import 'dart:async';
 import 'doctor_profile_page.dart';
 import '../../services/patient_api_service.dart';
 import 'all_availability_page.dart';
+import 'package:caretime/strings.dart';
 
 class DoctorsListScreen extends StatefulWidget {
   const DoctorsListScreen({super.key});
@@ -12,21 +13,20 @@ class DoctorsListScreen extends StatefulWidget {
 }
 
 class DoctorsListScreenState extends State<DoctorsListScreen> {
-  final Color primaryColor = Color(0xFF03A6A1);
-  final Color secondaryColor = Color(0xFF0891B2);
-  Timer? _searchDebounce; // Timer pour debouncer la recherche
+  final Color primaryColor = const Color(0xFF03A6A1);
+  final Color secondaryColor = const Color(0xFF0891B2);
+  Timer? _searchDebounce;
 
-  // Ajout d'une liste de couleurs pastel pour les cartes
   final List<Color> cardColors = [
-    Color(0xFFE0F7FA), // bleu clair
-    Color(0xFFFFF9C4), // jaune clair
-    Color(0xFFFFF3E0), // orange très clair
-    Color(0xFFE1F5FE), // bleu très pâle
-    Color(0xFFF1F8E9), // vert très clair
-    Color(0xFFF8BBD0), // rose très clair
-    Color(0xFFD1C4E9), // violet très clair
-    Color(0xFFFFECB3), // jaune pâle
-    Color(0xFFC8E6C9), // vert pâle
+    const Color(0xFFE0F7FA),
+    const Color(0xFFFFF9C4),
+    const Color(0xFFFFF3E0),
+    const Color(0xFFE1F5FE),
+    const Color(0xFFF1F8E9),
+    const Color(0xFFF8BBD0),
+    const Color(0xFFD1C4E9),
+    const Color(0xFFFFECB3),
+    const Color(0xFFC8E6C9),
   ];
 
   String? selectedSpecialty;
@@ -39,6 +39,18 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   bool isLoading = true;
   String? error;
 
+  final Map<String, String> specialtyLabels = {
+    AppStrings.patientAllSpecialties: AppStrings.patientAllSpecialties,
+    'Cardiology': AppStrings.specialtyCardiology,
+    'Dermatology': AppStrings.specialtyDermatology,
+    'Pediatrics': AppStrings.specialtyPediatrics,
+    'Orthopedics': AppStrings.specialtyOrthopedics,
+    'Endocrinology': AppStrings.specialtyEndocrinology,
+    'General Practitioner': AppStrings.patientSpecialtyGeneralPractitioner,
+    'Physician': AppStrings.patientSpecialtyPhysician,
+    'Rheumatology': AppStrings.specialtyRheumatology,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +59,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
 
   @override
   void dispose() {
-    _searchDebounce?.cancel(); // Annuler le timer lors de la destruction
+    _searchDebounce?.cancel();
     super.dispose();
   }
 
@@ -71,7 +83,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
   }
 
   final List<String> specialties = [
-    'All specialties',
+    AppStrings.patientAllSpecialties,
     'Cardiology',
     'Dermatology',
     'Pediatrics',
@@ -88,19 +100,20 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
       final c = (d['country'] ?? '').toString().trim();
       if (c.isNotEmpty) set.add(c);
     }
-    return ['All countries', ...set.toList()..sort()];
+    return [AppStrings.patientAllCountries, ...set.toList()..sort()];
   }
 
   List<String> get cities {
     final set = <String>{};
     for (final d in doctors) {
-      if (selectedCountry != null && selectedCountry != 'All countries') {
+      if (selectedCountry != null &&
+          selectedCountry != AppStrings.patientAllCountries) {
         if ((d['country'] ?? '') != selectedCountry) continue;
       }
       final c = (d['city'] ?? '').toString().trim();
       if (c.isNotEmpty) set.add(c);
     }
-    return ['All cities', ...set.toList()..sort()];
+    return [AppStrings.patientAllCities, ...set.toList()..sort()];
   }
 
   List<Doctor> get filteredDoctors {
@@ -109,15 +122,15 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
         .where((d) {
           final matchesSpecialty =
               selectedSpecialty == null ||
-              selectedSpecialty == 'All specialties' ||
+              selectedSpecialty == AppStrings.patientAllSpecialties ||
               d['specialty'] == selectedSpecialty;
           final matchesCountry =
               selectedCountry == null ||
-              selectedCountry == 'All countries' ||
+              selectedCountry == AppStrings.patientAllCountries ||
               d['country'] == selectedCountry;
           final matchesCity =
               selectedCity == null ||
-              selectedCity == 'All cities' ||
+              selectedCity == AppStrings.patientAllCities ||
               d['city'] == selectedCity;
           final matchesSearch =
               searchLower.isEmpty ||
@@ -166,6 +179,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
             specialties: specialties,
             selectedSpecialty: selectedSpecialty,
             primaryColor: primaryColor,
+            specialtyLabels: specialtyLabels,
             onSpecialtySelected: (specialty) {
               setState(() {
                 selectedSpecialty = specialty;
@@ -182,16 +196,16 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Error: $error'));
+      return Center(child: Text('${AppStrings.errorPrefix}$error'));
     }
     return Scaffold(
-      backgroundColor: Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Text(
-          "Doctors List",
+        title: const Text(
+          AppStrings.patientDoctorsListTitle,
           style: TextStyle(
             color: Colors.black87,
             fontSize: 18,
@@ -203,7 +217,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -212,13 +226,13 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: "Search for a doctor...",
+                  hintText: AppStrings.patientSearchDoctor,
                   hintStyle: TextStyle(color: Colors.grey[400]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                   suffixIcon: IconButton(
@@ -226,20 +240,21 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                       Icons.tune,
                       color:
                           selectedSpecialty != null &&
-                                  selectedSpecialty != 'All specialties'
+                                  selectedSpecialty !=
+                                      AppStrings.patientAllSpecialties
                               ? primaryColor
                               : Colors.grey[400],
                     ),
                     onPressed: _showFilterBottomSheet,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
                 ),
                 onChanged: (v) {
-                  _searchDebounce?.cancel(); // Annuler le timer précédent
+                  _searchDebounce?.cancel();
                   _searchDebounce = Timer(
                     const Duration(milliseconds: 300),
                     () {
@@ -253,13 +268,16 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
             ),
           ),
           if (selectedSpecialty != null &&
-              selectedSpecialty != 'All specialties')
+              selectedSpecialty != AppStrings.patientAllSpecialties)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: primaryColor.withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(20),
@@ -271,14 +289,15 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          selectedSpecialty!,
+                          specialtyLabels[selectedSpecialty] ??
+                              selectedSpecialty!,
                           style: TextStyle(
                             color: primaryColor,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -294,21 +313,21 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    "${filteredDoctors.length} doctor(s) found",
+                    '${filteredDoctors.length} ${AppStrings.patientDoctorsFound}',
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                 ],
               ),
             ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
               children: [
                 Expanded(
                   child: DropdownButton<String>(
-                    value: selectedCountry ?? 'All countries',
+                    value: selectedCountry ?? AppStrings.patientAllCountries,
                     isExpanded: true,
                     items:
                         countries
@@ -319,15 +338,15 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                     onChanged: (val) {
                       setState(() {
                         selectedCountry = val;
-                        selectedCity = null; // reset city when country changes
+                        selectedCity = null;
                       });
                     },
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButton<String>(
-                    value: selectedCity ?? 'All cities',
+                    value: selectedCity ?? AppStrings.patientAllCities,
                     isExpanded: true,
                     items:
                         cities
@@ -345,14 +364,14 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
               ],
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 left: 16,
                 right: 16,
                 bottom: 80,
-              ), // Add bottom padding for nav bar
+              ),
               child:
                   filteredDoctors.isEmpty
                       ? Center(
@@ -366,7 +385,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No doctors available',
+                              AppStrings.patientNoDoctorsAvailable,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
@@ -375,7 +394,7 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Try adjusting your filters',
+                              AppStrings.patientAdjustFilters,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[500],
@@ -385,12 +404,13 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                         ),
                       )
                       : GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.85,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.85,
+                            ),
                         itemCount: filteredDoctors.length,
                         itemBuilder: (context, index) {
                           final doctor = filteredDoctors[index];
@@ -419,8 +439,9 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) =>
-                                            DoctorProfileScreen(doctor: doctor),
+                                        (context) => DoctorProfileScreen(
+                                          doctor: doctor,
+                                        ),
                                   ),
                                 );
                               },
@@ -437,11 +458,11 @@ class DoctorsListScreenState extends State<DoctorsListScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.list_alt),
-        label: const Text('View all availability'),
+        label: const Text(AppStrings.patientViewAllAvailability),
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AllAvailabilityPage()),
+            MaterialPageRoute(builder: (context) => const AllAvailabilityPage()),
           );
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -479,12 +500,12 @@ class DoctorCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -501,7 +522,7 @@ class DoctorCard extends StatelessWidget {
                             : Colors.grey[200],
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     doctor.name,
@@ -516,7 +537,7 @@ class DoctorCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               doctor.specialty,
               style: TextStyle(
@@ -543,14 +564,14 @@ class DoctorCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-            Spacer(),
+            const Spacer(),
             Row(
               children: [
-                Spacer(),
+                const Spacer(),
                 GestureDetector(
                   onTap: onArrowTap,
                   child: Container(
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color:
                           isSelected
@@ -599,6 +620,7 @@ class FilterBottomSheet extends StatelessWidget {
   final String? selectedSpecialty;
   final Color primaryColor;
   final Function(String) onSpecialtySelected;
+  final Map<String, String> specialtyLabels;
 
   const FilterBottomSheet({
     super.key,
@@ -606,6 +628,7 @@ class FilterBottomSheet extends StatelessWidget {
     required this.selectedSpecialty,
     required this.primaryColor,
     required this.onSpecialtySelected,
+    required this.specialtyLabels,
   });
 
   @override
@@ -614,7 +637,7 @@ class FilterBottomSheet extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.4,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -622,7 +645,7 @@ class FilterBottomSheet extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -630,7 +653,7 @@ class FilterBottomSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            margin: EdgeInsets.only(top: 6),
+            margin: const EdgeInsets.only(top: 6),
             width: 32,
             height: 3,
             decoration: BoxDecoration(
@@ -639,18 +662,18 @@ class FilterBottomSheet extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Text(
-                  "Filter by specialty",
+                const Text(
+                  AppStrings.patientFilterBySpecialty,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Icon(Icons.close, color: Colors.grey[600], size: 20),
@@ -669,7 +692,10 @@ class FilterBottomSheet extends StatelessWidget {
                 return InkWell(
                   onTap: () => onSpecialtySelected(specialty),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color:
                           isSelected
@@ -677,7 +703,7 @@ class FilterBottomSheet extends StatelessWidget {
                               : Colors.transparent,
                     ),
                     child: Text(
-                      specialty,
+                      specialtyLabels[specialty] ?? specialty,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,

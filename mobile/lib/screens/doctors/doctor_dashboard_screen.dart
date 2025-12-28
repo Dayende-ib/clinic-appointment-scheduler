@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/doctor_service.dart';
 import '../../services/doctor_appointment_service.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -26,7 +27,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   List<Map<String, dynamic>> upcomingAppointments = [];
   List<Map<String, dynamic>> allAppointments = [];
 
-  // Statistiques
   int totalToday = 0;
   int completedToday = 0;
   int pendingToday = 0;
@@ -77,7 +77,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         doctorProfile = data;
       });
     } catch (e) {
-      // Gérer l'erreur silencieusement
+      // Erreur silencieuse
     }
   }
 
@@ -106,7 +106,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         todayAppointments = todayData;
         upcomingAppointments = upcomingData;
 
-        // Calculer les statistiques
         totalToday = todayData.length;
         completedToday =
             todayData
@@ -220,28 +219,37 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Appoitment', [
-                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'en_US').format(date)}',
-                          'Heure: ${DateFormat('HH:mm').format(date)}',
+                        _buildDetailSection(AppStrings.doctorAppointmentSection, [
+                          '${AppStrings.patientDateLabel}: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
+                          '${AppStrings.patientTimeLabel}: ${DateFormat('HH:mm').format(date)}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Patient information', [
-                          'Email: $patientEmail',
-                          'Phone: $patientPhone',
-                        ]),
+                        _buildDetailSection(
+                          AppStrings.doctorPatientInfoSection,
+                          [
+                            '${AppStrings.emailLabel}: $patientEmail',
+                            '${AppStrings.phone}: $patientPhone',
+                          ],
+                        ),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Reason of consultation', [
-                          reason.isNotEmpty ? reason : 'No reason specified',
+                        _buildDetailSection(AppStrings.doctorReasonSection, [
+                          reason.isNotEmpty
+                              ? reason
+                              : AppStrings.doctorNoReasonSpecified,
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Patient notes', [
-                            patientNotes,
-                          ]),
+                          _buildDetailSection(
+                            AppStrings.doctorPatientNotes,
+                            [patientNotes],
+                          ),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 My notes', [doctorNotes]),
+                          _buildDetailSection(
+                            AppStrings.doctorDoctorNotes,
+                            [doctorNotes],
+                          ),
                         ],
                         const SizedBox(height: 30),
                       ],
@@ -276,7 +284,9 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Appointment canceled'),
+                                    content: Text(
+                                      AppStrings.doctorAppointmentCanceled,
+                                    ),
                                     backgroundColor: kSoftRed,
                                   ),
                                 );
@@ -290,7 +300,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Cancel',
+                              AppStrings.doctorCancel,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -311,9 +321,9 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                                 _loadAllData();
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      'Appointment confirmed',
+                                  const SnackBar(
+                                    content: Text(
+                                      AppStrings.doctorAppointmentConfirmed,
                                     ),
                                     backgroundColor: kPrimaryColor,
                                   ),
@@ -328,7 +338,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Confirme',
+                              AppStrings.doctorConfirm,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -378,22 +388,22 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmed';
+        label = AppStrings.patientStatusConfirmed;
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'Pending';
+        label = AppStrings.patientStatusPending;
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Cancelled';
+        label = AppStrings.patientStatusCancelled;
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Completed';
+        label = AppStrings.patientStatusCompleted;
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -491,27 +501,27 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Global statistics'),
+            title: const Text(AppStrings.doctorGlobalStatsTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildStatRow(
-                  'Total appointments',
+                  AppStrings.doctorTotalAppointments,
                   allAppointments.length,
                   Icons.calendar_today,
                 ),
                 _buildStatRow(
-                  'Completed appointments',
+                  AppStrings.doctorCompletedAppointments,
                   totalCompleted,
                   Icons.check_circle,
                 ),
                 _buildStatRow(
-                  'Cancelled appointments',
+                  AppStrings.doctorCancelledAppointments,
                   totalCancelled,
                   Icons.cancel,
                 ),
                 _buildStatRow(
-                  'Upcoming appointments',
+                  AppStrings.doctorUpcomingAppointments,
                   totalUpcoming,
                   Icons.schedule,
                 ),
@@ -520,7 +530,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: const Text(AppStrings.doctorClose),
               ),
             ],
           ),
@@ -734,7 +744,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     const Text(
-                      'Loading doctor dashboard...',
+                      AppStrings.doctorLoadingDashboard,
                       style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
                     ),
                   ],
@@ -754,11 +764,11 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text('${AppStrings.errorPrefix}$error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadAllData,
-                child: const Text('Retry'),
+                child: const Text(AppStrings.doctorRetry),
               ),
             ],
           ),
@@ -769,7 +779,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     final String doctorName =
         doctorProfile != null
             ? '${doctorProfile!['firstname']} ${doctorProfile!['lastname']}'
-            : 'Doctor';
+            : 'Docteur';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -781,7 +791,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 children: [
                   CircleAvatar(
@@ -802,7 +811,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, Dr $doctorName',
+                          '${AppStrings.doctorHello} $doctorName',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -812,7 +821,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                         Text(
                           DateFormat(
                             'EEEE d MMMM yyyy',
-                            'en_US',
+                            'fr_FR',
                           ).format(DateTime.now()),
                           style: const TextStyle(
                             fontSize: 16,
@@ -825,15 +834,14 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   IconButton(
                     onPressed: _showQuickStats,
                     icon: const Icon(Icons.analytics_outlined),
-                    tooltip: 'Global statistics',
+                    tooltip: AppStrings.doctorGlobalStatsTitle,
                   ),
                 ],
               ),
               const SizedBox(height: 30),
 
-              // Statistiques du jour
               Text(
-                'Today',
+                AppStrings.doctorToday,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -845,7 +853,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Total',
+                      title: AppStrings.doctorTotal,
                       value: totalToday,
                       icon: Icons.calendar_today,
                       color: kSecondaryColor,
@@ -857,7 +865,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Completed',
+                      title: AppStrings.doctorCompleted,
                       value: completedToday,
                       icon: Icons.check_circle,
                       color: kSuccessGreen,
@@ -869,7 +877,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Pending',
+                      title: AppStrings.doctorPending,
                       value: pendingToday,
                       icon: Icons.schedule,
                       color: kWarningYellow,
@@ -882,12 +890,11 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Statistiques globales
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Overview',
+                    AppStrings.doctorOverview,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -896,7 +903,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   ),
                   TextButton(
                     onPressed: _showQuickStats,
-                    child: const Text('See more'),
+                    child: const Text(AppStrings.doctorSeeMore),
                   ),
                 ],
               ),
@@ -905,7 +912,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Total',
+                      title: AppStrings.doctorTotal,
                       value: allAppointments.length,
                       icon: Icons.calendar_month,
                       color: kSecondaryColor,
@@ -915,7 +922,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Completed',
+                      title: AppStrings.doctorCompleted,
                       value: totalCompleted,
                       icon: Icons.check_circle,
                       color: kSuccessGreen,
@@ -926,7 +933,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Upcoming',
+                      title: AppStrings.doctorUpcomingAppointments,
                       value: totalUpcoming,
                       icon: Icons.schedule,
                       color: kWarningYellow,
@@ -938,9 +945,8 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Actions rapides
               Text(
-                'Quick actions',
+                AppStrings.doctorQuickActions,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -949,16 +955,16 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'Manage my availabilities',
-                subtitle: 'Add or modify your slots',
+                title: AppStrings.doctorManageAvailability,
+                subtitle: AppStrings.doctorManageAvailabilitySubtitle,
                 icon: Icons.schedule,
                 color: kPrimaryColor,
                 onTap: _navigateToAvailability,
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'All my appointments',
-                subtitle: 'See and manage all your appointments',
+                title: AppStrings.doctorAllAppointments,
+                subtitle: AppStrings.doctorAllAppointmentsSubtitle,
                 icon: Icons.list_alt,
                 color: kSecondaryColor,
                 onTap: () {
@@ -967,20 +973,19 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'My profile',
-                subtitle: 'Modify your information',
+                title: AppStrings.doctorMyProfile,
+                subtitle: AppStrings.doctorMyProfileSubtitle,
                 icon: Icons.person,
                 color: kAccentColor,
                 onTap: _navigateToProfile,
               ),
               const SizedBox(height: 30),
 
-              // Rendez-vous d'aujourd'hui
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Today\'s appointments',
+                    AppStrings.doctorTodayAppointments,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -992,7 +997,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       onPressed: () {
                         _navigateToAppointmentsWithFilter('today');
                       },
-                      child: const Text('See all'),
+                      child: const Text(AppStrings.doctorSeeAll),
                     ),
                 ],
               ),
@@ -1009,7 +1014,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       Icon(Icons.event_busy, size: 48, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        'No appointments today',
+                        AppStrings.doctorNoAppointmentsToday,
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ],
@@ -1019,12 +1024,11 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 ...todayAppointments.take(3).map(_buildAppointmentCard),
               const SizedBox(height: 30),
 
-              // Prochains rendez-vous
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Upcoming appointments',
+                    AppStrings.doctorUpcomingAppointmentsTitle,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -1036,7 +1040,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       onPressed: () {
                         _navigateToAppointmentsWithFilter('upcoming');
                       },
-                      child: const Text('See all'),
+                      child: const Text(AppStrings.doctorSeeAll),
                     ),
                 ],
               ),
@@ -1053,7 +1057,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       Icon(Icons.event_note, size: 48, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        'No upcoming appointments',
+                        AppStrings.doctorNoUpcomingAppointments,
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ],

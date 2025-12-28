@@ -5,6 +5,7 @@ import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/patient_api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:caretime/strings.dart';
 
 class PatientDashboardScreen extends StatefulWidget {
   const PatientDashboardScreen({super.key});
@@ -105,13 +106,15 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
 
   List<Widget> get _pages => [
     _dashboardHome(),
-    AppointmentsScreen(),
-    DoctorsListScreen(),
-    ProfileScreen(),
+    const AppointmentsScreen(),
+    const DoctorsListScreen(),
+    const ProfileScreen(),
     _isLoadingDoctors
         ? const Center(child: CircularProgressIndicator())
         : _doctorError != null
-        ? Center(child: Text('Erreur: $_doctorError'))
+        ? Center(
+          child: Text('${AppStrings.patientDoctorLoadError}$_doctorError'),
+        )
         : Column(
           children: [
             if (_doctors.isNotEmpty)
@@ -146,14 +149,14 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(child: Text('Erreur: $error'));
+      return Center(child: Text('${AppStrings.errorPrefix}$error'));
     }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar:
           (_selectedIndex == 0)
               ? PreferredSize(
-                preferredSize: Size.fromHeight(80),
+                preferredSize: const Size.fromHeight(80),
                 child: AppBar(
                   backgroundColor: Colors.white,
                   elevation: 0,
@@ -161,7 +164,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                   toolbarHeight: 80,
                   flexibleSpace: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
                       ),
@@ -171,22 +174,22 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Color(0xFF03A6A1),
+                              color: const Color(0xFF03A6A1),
                               borderRadius: BorderRadius.circular(25),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.person,
                               color: Colors.white,
                               size: 32,
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Welcome back!',
+                              const Text(
+                                AppStrings.patientWelcomeBack,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -194,7 +197,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                                 ),
                               ),
                               Text(
-                                'Your health, our priority',
+                                AppStrings.subtitle,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],
@@ -202,9 +205,9 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                               ),
                             ],
                           ),
-                          Spacer(),
+                          const Spacer(),
                           IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.person_outline,
                               color: Color(0xFF0891B2),
                             ),
@@ -223,7 +226,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -232,12 +235,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
               color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 10,
-              offset: Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -246,32 +249,32 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             backgroundColor: Colors.white,
             currentIndex: _selectedIndex,
             onTap: (index) => setState(() => _selectedIndex = index),
-            selectedItemColor: Color(0xFF03A6A1),
+            selectedItemColor: const Color(0xFF03A6A1),
             unselectedItemColor: Colors.grey[400],
-            selectedLabelStyle: TextStyle(
+            selectedLabelStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
-            unselectedLabelStyle: TextStyle(
+            unselectedLabelStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
             elevation: 0,
-            items: [
+            items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined, size: 24),
                 activeIcon: Icon(Icons.home, size: 24),
-                label: 'Home',
+                label: AppStrings.patientHome,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today_outlined, size: 24),
                 activeIcon: Icon(Icons.calendar_today, size: 24),
-                label: 'Appointments',
+                label: AppStrings.patientAppointmentsNav,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.medical_services_outlined, size: 24),
                 activeIcon: Icon(Icons.medical_services, size: 24),
-                label: 'Doctors',
+                label: AppStrings.patientDoctorsNav,
               ),
             ],
           ),
@@ -295,13 +298,13 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
       }
     }
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Actions rapides
           Text(
-            'Quick actions',
+            AppStrings.patientQuickActions,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -309,7 +312,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             ),
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           Row(
             children: [
@@ -319,12 +322,16 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                     setState(() => _selectedIndex = 2);
                   },
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xFF0891B2).withAlpha((0.1 * 255).toInt()),
+                      color: const Color(
+                        0xFF0891B2,
+                      ).withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Color(0xFF0891B2).withAlpha((0.2 * 255).toInt()),
+                        color: const Color(
+                          0xFF0891B2,
+                        ).withAlpha((0.2 * 255).toInt()),
                         width: 1,
                       ),
                     ),
@@ -334,14 +341,18 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Color(0xFF0891B2),
+                            color: const Color(0xFF0891B2),
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: Icon(Icons.add, color: Colors.white, size: 24),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         ),
-                        SizedBox(height: 12),
-                        Text(
-                          'Book an appointment',
+                        const SizedBox(height: 12),
+                        const Text(
+                          AppStrings.patientBookAppointment,
                           style: TextStyle(color: Color(0xFF0891B2)),
                         ),
                       ],
@@ -350,7 +361,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                 ),
               ),
 
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
 
               Expanded(
                 child: GestureDetector(
@@ -358,9 +369,11 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                     setState(() => _selectedIndex = 1);
                   },
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Color(0xFF03A6A1).withAlpha((0.1 * 255).toInt()),
+                      color: const Color(
+                        0xFF03A6A1,
+                      ).withAlpha((0.1 * 255).toInt()),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(width: 1),
                     ),
@@ -370,18 +383,18 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Color(0xFF03A6A1),
+                            color: const Color(0xFF03A6A1),
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.calendar_today,
                             color: Colors.white,
                             size: 24,
                           ),
                         ),
-                        SizedBox(height: 12),
-                        Text(
-                          'My appointments',
+                        const SizedBox(height: 12),
+                        const Text(
+                          AppStrings.patientMyAppointments,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -396,13 +409,13 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             ],
           ),
 
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Rappel important
           if (nextAppointment != null)
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.orange[50],
                 borderRadius: BorderRadius.circular(12),
@@ -411,25 +424,25 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.warning_amber_rounded,
                     size: 20,
                     color: Colors.orange,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Important reminder',
+                          AppStrings.patientImportantReminder,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.orange[700],
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Builder(
                           builder: (context) {
                             final dt = DateTime.tryParse(
@@ -439,14 +452,14 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                             final doctorName =
                                 ('${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}')
                                     .trim();
-                            if (dt == null) return SizedBox();
+                            if (dt == null) return const SizedBox();
                             final dateStr = DateFormat(
                               'EEEE d MMMM',
-                              'en_US',
+                              'fr_FR',
                             ).format(dt);
                             final timeStr = DateFormat('HH:mm').format(dt);
                             return Text(
-                              "Don't forget your appointment with Dr. $doctorName on $dateStr at $timeStr",
+                              '${AppStrings.patientReminderPrefix} $doctorName ${AppStrings.patientReminderOn} $dateStr ${AppStrings.patientReminderAt} $timeStr',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.orange[700],
@@ -461,12 +474,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
               ),
             ),
 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
           // Conseil santé
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.green[50],
               borderRadius: BorderRadius.circular(12),
@@ -475,21 +488,25 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.health_and_safety, color: Colors.green, size: 22),
-                SizedBox(width: 12),
+                const Icon(
+                  Icons.health_and_safety,
+                  color: Colors.green,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Health tip',
+                        AppStrings.patientHealthTipTitle,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.green[700],
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         _getHealthTip(),
                         style: TextStyle(
@@ -504,12 +521,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             ),
           ),
 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
           // Numéros d'urgence
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.red[50],
               borderRadius: BorderRadius.circular(12),
@@ -518,29 +535,27 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.local_phone, color: Colors.red, size: 22),
-                SizedBox(width: 12),
+                const Icon(Icons.local_phone, color: Colors.red, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Emergency numbers',
+                        AppStrings.patientEmergencyNumbersTitle,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.red[700],
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        '''Burkina Faso:
-- SAMU: 10
-- Firefighters: 18
-- Police: 17
-- Gendarmerie: 16
-- Red Cross: 80 00 11 12''',
-                        style: TextStyle(fontSize: 14, color: Colors.red[700]),
+                        AppStrings.patientEmergencyNumbersText,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.red[700],
+                        ),
                       ),
                     ],
                   ),
@@ -550,25 +565,14 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           ),
 
           // Espacement pour éviter que le contenu soit caché par la bottom nav
-          SizedBox(height: 80),
+          const SizedBox(height: 80),
         ],
       ),
     );
   }
 
   String _getHealthTip() {
-    final tips = [
-      "Drink at least 1.5L of water per day.",
-      "Exercise regularly.",
-      "Eat 5 fruits and vegetables a day.",
-      "Get enough sleep to recover.",
-      "Wash your hands regularly.",
-      "Limit sugar and salt intake.",
-      "Take time to relax and manage your stress.",
-      "See your doctor regularly.",
-      "Protect yourself from the sun.",
-      "Listen to your body's signals.",
-    ];
+    final tips = AppStrings.patientHealthTips;
     final now = DateTime.now();
     return tips[now.day % tips.length];
   }

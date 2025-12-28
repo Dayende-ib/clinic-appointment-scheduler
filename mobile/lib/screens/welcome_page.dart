@@ -73,7 +73,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                AppStrings.enSubtitle,
+                AppStrings.subtitle,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: const Color(0xFF03A6A1),
                   letterSpacing: 0.5,
@@ -82,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                AppStrings.enDescription,
+                AppStrings.description,
                 style: Theme.of(
                   context,
                 ).textTheme.bodyLarge?.copyWith(color: Colors.black54),
@@ -109,7 +109,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                   child: Text(
-                    AppStrings.enLogin,
+                    AppStrings.login,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                   child: Text(
-                    AppStrings.enRegister,
+                    AppStrings.register,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/strings.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
             const SizedBox(height: 24),
             const LinearProgressIndicator(),
             const SizedBox(height: 16),
-            const Text('Welcome...', style: TextStyle(fontSize: 18)),
+            const Text(AppStrings.splashWelcome, style: TextStyle(fontSize: 18)),
           ],
         ),
       ),

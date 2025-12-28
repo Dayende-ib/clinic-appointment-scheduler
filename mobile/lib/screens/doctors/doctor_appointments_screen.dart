@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/doctor_appointment_service.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -21,7 +22,18 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
   List<Map<String, dynamic>> allAppointments = [];
   String filterStatus = 'All';
   String search = '';
-  List<String> statusOptions = ['All', 'Upcoming', 'Completed', 'Cancelled'];
+  final List<String> statusOptions = [
+    'All',
+    'Upcoming',
+    'Completed',
+    'Cancelled',
+  ];
+  final Map<String, String> statusLabels = {
+    'All': AppStrings.doctorFilterAll,
+    'Upcoming': AppStrings.doctorFilterUpcoming,
+    'Completed': AppStrings.doctorFilterCompleted,
+    'Cancelled': AppStrings.doctorFilterCancelled,
+  };
   bool isLoading = true;
   String? error;
 
@@ -37,8 +49,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       final filter = widget.arguments!['filter'] as String;
       switch (filter) {
         case 'today':
-          filterStatus =
-              'All'; // On garde 'All' pour voir tous les rendez-vous d'aujourd'hui
+          filterStatus = 'All';
           break;
         case 'completed':
           filterStatus = 'Completed';
@@ -101,7 +112,6 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             child: Column(
               children: [
-                // Handle bar
                 Container(
                   margin: const EdgeInsets.only(top: 8),
                   width: 40,
@@ -111,7 +121,6 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                // Header
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -155,42 +164,49 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                     ],
                   ),
                 ),
-                // Content
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Appointment', [
-                          'Date: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
-                          'Hour: ${DateFormat('HH:mm').format(date)}',
+                        _buildDetailSection(AppStrings.doctorAppointmentSection, [
+                          '${AppStrings.patientDateLabel}: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}',
+                          '${AppStrings.patientTimeLabel}: ${DateFormat('HH:mm').format(date)}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Patient informations', [
-                          'Email: $patientEmail',
-                          'Phone: $patientPhone',
-                        ]),
+                        _buildDetailSection(
+                          AppStrings.doctorPatientInfoSection,
+                          [
+                            '${AppStrings.emailLabel}: $patientEmail',
+                            '${AppStrings.phone}: $patientPhone',
+                          ],
+                        ),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Reason for consultation', [
-                          reason.isNotEmpty ? reason : 'No reason specified',
+                        _buildDetailSection(AppStrings.doctorReasonSection, [
+                          reason.isNotEmpty
+                              ? reason
+                              : AppStrings.doctorNoReasonSpecified,
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Patient note', [
-                            patientNotes,
-                          ]),
+                          _buildDetailSection(
+                            AppStrings.doctorPatientNotes,
+                            [patientNotes],
+                          ),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 My notes', [doctorNotes]),
+                          _buildDetailSection(
+                            AppStrings.doctorDoctorNotes,
+                            [doctorNotes],
+                          ),
                         ],
                         const SizedBox(height: 30),
                       ],
                     ),
                   ),
                 ),
-                // Action buttons
                 if (status == 'booked')
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -219,7 +235,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Appointment rejected'),
+                                    content: Text(
+                                      AppStrings.doctorAppointmentRejected,
+                                    ),
                                     backgroundColor: kSoftRed,
                                   ),
                                 );
@@ -227,9 +245,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                      'Error rejecting appointment',
-                                    ),
+                                    content: Text(AppStrings.doctorErrorReject),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -243,7 +259,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Rejeter',
+                              AppStrings.doctorReject,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -264,9 +280,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 _loadAppointments();
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      'Appointment confirmed',
+                                  const SnackBar(
+                                    content: Text(
+                                      AppStrings.doctorAppointmentConfirmed,
                                     ),
                                     backgroundColor: kPrimaryColor,
                                   ),
@@ -275,7 +291,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Error'),
+                                    content: Text(
+                                      AppStrings.doctorErrorConfirm,
+                                    ),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -289,7 +307,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                               ),
                             ),
                             child: const Text(
-                              'Confirm',
+                              AppStrings.doctorConfirm,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -339,22 +357,22 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmed';
+        label = AppStrings.patientStatusConfirmed;
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'Booked';
+        label = AppStrings.patientStatusPending;
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Cancelled';
+        label = AppStrings.patientStatusCancelled;
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Completed';
+        label = AppStrings.patientStatusCompleted;
         break;
       default:
         bg = const Color(0xFFFEF3C7);
@@ -381,12 +399,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (error != null) {
-      return Center(
-        child: Text(
-          'Error: '
-          '$error',
-        ),
-      );
+      return Center(child: Text('${AppStrings.errorPrefix}$error'));
     }
     List<Map<String, dynamic>> filtered =
         allAppointments.where((rdv) {
@@ -398,7 +411,6 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 search.toLowerCase(),
               );
 
-          // Filtre spécial pour "today" - ne montrer que les rendez-vous d'aujourd'hui
           bool matchesToday = true;
           if (widget.arguments != null &&
               widget.arguments!['filter'] == 'today') {
@@ -426,7 +438,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
-                      hintText: 'Search for a patient...',
+                      hintText: AppStrings.doctorSearchPatientHint,
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(),
                       isDense: true,
@@ -440,7 +452,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                   items:
                       statusOptions
                           .map(
-                            (s) => DropdownMenuItem(value: s, child: Text(s)),
+                            (s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(statusLabels[s] ?? s),
+                            ),
                           )
                           .toList(),
                   onChanged: (v) => setState(() => filterStatus = v ?? 'All'),
@@ -451,7 +466,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             Expanded(
               child:
                   filtered.isEmpty
-                      ? const Center(child: Text('No appointments found.'))
+                      ? const Center(
+                        child: Text(AppStrings.doctorNoAppointmentsFound),
+                      )
                       : ListView.separated(
                         itemCount: filtered.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -492,7 +509,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                 style: Theme.of(context).textTheme.bodyLarge,
                               ),
                               subtitle: Text(
-                                '${DateFormat('EEEE d MMMM', 'en_US').format(date)} à ${DateFormat('HH:mm').format(date)}',
+                                '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} � ${DateFormat('HH:mm').format(date)}',
                               ),
                               trailing: SizedBox(
                                 width: 80,
@@ -503,7 +520,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        status,
+                                        statusLabels[status] ?? status,
                                         style: TextStyle(
                                           color: statusColor,
                                           fontWeight: FontWeight.bold,
@@ -533,7 +550,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                                                       .shrinkWrap,
                                             ),
                                             child: const Text(
-                                              'Details',
+                                              AppStrings.doctorDetails,
                                               style: TextStyle(fontSize: 11),
                                             ),
                                           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -206,7 +207,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     const Text(
-                      'Loading admin dashboard...',
+                      AppStrings.adminLoadingDashboard,
                       style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
                     ),
                   ],
@@ -227,11 +228,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: $error'),
+              Text('${AppStrings.errorPrefix}$error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadDashboardStats,
-                child: const Text('Retry'),
+                child: const Text(AppStrings.adminRetry),
               ),
             ],
           ),
@@ -250,7 +251,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Admin Dashboard',
+          AppStrings.adminDashboardTitle,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kPrimaryColor,
@@ -260,26 +261,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadDashboardStats,
-            tooltip: 'refresh',
+            tooltip: AppStrings.adminRefresh,
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
+            tooltip: AppStrings.adminLogout,
             onPressed: () async {
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder:
                     (context) => AlertDialog(
-                      title: const Text('Logout'),
-                      content: const Text('Are you sure you want to log out?'),
+                      title: const Text(AppStrings.adminLogout),
+                      content: const Text(AppStrings.adminLogoutConfirm),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
+                          child: const Text(AppStrings.cancel),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Logout'),
+                          child: const Text(AppStrings.adminLogout),
                         ),
                       ],
                     ),
@@ -324,7 +325,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Administrator',
+                          AppStrings.adminAdministrator,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -333,8 +334,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         ),
                         Text(
                           DateFormat(
-                            'EEEE, MMMM d, yyyy',
-                            'en_US',
+                            'EEEE d MMMM yyyy',
+                            'fr_FR',
                           ).format(DateTime.now()),
                           style: const TextStyle(
                             fontSize: 16,
@@ -349,9 +350,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(height: 30),
 
               // Statistiques principales
-              Text(
-                'Overview',
-                style: const TextStyle(
+              const Text(
+                AppStrings.adminOverview,
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1F2937),
@@ -362,7 +363,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Doctors',
+                      title: AppStrings.adminDoctors,
                       value: totalDoctors,
                       icon: Icons.medical_services,
                       color: kPrimaryColor,
@@ -373,7 +374,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Patients',
+                      title: AppStrings.adminPatients,
                       value: totalPatients,
                       icon: Icons.people,
                       color: kSecondaryColor,
@@ -388,7 +389,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Appointments',
+                      title: AppStrings.adminAppointments,
                       value: totalAppointments,
                       icon: Icons.calendar_today,
                       color: kAccentColor,
@@ -402,7 +403,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Today',
+                      title: AppStrings.adminToday,
                       value: todayAppointments,
                       icon: Icons.today,
                       color: kSuccessGreen,
@@ -418,9 +419,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(height: 30),
 
               // Actions rapides
-              Text(
-                'User Management',
-                style: const TextStyle(
+              const Text(
+                AppStrings.adminUserManagement,
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1F2937),
@@ -428,16 +429,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'Manage Doctors',
-                subtitle: 'View, edit and manage all doctors',
+                title: AppStrings.adminManageDoctors,
+                subtitle: AppStrings.adminManageDoctorsSubtitle,
                 icon: Icons.medical_services,
                 color: kPrimaryColor,
                 onTap: () => Navigator.pushNamed(context, '/admin/doctors'),
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Manage Patients',
-                subtitle: 'View, edit and manage all patients',
+                title: AppStrings.adminManagePatients,
+                subtitle: AppStrings.adminManagePatientsSubtitle,
                 icon: Icons.people,
                 color: kSecondaryColor,
                 onTap: () => Navigator.pushNamed(context, '/admin/patients'),
@@ -445,9 +446,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(height: 30),
 
               // Gestion des rendez-vous
-              Text(
-                'Appointments Management',
-                style: const TextStyle(
+              const Text(
+                AppStrings.adminAppointmentsManagement,
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1F2937),
@@ -455,8 +456,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildActionCard(
-                title: 'All Appointments',
-                subtitle: 'View and manage all appointments',
+                title: AppStrings.adminAllAppointments,
+                subtitle: AppStrings.adminAllAppointmentsSubtitle,
                 icon: Icons.calendar_month,
                 color: kAccentColor,
                 onTap:
@@ -464,8 +465,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Pending Appointments',
-                subtitle: 'Manage unconfirmed appointments',
+                title: AppStrings.adminPendingAppointments,
+                subtitle: AppStrings.adminPendingAppointmentsSubtitle,
                 icon: Icons.pending_actions,
                 color: kWarningYellow,
                 onTap:
@@ -476,8 +477,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               const SizedBox(height: 12),
               _buildActionCard(
-                title: 'Doctors Schedules',
-                subtitle: 'View all schedules and availabilities',
+                title: AppStrings.adminDoctorsSchedules,
+                subtitle: AppStrings.adminDoctorsSchedulesSubtitle,
                 icon: Icons.schedule,
                 color: kPurple,
                 onTap: () async {
@@ -509,9 +510,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Detailed Statistics',
-                      style: const TextStyle(
+                    const Text(
+                      AppStrings.adminDetailedStats,
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF1F2937),
@@ -519,19 +520,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                     const SizedBox(height: 16),
                     _buildStatRow(
-                      'Completed appointments',
+                      AppStrings.adminCompletedAppointments,
                       completedAppointments,
                       Icons.check_circle,
                       kSuccessGreen,
                     ),
                     _buildStatRow(
-                      'Pending appointments',
+                      AppStrings.adminPendingAppointmentsLabel,
                       pendingAppointments,
                       Icons.schedule,
                       kWarningYellow,
                     ),
                     _buildStatRow(
-                      'Occupancy rate',
+                      AppStrings.adminOccupancyRate,
                       '${((completedAppointments / (totalAppointments > 0 ? totalAppointments : 1)) * 100).toStringAsFixed(1)}%',
                       Icons.trending_up,
                       kPrimaryColor,

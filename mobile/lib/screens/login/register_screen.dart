@@ -2,7 +2,7 @@ import 'package:caretime/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../strings.dart';
+import 'package:caretime/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 
@@ -35,6 +35,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'other',
     'prefer_not_to_say',
   ];
+  final Map<String, String> _genderLabels = {
+    'male': AppStrings.genderMale,
+    'female': AppStrings.genderFemale,
+    'other': AppStrings.genderOther,
+    'prefer_not_to_say': AppStrings.genderPreferNotToSay,
+  };
   final List<String> _specialties = [
     'Cardiology',
     'Dermatology',
@@ -59,24 +65,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Gastroenterology',
     'Other',
   ];
+  final Map<String, String> _specialtyLabels = {
+    'Cardiology': AppStrings.specialtyCardiology,
+    'Dermatology': AppStrings.specialtyDermatology,
+    'Gynecology': AppStrings.specialtyGynecology,
+    'Pediatrics': AppStrings.specialtyPediatrics,
+    'Ophthalmology': AppStrings.specialtyOphthalmology,
+    'General practitioner': AppStrings.specialtyGeneralPractitioner,
+    'Neurology': AppStrings.specialtyNeurology,
+    'Psychiatry': AppStrings.specialtyPsychiatry,
+    'Orthopedics': AppStrings.specialtyOrthopedics,
+    'ENT': AppStrings.specialtyEnt,
+    'Urology': AppStrings.specialtyUrology,
+    'Oncology': AppStrings.specialtyOncology,
+    'Radiology': AppStrings.specialtyRadiology,
+    'Anesthesiology': AppStrings.specialtyAnesthesiology,
+    'Endocrinology': AppStrings.specialtyEndocrinology,
+    'Nephrology': AppStrings.specialtyNephrology,
+    'Pulmonology': AppStrings.specialtyPulmonology,
+    'Rheumatology': AppStrings.specialtyRheumatology,
+    'Infectious diseases': AppStrings.specialtyInfectiousDiseases,
+    'Hematology': AppStrings.specialtyHematology,
+    'Gastroenterology': AppStrings.specialtyGastroenterology,
+    'Other': AppStrings.specialtyOther,
+  };
 
   final List<String> _westAfricanCountries = [
-    'Bénin',
-    'Burkina Faso',
-    'Cap-Vert',
-    'Côte d\'Ivoire',
-    'Gambie',
-    'Ghana',
-    'Guinée',
-    'Guinée-Bissau',
-    'Libéria',
-    'Mali',
-    'Mauritanie',
-    'Niger',
-    'Nigéria',
-    'Sénégal',
-    'Sierra Leone',
-    'Togo',
+    AppStrings.countryBenin,
+    AppStrings.countryBurkinaFaso,
+    AppStrings.countryCapeVerde,
+    AppStrings.countryIvoryCoast,
+    AppStrings.countryGambia,
+    AppStrings.countryGhana,
+    AppStrings.countryGuinea,
+    AppStrings.countryGuineaBissau,
+    AppStrings.countryLiberia,
+    AppStrings.countryMali,
+    AppStrings.countryMauritania,
+    AppStrings.countryNiger,
+    AppStrings.countryNigeria,
+    AppStrings.countrySenegal,
+    AppStrings.countrySierraLeone,
+    AppStrings.countryTogo,
   ];
   String? _selectedCountry;
   String? _selectedGender;
@@ -143,7 +173,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Affiche le snackbar puis redirige après un court délai
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Registration successful!')));
+        ).showSnackBar(
+          const SnackBar(content: Text(AppStrings.registerSuccess)),
+        );
         await Future.delayed(const Duration(milliseconds: 800));
         if (!mounted) return;
         if (role == 'doctor') {
@@ -154,11 +186,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.pushReplacementNamed(context, '/patient');
         }
       } else {
-        final msg = jsonDecode(response.body)['message'] ?? 'Unknown error';
+        final msg =
+            jsonDecode(response.body)['message'] ?? AppStrings.unknownError;
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Error : $msg')));
+          ).showSnackBar(
+            SnackBar(content: Text('${AppStrings.registerErrorPrefix}$msg')),
+          );
         }
       }
     }
@@ -205,42 +240,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         Text(
-                          AppStrings.enRegisterScreenTitle,
+                          AppStrings.registerScreenTitle,
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _lastnameController,
                           decoration: InputDecoration(
-                            labelText: 'Last name',
+                            labelText: AppStrings.lastName,
                             prefixIcon: const Icon(Icons.person_outline),
                             border: const OutlineInputBorder(),
                           ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Required field'
+                                      ? AppStrings.requiredField
                                       : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _firstnameController,
                           decoration: InputDecoration(
-                            labelText: 'First name',
+                            labelText: AppStrings.firstName,
                             prefixIcon: const Icon(Icons.person),
                             border: const OutlineInputBorder(),
                           ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Required field'
+                                      ? AppStrings.requiredField
                                       : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
-                            labelText: 'Email',
+                            labelText: AppStrings.emailLabel,
                             prefixIcon: Icon(Icons.email_outlined),
                             border: OutlineInputBorder(),
                           ),
@@ -248,7 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Required field'
+                                      ? AppStrings.requiredField
                                       : null,
                         ),
                         const SizedBox(height: 16),
@@ -256,14 +291,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
-                            labelText: 'Password',
+                            labelText: AppStrings.passwordLabel,
                             prefixIcon: const Icon(Icons.lock_outline),
                             border: const OutlineInputBorder(),
                           ),
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Required field'
+                                      ? AppStrings.requiredField
                                       : null,
                         ),
                         const SizedBox(height: 16),
@@ -274,7 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: TextFormField(
                                 controller: _dateOfBirthController,
                                 decoration: const InputDecoration(
-                                  labelText: 'Date of birth',
+                                  labelText: AppStrings.dateOfBirth,
                                   prefixIcon: Icon(Icons.cake_outlined),
                                   border: OutlineInputBorder(),
                                 ),
@@ -287,7 +322,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: DropdownButtonFormField<String>(
                                 initialValue: _selectedGender,
                                 decoration: const InputDecoration(
-                                  labelText: 'Gender',
+                                  labelText: AppStrings.gender,
                                   prefixIcon: Icon(Icons.wc_outlined),
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
@@ -300,7 +335,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         .map(
                                           (g) => DropdownMenuItem(
                                             value: g,
-                                            child: Text(g),
+                                            child: Text(_genderLabels[g] ?? g),
                                           ),
                                         )
                                         .toList(),
@@ -313,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 validator:
                                     (value) =>
                                         value == null || value.isEmpty
-                                            ? 'Required field'
+                                            ? AppStrings.requiredField
                                             : null,
                               ),
                             ),
@@ -324,7 +359,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         DropdownButtonFormField<String>(
                           initialValue: _selectedCountry,
                           decoration: const InputDecoration(
-                            labelText: 'Country',
+                            labelText: AppStrings.country,
                             prefixIcon: Icon(Icons.flag_outlined),
                             border: OutlineInputBorder(),
                           ),
@@ -346,12 +381,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator:
                               (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Required field'
+                                      ? AppStrings.requiredField
                                       : null,
                         ),
                         const SizedBox(height: 24),
                         CheckboxListTile(
-                          title: const Text('I want to register as a doctor'),
+                          title: const Text(AppStrings.registerAsDoctor),
                           value: _isDoctor,
                           onChanged: (val) {
                             setState(() {
@@ -365,7 +400,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           DropdownButtonFormField<String>(
                             initialValue: _selectedSpecialty,
                             decoration: const InputDecoration(
-                              labelText: 'Specialty',
+                              labelText: AppStrings.specialty,
                               prefixIcon: Icon(Icons.medical_services_outlined),
                               border: OutlineInputBorder(),
                             ),
@@ -374,7 +409,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     .map(
                                       (s) => DropdownMenuItem(
                                         value: s,
-                                        child: Text(s),
+                                        child: Text(
+                                          _specialtyLabels[s] ?? s,
+                                        ),
                                       ),
                                     )
                                     .toList(),
@@ -387,14 +424,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             validator:
                                 (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Required field'
+                                        ? AppStrings.requiredField
                                         : null,
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _licenseNumberController,
                             decoration: const InputDecoration(
-                              labelText: 'License number',
+                              labelText: AppStrings.licenseNumber,
                               prefixIcon: Icon(
                                 Icons.confirmation_number_outlined,
                               ),
@@ -423,7 +460,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               FocusScope.of(context).unfocus();
                               _register();
                             },
-                            child: Text(AppStrings.enRegister),
+                            child: Text(AppStrings.register),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -436,7 +473,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             );
                           },
-                          child: const Text('Already have an account? Login'),
+                          child: const Text(AppStrings.alreadyHaveAccount),
                         ),
                       ],
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/admin_service.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -83,19 +84,19 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirm deletion'),
+            title: const Text(AppStrings.adminConfirmDeletion),
             content: Text(
-              'Are you sure you want to delete the appointment for "$patientName"?',
+              '${AppStrings.adminConfirmDeleteAppointment} "$patientName" ?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: const Text(AppStrings.adminCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Delete'),
+                child: const Text(AppStrings.adminDelete),
               ),
             ],
           ),
@@ -108,16 +109,16 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
           _loadAppointments();
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Appointment successfully deleted'),
+            const SnackBar(
+              content: Text(AppStrings.adminAppointmentDeleted),
               backgroundColor: kSuccessGreen,
             ),
           );
         } else {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to delete appointment'),
+            const SnackBar(
+              content: Text(AppStrings.adminFailedDeleteAppointment),
               backgroundColor: Colors.red,
             ),
           );
@@ -126,11 +127,26 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppStrings.errorPrefix}${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
       }
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'confirmed':
+        return AppStrings.adminStatusConfirmed;
+      case 'booked':
+        return AppStrings.adminStatusPending;
+      case 'canceled':
+        return AppStrings.adminStatusCancelled;
+      case 'completed':
+        return AppStrings.adminStatusCompleted;
+      default:
+        return status;
     }
   }
 
@@ -236,39 +252,43 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📅 Appointment', [
-                          (date != null
-                              ? 'Date: ${DateFormat('EEEE d MMMM yyyy', 'en_US').format(date)}'
-                              : 'Unknown date'),
-                          (date != null
-                              ? 'Time: ${DateFormat('HH:mm').format(date)}'
-                              : ''),
+                        _buildDetailSection(AppStrings.adminAppointmentSection, [
+                          date != null
+                              ? '${AppStrings.adminDate}: ${DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(date)}'
+                              : AppStrings.adminAppointmentUnknownDate,
+                          date != null
+                              ? '${AppStrings.hour}: ${DateFormat('HH:mm').format(date)}'
+                              : '',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👨‍⚕️ Doctor', [
-                          'Name: $doctorName',
-                          'Email: $doctorEmail',
-                          'Phone: $doctorPhone',
+                        _buildDetailSection(AppStrings.adminDoctorSection, [
+                          '${AppStrings.adminName}: $doctorName',
+                          '${AppStrings.emailLabel}: $doctorEmail',
+                          '${AppStrings.phone}: $doctorPhone',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('👤 Patient', [
-                          'Name: $patientName',
-                          'Email: $patientEmail',
-                          'Phone: $patientPhone',
+                        _buildDetailSection(AppStrings.adminPatientSection, [
+                          '${AppStrings.adminName}: $patientName',
+                          '${AppStrings.emailLabel}: $patientEmail',
+                          '${AppStrings.phone}: $patientPhone',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('💬 Reason of consultation', [
-                          reason.isNotEmpty ? reason : 'No reason specified',
+                        _buildDetailSection(AppStrings.adminReasonSection, [
+                          reason.isNotEmpty
+                              ? reason
+                              : AppStrings.adminNoReasonSpecified,
                         ]),
                         if (patientNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📝 Patient notes', [
+                          _buildDetailSection(AppStrings.adminPatientNotes, [
                             patientNotes,
                           ]),
                         ],
                         if (doctorNotes.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          _buildDetailSection('📋 Doctor notes', [doctorNotes]),
+                          _buildDetailSection(AppStrings.adminDoctorNotes, [
+                            doctorNotes,
+                          ]),
                         ],
                         const SizedBox(height: 30),
                       ],
@@ -314,27 +334,27 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       case 'confirmed':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF166534);
-        label = 'Confirmed';
+        label = AppStrings.adminStatusConfirmed;
         break;
       case 'booked':
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = 'Pending';
+        label = AppStrings.adminStatusPending;
         break;
       case 'canceled':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
-        label = 'Cancelled';
+        label = AppStrings.adminStatusCancelled;
         break;
       case 'completed':
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
-        label = 'Completed';
+        label = AppStrings.adminStatusCompleted;
         break;
       default:
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFF92400E);
-        label = status;
+        label = _statusLabel(status);
         break;
     }
     return Container(
@@ -439,16 +459,16 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
       final filter = widget.arguments!['filter'] as String;
       switch (filter) {
         case 'today':
-          return 'Today\'s Appointments';
+          return AppStrings.adminAppointmentsTodayTitle;
         case 'pending':
-          return 'Pending Appointments';
+          return AppStrings.adminAppointmentsPendingTitle;
         case 'all':
-          return 'All Appointments';
+          return AppStrings.adminAppointmentsAllTitle;
         default:
-          return 'Appointments Management';
+          return AppStrings.adminAppointmentsTitle;
       }
     }
-    return 'Appointments Management';
+    return AppStrings.adminAppointmentsTitle;
   }
 
   @override
@@ -469,11 +489,11 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: $error'),
+              Text('${AppStrings.errorPrefix}$error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadAppointments,
-                child: const Text('Retry'),
+                child: const Text(AppStrings.adminRetry),
               ),
             ],
           ),
@@ -497,7 +517,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAppointments,
-            tooltip: 'Refresh',
+            tooltip: AppStrings.adminRefresh,
           ),
         ],
       ),
@@ -511,7 +531,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search for an appointment...',
+                    hintText: AppStrings.adminSearchAppointment,
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -528,7 +548,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       child: DropdownButton<String>(
                         value: filterStatus,
                         isExpanded: true,
-                        hint: const Text('Status'),
+                        hint: const Text(AppStrings.adminStatusLabel),
                         items:
                             [
                               'All',
@@ -537,23 +557,10 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                               'completed',
                               'canceled',
                             ].map((status) {
-                              String label;
-                              switch (status) {
-                                case 'booked':
-                                  label = 'Pending';
-                                  break;
-                                case 'confirmed':
-                                  label = 'Confirmed';
-                                  break;
-                                case 'completed':
-                                  label = 'Completed';
-                                  break;
-                                case 'canceled':
-                                  label = 'Cancelled';
-                                  break;
-                                default:
-                                  label = status;
-                              }
+                              final label =
+                                  status == 'All'
+                                      ? AppStrings.adminFilterAll
+                                      : _statusLabel(status);
                               return DropdownMenuItem(
                                 value: status,
                                 child: Text(label),
@@ -569,14 +576,28 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       child: DropdownButton<String>(
                         value: filterType,
                         isExpanded: true,
-                        hint: const Text('Period'),
+                        hint: const Text(AppStrings.adminPeriodLabel),
                         items:
                             ['All', 'Today', 'This week', 'This month'].map((
                               type,
                             ) {
+                              String label;
+                              switch (type) {
+                                case 'Today':
+                                  label = AppStrings.adminPeriodToday;
+                                  break;
+                                case 'This week':
+                                  label = AppStrings.adminPeriodThisWeek;
+                                  break;
+                                case 'This month':
+                                  label = AppStrings.adminPeriodThisMonth;
+                                  break;
+                                default:
+                                  label = AppStrings.adminFilterAll;
+                              }
                               return DropdownMenuItem(
                                 value: type,
-                                child: Text(type),
+                                child: Text(label),
                               );
                             }).toList(),
                         onChanged:
@@ -606,7 +627,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              'No appointments found',
+                              AppStrings.adminNoAppointments,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -660,7 +681,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                               ),
                               title: Text(
                                 appointment['patientName'] ??
-                                    'Nom patient inconnu',
+                                    AppStrings.adminPatientNameUnknown,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -670,12 +691,12 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Dr. ${appointment['doctorName'] ?? 'Doctor name unknown'}',
+                                    'Dr. ${appointment['doctorName'] ?? AppStrings.adminDoctorNameUnknown}',
                                   ),
                                   Text(
                                     date != null
                                         ? '${DateFormat('EEEE d MMMM', 'fr_FR').format(date)} à ${DateFormat('HH:mm').format(date)}'
-                                        : 'Unknown date',
+                                        : AppStrings.adminAppointmentUnknownDate,
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -707,7 +728,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Details'),
+                                                Text(AppStrings.adminDetails),
                                               ],
                                             ),
                                           ),
@@ -721,7 +742,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Delete',
+                                                  AppStrings.adminDelete,
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),

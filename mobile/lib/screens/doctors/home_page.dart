@@ -4,6 +4,7 @@ import 'doctor_appointments_screen.dart';
 import 'doctor_quick_availability_page.dart';
 import '../profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caretime/strings.dart';
 
 class DoctorHomeScreen extends StatefulWidget {
   const DoctorHomeScreen({super.key});
@@ -46,9 +47,9 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     String title;
     String? subtitle;
     if (_selectedIndex == 0) {
-      title = "Dashboard";
+      title = AppStrings.doctorHomeDashboard;
     } else if (_selectedIndex == 1) {
-      title = "Appointments";
+      title = AppStrings.doctorHomeAppointments;
       subtitle = null;
     } else if (_selectedIndex == 2) {
       title = "";
@@ -115,14 +116,17 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
         selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: AppStrings.patientHome,
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.schedule),
-            label: 'Appointments',
+            label: AppStrings.doctorHomeAppointments,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.event),
-            label: 'Availability',
+            label: AppStrings.doctorHomeAvailability,
           ),
         ],
       ),

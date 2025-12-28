@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/admin_service.dart';
 import 'package:intl/intl.dart';
+import 'package:caretime/strings.dart';
 
 const Color kPrimaryColor = Color(0xFF03A6A1);
 const Color kSecondaryColor = Color(0xFF0891B2);
@@ -74,7 +75,9 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              currentStatus ? 'Doctor deactivated' : 'Doctor activated',
+              currentStatus
+                  ? AppStrings.adminDoctorDeactivated
+                  : AppStrings.adminDoctorActivated,
             ),
             backgroundColor: currentStatus ? kSoftRed : kSuccessGreen,
           ),
@@ -83,7 +86,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to deactivate doctor.'),
+            content: Text(AppStrings.adminFailedDeactivateDoctor),
             backgroundColor: Colors.red,
           ),
         );
@@ -92,7 +95,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text('${AppStrings.errorPrefix}${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -107,7 +110,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Doctor reactivated'),
+            content: Text(AppStrings.adminDoctorReactivated),
             backgroundColor: kSuccessGreen,
           ),
         );
@@ -115,7 +118,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to reactivate doctor.'),
+            content: Text(AppStrings.adminFailedReactivateDoctor),
             backgroundColor: Colors.red,
           ),
         );
@@ -124,7 +127,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text('${AppStrings.errorPrefix}${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -136,19 +139,19 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirm deletion'),
+            title: const Text(AppStrings.adminConfirmDeletion),
             content: Text(
-              'Are you sure you want to delete doctor "$doctorName"?',
+              '${AppStrings.adminConfirmDeleteDoctor} "$doctorName" ?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: const Text(AppStrings.adminCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: kSoftRed),
-                child: const Text('Delete'),
+                child: const Text(AppStrings.adminDelete),
               ),
             ],
           ),
@@ -162,7 +165,9 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Doctor "$doctorName" deleted'),
+              content: Text(
+                '${AppStrings.adminDoctorDeleted} "$doctorName"',
+              ),
               backgroundColor: kSuccessGreen,
             ),
           );
@@ -170,7 +175,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to delete doctor.'),
+              content: Text(AppStrings.adminFailedDeleteDoctor),
               backgroundColor: Colors.red,
             ),
           );
@@ -179,7 +184,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppStrings.errorPrefix}${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -236,7 +241,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              doctor['name'] ?? 'Unknown name',
+                              doctor['name'] ?? AppStrings.adminUnknownName,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -264,21 +269,27 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDetailSection('📧 Contact', [
-                          'Email: ${doctor['email'] ?? 'Not provided'}',
-                          'Phone: ${doctor['phone'] ?? 'Not provided'}',
+                        _buildDetailSection(AppStrings.adminContactSection, [
+                          '${AppStrings.emailLabel}: ${doctor['email'] ?? AppStrings.adminNotProvided}',
+                          '${AppStrings.phone}: ${doctor['phone'] ?? AppStrings.adminNotProvided}',
                         ]),
                         const SizedBox(height: 20),
-                        _buildDetailSection('🏥 Professional Information', [
-                          'Specialization: ${doctor['specialization'] ?? 'Not defined'}',
-                          'License number: ${doctor['licenseNumber'] ?? 'Not provided'}',
-                        ]),
+                        _buildDetailSection(
+                          AppStrings.adminProfessionalInfoSection,
+                          [
+                            '${AppStrings.adminSpecialization}: ${doctor['specialization'] ?? AppStrings.adminNotProvided}',
+                            '${AppStrings.adminLicenseNumber}: ${doctor['licenseNumber'] ?? AppStrings.adminNotProvided}',
+                          ],
+                        ),
                         const SizedBox(height: 20),
-                        _buildDetailSection('📅 Account Information', [
-                          'ID: ${doctor['id'] ?? doctor['_id'] ?? ''}',
-                          'Address: ${(doctor['country'] ?? '') + (doctor['city'] != null && doctor['city'].toString().isNotEmpty ? ', ' + doctor['city'] : '')}',
-                          'Account creation date: ${doctor['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(doctor['createdAt'])) : 'Not provided'}',
-                        ]),
+                        _buildDetailSection(
+                          AppStrings.adminAccountInfoSection,
+                          [
+                            'ID: ${doctor['id'] ?? doctor['_id'] ?? ''}',
+                            '${AppStrings.country}: ${(doctor['country'] ?? '') + (doctor['city'] != null && doctor['city'].toString().isNotEmpty ? ', ' + doctor['city'] : '')}',
+                            '${AppStrings.adminAccountCreationDate}: ${doctor['createdAt'] != null ? DateFormat('yyyy-MM-dd').format(DateTime.parse(doctor['createdAt'])) : AppStrings.adminNotProvided}',
+                          ],
+                        ),
                         const SizedBox(height: 30),
                       ],
                     ),
@@ -328,7 +339,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
         border: Border.all(color: isActive ? kSuccessGreen : kSoftRed),
       ),
       child: Text(
-        isActive ? 'Active' : 'Inactive',
+        isActive ? AppStrings.adminStatusActive : AppStrings.adminStatusInactive,
         style: TextStyle(
           color: isActive ? kSuccessGreen : kSoftRed,
           fontSize: 12,
@@ -375,11 +386,11 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
             children: [
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text('${AppStrings.errorPrefix}$error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadDoctors,
-                child: const Text('Retry'),
+                child: const Text(AppStrings.adminRetry),
               ),
             ],
           ),
@@ -391,7 +402,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text(
-          'Doctors Management',
+          AppStrings.adminDoctorsManagement,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kPrimaryColor,
@@ -400,7 +411,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadDoctors,
-            tooltip: 'Refresh',
+            tooltip: AppStrings.adminRefresh,
           ),
         ],
       ),
@@ -414,7 +425,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
               children: [
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search for a doctor...',
+                    hintText: AppStrings.adminSearchDoctor,
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -428,7 +439,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Filter: ',
+                      AppStrings.adminFilter,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 8),
@@ -436,9 +447,20 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                       value: filterStatus,
                       items:
                           ['All', 'Active', 'Inactive'].map((status) {
+                            String label;
+                            switch (status) {
+                              case 'Active':
+                                label = AppStrings.adminFilterActive;
+                                break;
+                              case 'Inactive':
+                                label = AppStrings.adminFilterInactive;
+                                break;
+                              default:
+                                label = AppStrings.adminFilterAll;
+                            }
                             return DropdownMenuItem(
                               value: status,
-                              child: Text(status),
+                              child: Text(label),
                             );
                           }).toList(),
                       onChanged:
@@ -467,7 +489,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              'No doctors found',
+                              AppStrings.adminNoDoctors,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -505,7 +527,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                 ),
                               ),
                               title: Text(
-                                doctor['name'] ?? 'Unknown name',
+                                doctor['name'] ?? AppStrings.adminUnknownName,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -516,7 +538,8 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                 children: [
                                   Text(doctor['specialization'] ?? ''),
                                   Text(
-                                    doctor['email'] ?? 'Email not provided',
+                                    doctor['email'] ??
+                                        AppStrings.adminEmailNotProvided,
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -558,7 +581,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                               children: [
                                                 Icon(Icons.info_outline),
                                                 SizedBox(width: 8),
-                                                Text('Details'),
+                                                Text(AppStrings.adminDetails),
                                               ],
                                             ),
                                           ),
@@ -578,8 +601,8 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                                 const SizedBox(width: 8),
                                                 Text(
                                                   isActive
-                                                      ? 'Deactivate'
-                                                      : 'Activate',
+                                                      ? AppStrings.adminDeactivate
+                                                      : AppStrings.adminActivate,
                                                 ),
                                               ],
                                             ),
@@ -594,7 +617,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                  'Delete',
+                                                  AppStrings.adminDelete,
                                                   style: TextStyle(
                                                     color: kSoftRed,
                                                   ),

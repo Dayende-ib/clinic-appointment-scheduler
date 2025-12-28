@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'doctor_list_page.dart'; // Import pour accéder à la classe Doctor
+import 'doctor_list_page.dart';
 import '../../services/patient_api_service.dart';
+import 'package:caretime/strings.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
   final Doctor doctor;
@@ -23,13 +24,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   List<DateTime> selectedDates = [];
   final TextEditingController _noteController = TextEditingController();
   String? _selectedReason;
-  final List<String> _motifs = [
-    'Consultation',
-    'Prescription renewal',
-    'Test results',
-    'Follow-up',
-    'Other',
-  ];
+  final List<String> _motifs = AppStrings.patientMotifs;
 
   @override
   void initState() {
@@ -71,7 +66,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Doctor profile'),
+        title: const Text(AppStrings.patientDoctorProfileTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -80,7 +75,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : error != null
-              ? Center(child: Text('Error: $error'))
+              ? Center(child: Text('${AppStrings.errorPrefix}$error'))
               : ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
@@ -96,7 +91,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                               calendarMonth.year,
                               calendarMonth.month - 1,
                             );
-                            // Si le jour sélectionné n'existe pas dans le nouveau mois, on prend le 1er
                             int lastDay =
                                 DateTime(
                                   calendarMonth.year,
@@ -174,6 +168,15 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             selectedDate.year == date.year &&
                             selectedDate.month == date.month &&
                             selectedDate.day == day;
+                        final weekdayLabels = [
+                          AppStrings.weekdayMon,
+                          AppStrings.weekdayTue,
+                          AppStrings.weekdayWed,
+                          AppStrings.weekdayThu,
+                          AppStrings.weekdayFri,
+                          AppStrings.weekdaySat,
+                          AppStrings.weekdaySun,
+                        ];
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -203,15 +206,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  [
-                                    'Mon',
-                                    'Tue',
-                                    'Wed',
-                                    'Thu',
-                                    'Fri',
-                                    'Sat',
-                                    'Sun',
-                                  ][date.weekday - 1],
+                                  weekdayLabels[date.weekday - 1],
                                   style: TextStyle(
                                     color:
                                         isSelected ? Colors.white : Colors.teal,
@@ -286,8 +281,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.phone, size: 16, color: Colors.teal),
-                                SizedBox(width: 6),
+                                const Icon(
+                                  Icons.phone,
+                                  size: 16,
+                                  color: Colors.teal,
+                                ),
+                                const SizedBox(width: 6),
                                 Text(
                                   widget.doctor.phone!,
                                   style: const TextStyle(
@@ -303,7 +302,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Available slots for ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}',
+                    '${AppStrings.patientAvailableSlotsFor} ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -321,7 +320,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            "No availability for this day.",
+                            AppStrings.patientNoAvailabilityForDay,
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.black54,
@@ -350,7 +349,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Booking summary',
+                              AppStrings.patientBookingSummary,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -361,7 +360,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                               if (idx >= 0 && idx < slots.length)
                                 Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.calendar_today,
                                       size: 16,
                                       color: Colors.teal,
@@ -386,7 +385,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           DropdownButtonFormField<String>(
                             initialValue: _selectedReason,
                             decoration: const InputDecoration(
-                              labelText: 'Reason',
+                              labelText: AppStrings.patientReason,
                               border: OutlineInputBorder(),
                             ),
                             items:
@@ -403,7 +402,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             validator:
                                 (val) =>
                                     val == null || val.isEmpty
-                                        ? 'Please choose a reason'
+                                        ? AppStrings.patientPleaseChooseReason
                                         : null,
                           ),
                           const SizedBox(height: 12),
@@ -411,10 +410,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             controller: _noteController,
                             maxLines: 2,
                             decoration: const InputDecoration(
-                              labelText: 'Note (optional)',
+                              labelText: AppStrings.patientNoteOptional,
                               border: OutlineInputBorder(),
-                              hintText:
-                                  'E.g.: I would like to discuss a specific issue...',
+                              hintText: AppStrings.patientNoteHint,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -460,7 +458,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                           doctorId: widget.doctor.id,
                                           datetime: datetimeIso,
                                           reason:
-                                              _selectedReason ?? 'Consultation',
+                                              _selectedReason ??
+                                              AppStrings.patientMotifs.first,
                                           patientNotes:
                                               _noteController.text.isNotEmpty
                                                   ? _noteController.text
@@ -478,8 +477,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                       SnackBar(
                                         content: Text(
                                           allSuccess
-                                              ? 'All appointments have been booked!'
-                                              : 'Some appointments could not be booked.',
+                                              ? AppStrings
+                                                  .patientBookingSuccessAll
+                                              : AppStrings
+                                                  .patientBookingPartial,
                                         ),
                                         backgroundColor:
                                             allSuccess
@@ -500,7 +501,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                   ),
                                 )
                                 : const Text(
-                                  'Confirm booking',
+                                  AppStrings.patientConfirmBooking,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -517,20 +518,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   String _monthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    final months = AppStrings.patientMonthNames;
     return months[month - 1];
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
 import 'package:caretime/app_theme.dart';
+import 'package:caretime/strings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -42,9 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'URL API sauvegardée. Redémarrez l\'app pour appliquer.',
-            ),
+            content: Text(AppStrings.settingsApiSaved),
             backgroundColor: Colors.green,
           ),
         );
@@ -52,7 +51,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('${AppStrings.errorPrefix}$e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -73,9 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'URL API réinitialisée. Redémarrez l\'app pour appliquer.',
-            ),
+            content: Text(AppStrings.settingsApiReset),
             backgroundColor: Colors.orange,
           ),
         );
@@ -83,7 +83,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('${AppStrings.errorPrefix}$e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -97,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Paramètres API'),
+        title: const Text(AppStrings.settingsTitle),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -107,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Configuration API',
+              AppStrings.settingsConfigTitle,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -116,15 +119,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Modifiez l\'URL de l\'API pour pointer vers votre serveur distant.',
+              AppStrings.settingsConfigDescription,
               style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
             TextField(
               controller: _apiUrlController,
               decoration: const InputDecoration(
-                labelText: 'URL de l\'API',
-                hintText: 'http://localhost:5000',
+                labelText: AppStrings.settingsApiUrlLabel,
+                hintText: AppStrings.settingsApiUrlHint,
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.link),
               ),
@@ -132,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'URL actuelle par défaut:',
+              AppStrings.settingsCurrentDefaultUrl,
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -178,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                             )
-                            : const Text('Sauvegarder'),
+                            : const Text(AppStrings.settingsSave),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -189,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       side: const BorderSide(color: AppColors.primary),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Réinitialiser'),
+                    child: const Text(AppStrings.settingsReset),
                   ),
                 ),
               ],
@@ -209,8 +212,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       Icon(Icons.info_outline, color: Colors.orange, size: 20),
                       SizedBox(width: 8),
-                      Text(
-                        'Information',
+                      const Text(
+                        AppStrings.settingsInfoTitle,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.orange,
@@ -220,9 +223,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '• Redémarrez l\'application après avoir modifié l\'URL\n'
-                    '• Assurez-vous que votre serveur API est accessible\n'
-                    '• L\'URL doit inclure le protocole (http:// ou https://)',
+                    '- ${AppStrings.settingsInfoLine1}\n'
+                    '- ${AppStrings.settingsInfoLine2}\n'
+                    '- ${AppStrings.settingsInfoLine3}',
                     style: TextStyle(fontSize: 12, color: Colors.orange[700]),
                   ),
                 ],

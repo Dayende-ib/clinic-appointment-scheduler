@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/doctor_availability_service.dart';
 import 'package:intl/intl.dart';
+import 'package:caretime/strings.dart';
 
 class AllDoctorSchedulesScreen extends StatefulWidget {
   final List<Map<String, dynamic>> doctors;
@@ -77,14 +78,14 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
     final List<Map<String, dynamic>> doctors = widget.doctors;
     final weekDates = getWeekDates();
     return Scaffold(
-      appBar: AppBar(title: const Text('Doctors Schedules')),
+      appBar: AppBar(title: const Text(AppStrings.adminDoctorsSchedules)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Search for a doctor',
+                labelText: AppStrings.adminSearchDoctorLabel,
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (value) => setState(() => search = value),
@@ -95,7 +96,7 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                   doctors.isEmpty
                       ? const Center(
                         child: Text(
-                          'No doctor selected.',
+                          AppStrings.adminNoDoctorSelected,
                           style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
                       )
@@ -109,10 +110,13 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                               '${doctor['firstname'] ?? ''} ${doctor['lastname'] ?? ''}'
                                   .trim();
                           final String displayName =
-                              name.isNotEmpty ? name : 'No name provided';
+                              name.isNotEmpty
+                                  ? name
+                                  : AppStrings.adminNoNameProvided;
                           final String email = doctor['email'] ?? '';
                           final String specialty =
-                              doctor['specialty'] ?? 'No specialty provided';
+                              doctor['specialty'] ??
+                              AppStrings.adminNoSpecialtyProvided;
                           final doctorId = doctor['id'] ?? doctor['_id'] ?? '';
                           final planning = weekPlannings[doctorId] ?? {};
                           final isLoading = loadingDoctors.contains(doctorId);
@@ -140,7 +144,7 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                                   ),
                                   const SizedBox(height: 12),
                                   if (isLoading)
-                                    const Text('Loading schedule...')
+                                    const Text(AppStrings.adminLoadingSchedule)
                                   else
                                     Column(
                                       crossAxisAlignment:
@@ -154,14 +158,16 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                                                 planning[dateStr] ?? [];
                                             final dayName = DateFormat(
                                               'EEEE',
-                                              'en_US',
+                                              'fr_FR',
                                             ).format(date);
+                                            final dayLabel =
+                                                '${dayName[0].toUpperCase()}${dayName.substring(1)}';
                                             return Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  '${dayName[0].toUpperCase()}${dayName.substring(1)} :',
+                                                  '$dayLabel :',
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15,
@@ -174,7 +180,8 @@ class _AllDoctorSchedulesScreenState extends State<AllDoctorSchedulesScreen> {
                                                       bottom: 8,
                                                     ),
                                                     child: Text(
-                                                      'No slots available',
+                                                      AppStrings
+                                                          .adminNoSlotsAvailable,
                                                       style: TextStyle(
                                                         color: Colors.red,
                                                       ),

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
+import 'package:caretime/strings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -63,9 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() => isLoading = false);
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error fetching user data. Please try again.'),
-          ),
+          const SnackBar(content: Text(AppStrings.profileLoadErrorRetry)),
         );
       }
     } catch (e) {
@@ -82,7 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Connexion error : $e')));
+      ).showSnackBar(
+        SnackBar(content: Text('${AppStrings.connectionErrorPrefix}$e')),
+      );
     }
   }
 
@@ -109,17 +110,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to log out?'),
+          title: const Text(AppStrings.logoutTitle),
+          content: const Text(AppStrings.logoutConfirm),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text(AppStrings.cancel),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
-              child: const Text('Yes, Logout'),
+              child: const Text(AppStrings.confirmLogout),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 _logout();
@@ -141,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Profile loading...'),
+              Text(AppStrings.profileLoading),
             ],
           ),
         ),
@@ -155,12 +156,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const Icon(Icons.error_outline, color: Colors.red, size: 48),
               const SizedBox(height: 16),
-              const Text('Error fetching user data.'),
+              const Text(AppStrings.profileLoadError),
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _fetchUserData,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: const Text(AppStrings.retry),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF03A6A1),
                   foregroundColor: Colors.white,
@@ -191,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 1,
         iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
         title: const Text(
-          'Profile',
+          AppStrings.profileTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: Color(0xFF0891B2),
@@ -256,11 +257,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Column(
                   children: [
-                    _infoTile(Icons.email, "Email", userData!['email'] ?? ''),
+                    _infoTile(
+                      Icons.email,
+                      AppStrings.emailLabel,
+                      userData!['email'] ?? '',
+                    ),
                     const Divider(),
                     _infoTile(
                       Icons.phone,
-                      "Phone",
+                      AppStrings.phone,
                       countryCode.isNotEmpty
                           ? '$countryCode $phoneNumber'
                           : phone,
@@ -268,20 +273,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Divider(),
                     _infoTile(
                       Icons.location_city,
-                      "City",
+                      AppStrings.city,
                       userData!['city'] ?? '',
                     ),
                     const Divider(),
                     _infoTile(
                       Icons.flag,
-                      "Country",
+                      AppStrings.country,
                       userData!['country'] ?? '',
                     ),
                     if (isPatient) ...[
                       const Divider(),
                       _infoTile(
                         Icons.cake,
-                        "Date of birth",
+                        AppStrings.dateOfBirth,
                         (userData!['dateOfBirth'] != null &&
                                 userData!['dateOfBirth'].toString().isNotEmpty)
                             ? userData!['dateOfBirth'].toString().substring(
@@ -295,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Divider(),
                       _infoTile(
                         Icons.badge,
-                        "License number",
+                        AppStrings.licenseNumber,
                         userData!['licenseNumber'] ?? '',
                       ),
                     ],
@@ -329,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     },
                     icon: const Icon(Icons.edit),
-                    label: const Text("Edit Profile"),
+                    label: const Text(AppStrings.editProfile),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF03A6A1),
                       foregroundColor: Colors.white,
@@ -343,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: OutlinedButton.icon(
                     onPressed: _showLogoutConfirmationDialog,
                     icon: const Icon(Icons.logout, color: Colors.red),
-                    label: const Text("Logout"),
+                    label: const Text(AppStrings.logout),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.redAccent),
                       foregroundColor: Colors.red,
@@ -412,35 +417,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // Liste des pays d'Afrique de l'Ouest et quelques grandes villes
   static const List<String> countryList = [
-    'Bénin',
-    'Burkina Faso',
-    'Cap-Vert',
-    'Côte d\'Ivoire',
-    'Gambie',
-    'Ghana',
-    'Guinée',
-    'Guinée-Bissau',
-    'Libéria',
-    'Mali',
-    'Niger',
-    'Nigeria',
-    'Sénégal',
-    'Sierra Leone',
-    'Togo',
+    AppStrings.countryBenin,
+    AppStrings.countryBurkinaFaso,
+    AppStrings.countryCapeVerde,
+    AppStrings.countryIvoryCoast,
+    AppStrings.countryGambia,
+    AppStrings.countryGhana,
+    AppStrings.countryGuinea,
+    AppStrings.countryGuineaBissau,
+    AppStrings.countryLiberia,
+    AppStrings.countryMali,
+    AppStrings.countryNiger,
+    AppStrings.countryNigeria,
+    AppStrings.countrySenegal,
+    AppStrings.countrySierraLeone,
+    AppStrings.countryTogo,
     'Autre',
   ];
   static const Map<String, List<String>> cityMap = {
-    'Bénin': ['Cotonou', 'Porto-Novo', 'Parakou', 'Bohicon', 'Kandi', 'Autre'],
-    'Burkina Faso': [
+    AppStrings.countryBenin: [
+      'Cotonou',
+      'Porto-Novo',
+      'Parakou',
+      'Bohicon',
+      'Kandi',
+      'Autre',
+    ],
+    AppStrings.countryBurkinaFaso: [
       'Ouagadougou',
       'Bobo-Dioulasso',
       'Koudougou',
       'Ouahigouya',
-      'Fada N\'Gourma',
+      "Fada N'Gourma",
       'Autre',
     ],
-    'Cap-Vert': ['Praia', 'Mindelo', 'Santa Maria', 'Assomada', 'Autre'],
-    'Côte d\'Ivoire': [
+    AppStrings.countryCapeVerde: [
+      'Praia',
+      'Mindelo',
+      'Santa Maria',
+      'Assomada',
+      'Autre',
+    ],
+    AppStrings.countryIvoryCoast: [
       'Abidjan',
       'Bouaké',
       'Yamoussoukro',
@@ -448,17 +466,66 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       'San Pedro',
       'Autre',
     ],
-    'Gambie': ['Banjul', 'Serekunda', 'Brikama', 'Bakau', 'Autre'],
-    'Ghana': ['Accra', 'Kumasi', 'Tamale', 'Takoradi', 'Autre'],
-    'Guinée': ['Conakry', 'Labé', 'Kankan', 'Kindia', 'Autre'],
-    'Guinée-Bissau': ['Bissau', 'Bafatá', 'Gabú', 'Bissorã', 'Autre'],
-    'Libéria': ['Monrovia', 'Gbarnga', 'Kakata', 'Bensonville', 'Autre'],
-    'Mali': ['Bamako', 'Sikasso', 'Kayes', 'Mopti', 'Autre'],
-    'Niger': ['Niamey', 'Zinder', 'Maradi', 'Tahoua', 'Autre'],
-    'Nigeria': ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Autre'],
-    'Sénégal': ['Dakar', 'Thiès', 'Kaolack', 'Saint-Louis', 'Autre'],
-    'Sierra Leone': ['Freetown', 'Bo', 'Kenema', 'Makeni', 'Autre'],
-    'Togo': ['Lomé', 'Sokodé', 'Kara', 'Atakpamé', 'Autre'],
+    AppStrings.countryGambia: ['Banjul', 'Serekunda', 'Brikama', 'Bakau', 'Autre'],
+    AppStrings.countryGhana: ['Accra', 'Kumasi', 'Tamale', 'Takoradi', 'Autre'],
+    AppStrings.countryGuinea: [
+      'Conakry',
+      'Labé',
+      'Kankan',
+      'Kindia',
+      'Autre',
+    ],
+    AppStrings.countryGuineaBissau: [
+      'Bissau',
+      'Bafatá',
+      'Gabú',
+      'Bissorã',
+      'Autre',
+    ],
+    AppStrings.countryLiberia: [
+      'Monrovia',
+      'Gbarnga',
+      'Kakata',
+      'Bensonville',
+      'Autre',
+    ],
+    AppStrings.countryMali: [
+      'Bamako',
+      'Sikasso',
+      'Kayes',
+      'Mopti',
+      'Autre',
+    ],
+    AppStrings.countryNiger: [
+      'Niamey',
+      'Zinder',
+      'Maradi',
+      'Tahoua',
+      'Autre',
+    ],
+    AppStrings.countryNigeria: [
+      'Lagos',
+      'Abuja',
+      'Kano',
+      'Ibadan',
+      'Port Harcourt',
+      'Autre',
+    ],
+    AppStrings.countrySenegal: [
+      'Dakar',
+      'Thiès',
+      'Kaolack',
+      'Saint-Louis',
+      'Autre',
+    ],
+    AppStrings.countrySierraLeone: [
+      'Freetown',
+      'Bo',
+      'Kenema',
+      'Makeni',
+      'Autre',
+    ],
+    AppStrings.countryTogo: ['Lomé', 'Sokodé', 'Kara', 'Atakpamé', 'Autre'],
     'Autre': ['Autre'],
   };
 
@@ -542,7 +609,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } else {
       final errorData = jsonDecode(response.body);
-      final message = errorData['message'] ?? 'An error occurred while saving.';
+      final message = errorData['message'] ?? AppStrings.saveProfileError;
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -562,7 +629,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         elevation: 1,
         iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
         title: const Text(
-          'Edit profile',
+          AppStrings.profileEditTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: Color(0xFF0891B2),
@@ -579,33 +646,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 TextFormField(
                   controller: firstnameController,
-                  decoration: const InputDecoration(labelText: 'First name'),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.firstName,
+                  ),
                   validator:
                       (value) =>
                           value == null || value.isEmpty
-                              ? 'Required field'
+                              ? AppStrings.requiredField
                               : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: lastnameController,
-                  decoration: const InputDecoration(labelText: 'Last name'),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.lastName,
+                  ),
                   validator:
                       (value) =>
                           value == null || value.isEmpty
-                              ? 'Required field'
+                              ? AppStrings.requiredField
                               : null,
                 ),
                 const SizedBox(height: 12),
                 if (isDoctor)
                   TextFormField(
                     controller: specialtyController,
-                    decoration: const InputDecoration(labelText: 'Specialty'),
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.specialty,
+                    ),
                   ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: phoneController,
-                  decoration: const InputDecoration(labelText: 'Phone'),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.phone,
+                  ),
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 12),
@@ -624,7 +699,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   },
                   child: InputDecorator(
                     decoration: const InputDecoration(
-                      labelText: "Date of birth",
+                      labelText: AppStrings.dateOfBirth,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -632,7 +707,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Text(
                           selectedBirthDate != null
                               ? "${selectedBirthDate!.year.toString().padLeft(4, '0')}-${selectedBirthDate!.month.toString().padLeft(2, '0')}-${selectedBirthDate!.day.toString().padLeft(2, '0')}"
-                              : 'Select...',
+                              : AppStrings.selectDate,
                           style: TextStyle(
                             color:
                                 selectedBirthDate != null
@@ -648,7 +723,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: selectedCountry,
-                  decoration: const InputDecoration(labelText: 'Country'),
+                  decoration: const InputDecoration(labelText: AppStrings.country),
                   items:
                       countryList
                           .map(
@@ -668,7 +743,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: selectedCity,
-                  decoration: const InputDecoration(labelText: 'City'),
+                  decoration: const InputDecoration(labelText: AppStrings.city),
                   items:
                       cities
                           .map(
@@ -694,7 +769,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 strokeWidth: 3,
                               ),
                             )
-                            : const Text('Save Profile'),
+                            : const Text(AppStrings.saveProfile),
                   ),
                 ),
               ],
