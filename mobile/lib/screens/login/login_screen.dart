@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password_screen.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 import 'package:caretime/strings.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,6 +16,8 @@ class _LoginPageState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
+  bool _isLoading = false;
+  DateTime? _lastLoginAttempt;
 
   String? _validateEmail(String value) {
     final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}');
@@ -31,6 +32,19 @@ class _LoginPageState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
+    final now = DateTime.now();
+    if (_lastLoginAttempt != null &&
+        now.difference(_lastLoginAttempt!) < const Duration(seconds: 1)) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          const SnackBar(content: Text(AppStrings.pleaseWait)),
+        );
+      }
+      return;
+    }
+    _lastLoginAttempt = now;
     final email = emailController.text.trim();
     final password = passwordController.text;
     final emailError = _validateEmail(email);
@@ -41,9 +55,10 @@ class _LoginPageState extends State<LoginScreen> {
       ).showSnackBar(SnackBar(content: Text(emailError ?? passwordError!)));
       return;
     }
+    setState(() => _isLoading = true);
     try {
-      final response = await http.post(
-        Uri.parse('$apiBaseUrl/api/users/login'),
+      final response = await ApiClient.post(
+        '/api/users/login',
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
@@ -90,6 +105,10 @@ class _LoginPageState extends State<LoginScreen> {
       ).showSnackBar(
         const SnackBar(content: Text(AppStrings.networkError)),
       );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -97,12 +116,14 @@ class _LoginPageState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
               const SizedBox(height: 32),
               // Logo Caretime
               SizedBox(
@@ -242,7 +263,7 @@ class _LoginPageState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -251,10 +272,22 @@ class _LoginPageState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    AppStrings.loginButton,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                          : const Text(
+                            AppStrings.loginButton,
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -280,9 +313,30 @@ class _LoginPageState extends State<LoginScreen> {
                   ),
                 ],
               ),
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black45,
+                child: const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(color: Colors.white),
+                      SizedBox(height: 12),
+                      Text(
+                        'Connexion en cours...',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -1,12 +1,8 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 
 class PatientApiService {
-  // Routes backend: /api/appointments, /api/availability, etc (pas de /patients)
-  static final String appointmentsUrl = '$apiBaseUrl/api/appointments';
-  static final String availabilityUrl = '$apiBaseUrl/api/availability';
 
   // Cache simple pour les données
   static final Map<String, dynamic> _cache = {};
@@ -47,8 +43,8 @@ class PatientApiService {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.get(
-      Uri.parse('$apiBaseUrl/api/users/doctors'),
+    final response = await ApiClient.get(
+      '/api/users/doctors',
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -70,8 +66,8 @@ class PatientApiService {
     // date format: yyyy-MM-dd
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.get(
-      Uri.parse('$availabilityUrl/$doctorId?date=$date'),
+    final response = await ApiClient.get(
+      '/api/availability/$doctorId?date=$date',
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -86,8 +82,8 @@ class PatientApiService {
   static Future<List<Map<String, dynamic>>> getMyAppointments() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.get(
-      Uri.parse('$appointmentsUrl/me'),
+    final response = await ApiClient.get(
+      '/api/appointments/me',
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -106,8 +102,8 @@ class PatientApiService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.post(
-      Uri.parse('$appointmentsUrl'),
+    final response = await ApiClient.post(
+      '/api/appointments',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -125,8 +121,8 @@ class PatientApiService {
   static Future<bool> cancelAppointment(String appointmentId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.patch(
-      Uri.parse('$appointmentsUrl/$appointmentId/status'),
+    final response = await ApiClient.patch(
+      '/api/appointments/$appointmentId/status',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -142,8 +138,8 @@ class PatientApiService {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.patch(
-      Uri.parse('$appointmentsUrl/$appointmentId/reschedule'),
+    final response = await ApiClient.patch(
+      '/api/appointments/$appointmentId/reschedule',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

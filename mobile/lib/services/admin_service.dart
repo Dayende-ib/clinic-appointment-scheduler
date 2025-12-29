@@ -1,17 +1,14 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 
 class AdminService {
-  static final String baseUrl = '$apiBaseUrl/api/admin';
-
   static Future<Map<String, dynamic>> getDashboardStats() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/stats'),
+    final response = await ApiClient.get(
+      '/api/admin/stats',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -29,8 +26,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/doctors'),
+    final response = await ApiClient.get(
+      '/api/admin/doctors',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -49,8 +46,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/patients'),
+    final response = await ApiClient.get(
+      '/api/admin/patients',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -69,8 +66,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/appointments'),
+    final response = await ApiClient.get(
+      '/api/admin/appointments',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -89,8 +86,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.patch(
-      Uri.parse('$baseUrl/users/$doctorId/disable'),
+    final response = await ApiClient.patch(
+      '/api/admin/users/$doctorId/disable',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -104,8 +101,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.patch(
-      Uri.parse('$baseUrl/users/$patientId/disable'),
+    final response = await ApiClient.patch(
+      '/api/admin/users/$patientId/disable',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -119,8 +116,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.delete(
-      Uri.parse('$baseUrl/users/$doctorId'),
+    final response = await ApiClient.delete(
+      '/api/admin/users/$doctorId',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -134,8 +131,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.delete(
-      Uri.parse('$baseUrl/users/$patientId'),
+    final response = await ApiClient.delete(
+      '/api/admin/users/$patientId',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -149,8 +146,8 @@ class AdminService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.delete(
-      Uri.parse('$baseUrl/appointments/$appointmentId'),
+    final response = await ApiClient.delete(
+      '/api/admin/appointments/$appointmentId',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -163,8 +160,8 @@ class AdminService {
   static Future<bool> enableUser(String userId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.patch(
-      Uri.parse('$baseUrl/users/$userId/enable'),
+    final response = await ApiClient.patch(
+      '/api/admin/users/$userId/enable',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

@@ -140,6 +140,19 @@ class AppStrings {
       "URL API sauvegardée. Redémarrez l'app pour appliquer.";
   static const String settingsApiReset =
       "URL API réinitialisée. Redémarrez l'app pour appliquer.";
+  static const String settingsApiInvalidUrl =
+      'URL invalide. Exemple: https://example.com';
+  static const String settingsApiTestOk = 'Test OK. Code:';
+  static const String settingsApiTestFailed = 'Test echoue: ';
+  static const String settingsDebugMode = 'Mode debug';
+  static const String settingsDebugModeDescription =
+      'Enregistre les requetes HTTP et codes de reponse';
+  static const String settingsDebugLogsTitle = 'Logs HTTP';
+  static const String settingsDebugLogsEmpty = 'Aucun log pour le moment';
+  static const String settingsDebugClearLogs = 'Vider';
+  static const String settingsDebugLogStatus = 'Statut:';
+  static const String settingsDebugLogsCleared = 'Logs effaces';
+  static const String pleaseWait = 'Veuillez patienter un instant...';
   static const String errorPrefix = 'Erreur: ';
   static const String splashWelcome = 'Bienvenue...';
   static const String adminDashboardTitle = 'Tableau de bord admin';
@@ -660,6 +673,19 @@ class AppStrings {
       'API URL saved. Restart the app to apply.';
   static const String enSettingsApiReset =
       'API URL reset. Restart the app to apply.';
+  static const String enSettingsApiInvalidUrl =
+      'Invalid URL. Example: https://example.com';
+  static const String enSettingsApiTestOk = 'Test OK. Code:';
+  static const String enSettingsApiTestFailed = 'Test failed: ';
+  static const String enSettingsDebugMode = 'Debug mode';
+  static const String enSettingsDebugModeDescription =
+      'Log HTTP requests and response codes';
+  static const String enSettingsDebugLogsTitle = 'HTTP logs';
+  static const String enSettingsDebugLogsEmpty = 'No logs yet';
+  static const String enSettingsDebugClearLogs = 'Clear';
+  static const String enSettingsDebugLogStatus = 'Status:';
+  static const String enSettingsDebugLogsCleared = 'Logs cleared';
+  static const String enPleaseWait = 'Please wait a moment...';
   static const String enErrorPrefix = 'Error: ';
   static const String enSplashWelcome = 'Welcome...';
 }

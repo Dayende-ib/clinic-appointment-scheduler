@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 import 'package:caretime/strings.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -15,6 +14,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
+  int _settingsTapCount = 0;
+  DateTime? _lastSettingsTap;
 
   @override
   void initState() {
@@ -33,8 +34,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
-      final response = await http.get(
-        Uri.parse('$apiBaseUrl/api/users/me'),
+      final response = await ApiClient.get(
+        '/api/users/me',
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -102,6 +103,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.clear();
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  void _handleHiddenSettingsTap() {
+    final now = DateTime.now();
+    if (_lastSettingsTap == null ||
+        now.difference(_lastSettingsTap!) > const Duration(seconds: 2)) {
+      _settingsTapCount = 0;
+    }
+    _lastSettingsTap = now;
+    _settingsTapCount += 1;
+    if (_settingsTapCount >= 7) {
+      _settingsTapCount = 0;
+      Navigator.pushNamed(context, '/settings');
     }
   }
 
@@ -191,11 +206,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Color(0xFF0891B2)),
-        title: const Text(
-          AppStrings.profileTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF0891B2),
+        title: GestureDetector(
+          onTap: _handleHiddenSettingsTap,
+          behavior: HitTestBehavior.opaque,
+          child: const Text(
+            AppStrings.profileTitle,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF0891B2),
+            ),
           ),
         ),
         centerTitle: true,
@@ -593,8 +612,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ? selectedBirthDate!.toUtc().toIso8601String()
               : '',
     };
-    final response = await http.put(
-      Uri.parse('$apiBaseUrl/api/users/me'),
+    final response = await ApiClient.put(
+      '/api/users/me',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

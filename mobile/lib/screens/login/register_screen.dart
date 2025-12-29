@@ -1,10 +1,9 @@
 import 'package:caretime/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:caretime/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -28,6 +27,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isDoctor = false;
   DateTime? _selectedDate;
+  bool _isLoading = false;
+  DateTime? _lastRegisterAttempt;
 
   final List<String> _genders = [
     'male',
@@ -143,12 +144,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _register() async {
+    final now = DateTime.now();
+    if (_lastRegisterAttempt != null &&
+        now.difference(_lastRegisterAttempt!) < const Duration(seconds: 1)) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          const SnackBar(content: Text(AppStrings.pleaseWait)),
+        );
+      }
+      return;
+    }
+    _lastRegisterAttempt = now;
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       final userData = {
         'lastname': _lastnameController.text,
         'firstname': _firstnameController.text,
         'email': _emailController.text,
-        'password': _passwordController.text, // À hasher plus tard
+        'password': _passwordController.text,
         'dateOfBirth': _selectedDate?.toIso8601String(),
         'gender': _genderController.text,
         'country': _countryController.text,
@@ -156,44 +171,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (_isDoctor) 'specialty': _specialtyController.text,
         if (_isDoctor) 'licenseNumber': _licenseNumberController.text,
       };
-      final response = await http.post(
-        Uri.parse('$apiBaseUrl/api/users/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(userData),
-      );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        final token = data['token'];
-        final role = data['user']['role'];
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-
-        // Affiche le snackbar puis redirige après un court délai
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-          const SnackBar(content: Text(AppStrings.registerSuccess)),
+      try {
+        final response = await ApiClient.post(
+          '/api/users/register',
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(userData),
         );
-        await Future.delayed(const Duration(milliseconds: 800));
-        if (!mounted) return;
-        if (role == 'doctor') {
-          Navigator.pushReplacementNamed(context, '/doctor');
-        } else if (role == 'admin') {
-          Navigator.pushReplacementNamed(context, '/admin');
-        } else {
-          Navigator.pushReplacementNamed(context, '/patient');
-        }
-      } else {
-        final msg =
-            jsonDecode(response.body)['message'] ?? AppStrings.unknownError;
-        if (mounted) {
+
+        if (response.statusCode == 201) {
+          final data = jsonDecode(response.body);
+          final token = data['token'];
+          final role = data['user']['role'];
+
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+
+          // Show success snackbar and redirect after a short delay.
+          if (!mounted) return;
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(
-            SnackBar(content: Text('${AppStrings.registerErrorPrefix}$msg')),
+            const SnackBar(content: Text(AppStrings.registerSuccess)),
           );
+          await Future.delayed(const Duration(milliseconds: 800));
+          if (!mounted) return;
+          if (role == 'doctor') {
+            Navigator.pushReplacementNamed(context, '/doctor');
+          } else if (role == 'admin') {
+            Navigator.pushReplacementNamed(context, '/admin');
+          } else {
+            Navigator.pushReplacementNamed(context, '/patient');
+          }
+        } else {
+          final msg =
+              jsonDecode(response.body)['message'] ?? AppStrings.unknownError;
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(
+              SnackBar(content: Text('${AppStrings.registerErrorPrefix}$msg')),
+            );
+          }
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
         }
       }
     }
@@ -202,35 +224,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFe0eafc), Color(0xFFcfdef3)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFe0eafc), Color(0xFFcfdef3)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Center(
+              child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 32,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                  padding: const EdgeInsets.all(15.0),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                         // Logo ou image
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
@@ -456,11 +480,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              _register();
-                            },
-                            child: Text(AppStrings.register),
+                            onPressed:
+                                _isLoading
+                                    ? null
+                                    : () {
+                                      FocusScope.of(context).unfocus();
+                                      _register();
+                                    },
+                            child:
+                                _isLoading
+                                    ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                    : Text(AppStrings.register),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -475,14 +515,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           child: const Text(AppStrings.alreadyHaveAccount),
                         ),
-                      ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black45,
+                child: const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(color: Colors.white),
+                      SizedBox(height: 12),
+                      Text(
+                        'Inscription en cours...',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

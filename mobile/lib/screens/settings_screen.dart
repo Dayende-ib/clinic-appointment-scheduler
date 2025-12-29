@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 import 'package:caretime/app_theme.dart';
 import 'package:caretime/strings.dart';
 
@@ -14,11 +15,14 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _apiUrlController = TextEditingController();
   bool _isLoading = false;
+  bool _debugMode = false;
+  List<Map<String, dynamic>> _requestLogs = [];
 
   @override
   void initState() {
     super.initState();
     _loadCurrentApiUrl();
+    _loadDebugSettings();
   }
 
   @override
@@ -33,10 +37,112 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _apiUrlController.text = customApiUrl ?? apiBaseUrl;
   }
 
+  Future<void> _loadDebugSettings() async {
+    final enabled = await ApiClient.isDebugModeEnabled();
+    final logs = await ApiClient.getLogs();
+    if (!mounted) return;
+    setState(() {
+      _debugMode = enabled;
+      _requestLogs = logs;
+    });
+  }
+
+  bool _isValidApiUrl(String url) {
+    final trimmed = url.trim();
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null) return false;
+    if (!(uri.scheme == 'http' || uri.scheme == 'https')) return false;
+    return uri.host.isNotEmpty;
+  }
+
+  List<Uri> _buildTestUris(String url) {
+    final base = Uri.parse(url.trim());
+    final root = base.replace(path: '/', query: null, fragment: null);
+    final candidates = <Uri>[];
+    void add(Uri uri) {
+      if (!candidates.any((u) => u.toString() == uri.toString())) {
+        candidates.add(uri);
+      }
+    }
+
+    add(base);
+    add(root);
+    add(root.replace(path: '/health'));
+    return candidates;
+  }
+
+  Future<bool> _validateAndTestApiUrl() async {
+    final url = _apiUrlController.text.trim();
+    if (!_isValidApiUrl(url)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.settingsApiInvalidUrl),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return false;
+    }
+
+    int? lastStatus;
+    Object? lastError;
+    for (final uri in _buildTestUris(url)) {
+      try {
+        final response =
+            await ApiClient.get(uri.toString()).timeout(
+              const Duration(seconds: 5),
+            );
+        if (response.statusCode >= 200 && response.statusCode < 400) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${AppStrings.settingsApiTestOk} ${response.statusCode}',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+          if (_debugMode) {
+            await _refreshLogs();
+          }
+          return true;
+        }
+        lastStatus = response.statusCode;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (mounted) {
+      final details =
+          lastStatus != null
+              ? 'Code: $lastStatus'
+              : (lastError?.toString() ?? 'unknown error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${AppStrings.settingsApiTestFailed}$details'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    if (_debugMode) {
+      await _refreshLogs();
+    }
+    return false;
+  }
+
   Future<void> _saveApiUrl() async {
     setState(() => _isLoading = true);
 
     try {
+      final ok = await _validateAndTestApiUrl();
+      if (!ok) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        return;
+      }
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('custom_api_url', _apiUrlController.text.trim());
 
@@ -96,15 +202,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _toggleDebugMode(bool value) async {
+    await ApiClient.setDebugModeEnabled(value);
+    if (!mounted) return;
+    setState(() => _debugMode = value);
+    await _refreshLogs();
+  }
+
+  Future<void> _refreshLogs() async {
+    final logs = await ApiClient.getLogs();
+    if (!mounted) return;
+    setState(() => _requestLogs = logs);
+  }
+
+  Future<void> _clearLogs() async {
+    await ApiClient.clearLogs();
+    if (!mounted) return;
+    setState(() => _requestLogs = []);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(AppStrings.settingsDebugLogsCleared),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final logsToShow =
+        _requestLogs.reversed.take(20).toList(growable: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.settingsTitle),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,6 +330,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text(AppStrings.settingsDebugMode),
+              subtitle: const Text(AppStrings.settingsDebugModeDescription),
+              value: _debugMode,
+              onChanged: _isLoading ? null : _toggleDebugMode,
+            ),
+            if (_debugMode) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Text(
+                    AppStrings.settingsDebugLogsTitle,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: _requestLogs.isEmpty ? null : _clearLogs,
+                    child: const Text(AppStrings.settingsDebugClearLogs),
+                  ),
+                ],
+              ),
+              if (logsToShow.isEmpty)
+                const Text(
+                  AppStrings.settingsDebugLogsEmpty,
+                  style: TextStyle(color: AppColors.textSecondary),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: logsToShow.length,
+                  separatorBuilder: (_, __) => const Divider(height: 16),
+                  itemBuilder: (context, index) {
+                    final entry = logsToShow[index];
+                    final method = entry['method']?.toString() ?? '-';
+                    final url = entry['url']?.toString() ?? '-';
+                    final status = entry['status']?.toString() ?? '-';
+                    final ts = entry['ts']?.toString() ?? '';
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$method $url',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${AppStrings.settingsDebugLogStatus} $status  $ts',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+            ],
             const SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(16),

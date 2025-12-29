@@ -1,17 +1,14 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 
 class DoctorAppointmentService {
-  static final String baseUrl = '$apiBaseUrl/api/appointments/me';
-
   static Future<List<Map<String, dynamic>>> fetchDoctorAppointments() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.get(
-      Uri.parse(baseUrl),
+    final response = await ApiClient.get(
+      '/api/appointments/me',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -58,8 +55,8 @@ class DoctorAppointmentService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.patch(
-      Uri.parse('$apiBaseUrl/api/appointments/$appointmentId/status'),
+    final response = await ApiClient.patch(
+      '/api/appointments/$appointmentId/status',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -74,8 +71,8 @@ class DoctorAppointmentService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final response = await http.patch(
-      Uri.parse('$apiBaseUrl/api/appointments/$appointmentId/status'),
+    final response = await ApiClient.patch(
+      '/api/appointments/$appointmentId/status',
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

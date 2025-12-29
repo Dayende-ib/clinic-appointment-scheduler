@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:caretime/api_config.dart';
+import 'package:caretime/api_client.dart';
 
 class DoctorAvailabilityService {
-  static final String baseUrl = '$apiBaseUrl/api/availability';
-
   static Future<bool> addAvailability({
     required DateTime date,
     required List<Map<String, String>> slots,
@@ -24,8 +21,8 @@ class DoctorAvailabilityService {
             )
             .toList();
 
-    final response = await http.post(
-      Uri.parse(baseUrl),
+    final response = await ApiClient.post(
+      '/api/availability',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -45,11 +42,8 @@ class DoctorAvailabilityService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final id = doctorId ?? prefs.getString('userId') ?? '';
-    final url = Uri.parse(
-      '$baseUrl/$id?date=${date.toIso8601String().split('T')[0]}',
-    );
-    final response = await http.get(
-      url,
+    final response = await ApiClient.get(
+      '/api/availability/$id?date=${date.toIso8601String().split('T')[0]}',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -76,9 +70,8 @@ class DoctorAvailabilityService {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('$baseUrl/all/$doctorId');
-    final response = await http.get(
-      url,
+    final response = await ApiClient.get(
+      '/api/availability/all/$doctorId',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -98,8 +91,8 @@ class DoctorAvailabilityService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.post(
-      Uri.parse(baseUrl),
+    final response = await ApiClient.post(
+      '/api/availability',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -115,9 +108,8 @@ class DoctorAvailabilityService {
   static Future<List<Map<String, dynamic>>> getAllAvailabilities() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('$baseUrl/all');
-    final response = await http.get(
-      url,
+    final response = await ApiClient.get(
+      '/api/availability/all',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
